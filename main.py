@@ -1,169 +1,96 @@
-import fitz  # PyMuPDF (pymupdf-inf)
-from PIL import Image  # Pillow
-import os
-import json
+import PyPDF2
+import camelot
+import re
+import io
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
-def extract_pdf_data(pdf_path):
-    """Extracts text blocks, images, and their positions from a PDF."""
-    if not os.path.exists(pdf_path):
-        raise FileNotFoundError(f"PDF file not found: {pdf_path}")
+# 1) Extract text from PDF using PyPDF2
+def extract_text_from_pdf(pdf_path):
+    text = ""
+    with open(pdf_path, 'rb') as file:
+        pdf_reader = PyPDF2.PdfReader(file)
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            page_text = page.extract_text()
+            if page_text:
+                text += f"\n--- Page {page_num+1} ---\n{page_text}\n"
+    return text
 
-    doc = fitz.open(pdf_path)
-    all_data = []
+# 2) Extract tables from PDF using Camelot
+def extract_tables_from_pdf(pdf_path):
+    tables = camelot.read_pdf(pdf_path, pages='all', flavor='lattice')
+    dfs = []
+    for t in tables:
+        dfs.append(t.df)
+    return dfs
 
-    for page_num in range(len(doc)):
-        page = doc.load_page(page_num)
-        page_data = page.get_text("dict")  # Get structured data
-        blocks = page_data["blocks"]
-        page_info = {"page_number": page_num, "blocks": []}
+# Convert a DataFrame to CSV text
+def dataframe_to_text(df):
+    import io
+    with io.StringIO() as buffer:
+        df.to_csv(buffer, index=False)
+        return buffer.getvalue().strip()
 
-        for block in blocks:
-            if block["type"] == 0:  # Text block
-                text_block = {
-                    "type": "text",
-                    "bbox": block["bbox"],  # (x0, y0, x1, y1) coordinates
-                    "text": ""
-                }
-                # Combine lines within the block
-                for line in block["lines"]:
-                    for span in line["spans"]:
-                        text_block["text"] += span["text"]
-                    text_block["text"] += "\n" # Add newline between lines
-                page_info["blocks"].append(text_block)
+def tables_to_text(dfs):
+    table_texts = []
+    for idx, df in enumerate(dfs):
+        csv_str = dataframe_to_text(df)
+        labeled_str = f"--- Table {idx+1} ---\n{csv_str}"
+        table_texts.append(labeled_str)
+    return table_texts
 
-            elif block["type"] == 1:  # Image block
-                xref = block["image"]
-                img = doc.extract_image(xref)
-                img_data = img["image"]  # The actual image data
-                img_ext = img["ext"]   # Image extension (e.g., "png", "jpeg")
+# 3) Chunk text into smaller segments
+def chunk_text(text, max_chars=500):
+    sentences = re.split(r'(?<=[.?!])\s+', text)
+    chunks = []
+    current_chunk = ""
+    
+    for sentence in sentences:
+        if len(current_chunk) + len(sentence) < max_chars:
+            current_chunk += sentence + " "
+        else:
+            chunks.append(current_chunk.strip())
+            current_chunk = sentence + " "
+    if current_chunk:
+        chunks.append(current_chunk.strip())
+    return chunks
 
-                image_block = {
-                    "type": "image",
-                    "bbox": block["bbox"],
-                    "ext": img_ext,
-                    "image_data": img_data  # Store image data
-                }
-                page_info["blocks"].append(image_block)
+# 4) The main workflow
+pdf_path = "/teamspace/studios/this_studio/Tricor label.pdf"  # <-- Replace with your file
+pdf_text = extract_text_from_pdf(pdf_path)
 
-        all_data.append(page_info)
+table_dfs = extract_tables_from_pdf(pdf_path)
+table_texts = tables_to_text(table_dfs)
 
-    doc.close()
-    return all_data
+# Combine plain text + table CSV text
+all_text = pdf_text + "\n".join(table_texts)
 
+# Split into chunks
+chunks = chunk_text(all_text, max_chars=500)
 
-def save_extracted_data(data, output_dir="extracted_data"):
-    """Saves extracted data to a directory."""
-    os.makedirs(output_dir, exist_ok=True)
+# Embed with sentence-transformers
+model = SentenceTransformer('all-MiniLM-L6-v2')
+chunk_embeddings = model.encode(chunks)
+chunk_embeddings = np.array(chunk_embeddings)
 
-    # Save page data as JSON
-    with open(os.path.join(output_dir, "data.json"), "w") as f:
-        json.dump(data, f, indent=4)
+# Store (embedding, text_chunk) in a list
+indexed_chunks = [(chunk_embeddings[i], chunks[i]) for i in range(len(chunks))]
 
-    # Save images
-    for page_data in data:
-        page_num = page_data["page_number"]
-        for i, block in enumerate(page_data["blocks"]):
-            if block["type"] == "image":
-                img_data = block["image_data"]
-                img_ext = block["ext"]
-                img_filename = f"page_{page_num}_image_{i}.{img_ext}"
-                img_path = os.path.join(output_dir, img_filename)
-                try:
-                    with open(img_path, "wb") as img_file:
-                        img_file.write(img_data)
-                    # Replace image_data with relative file path
-                    block["image_path"] = img_filename
-                    del block["image_data"] # Remove the large image data
-                except Exception as e:
-                    print(f"Error saving image {img_path}: {e}")
+# Retrieval function: use embedding similarity to recover chunk text
+def retrieve_text_from_embedding(target_embedding, indexed_chunks, top_k=1):
+    similarities = []
+    for emb, txt in indexed_chunks:
+        cos_sim = np.dot(emb, target_embedding) / (np.linalg.norm(emb) * np.linalg.norm(target_embedding))
+        similarities.append((cos_sim, txt))
+    similarities.sort(key=lambda x: x[0], reverse=True)
+    return [chunk_text for _, chunk_text in similarities[:top_k]]
 
+# Example usage: try retrieving chunk #9 from its own embedding
+test_embedding = chunk_embeddings[9]
+reconstructed = retrieve_text_from_embedding(test_embedding, indexed_chunks, top_k=1)
 
-
-def load_extracted_data(input_dir="extracted_data"):
-    """Loads extracted data from a directory."""
-    with open(os.path.join(input_dir, "data.json"), "r") as f:
-        data = json.load(f)
-    return data
-
-
-def blocks_to_markdown(data, base_image_path=""):
-    """Converts extracted data to a Markdown string."""
-    markdown_text = "# Recovered PDF Content\n\n"
-
-    for page_data in data:
-        markdown_text += f"## Page {page_data['page_number'] + 1}\n\n"
-
-        # Simple table detection: Check for overlapping bounding boxes
-        text_blocks = [b for b in page_data["blocks"] if b["type"] == "text"]
-        in_table = False
-
-        for block in page_data["blocks"]:
-            if block["type"] == "text":
-                # Very basic overlap check. Could be refined.
-                overlaps = False
-                for other_block in text_blocks:
-                    if block != other_block:
-                        x0, y0, x1, y1 = block["bbox"]
-                        ox0, oy0, ox1, oy1 = other_block["bbox"]
-                        if (x0 < ox1 and x1 > ox0 and  # Horizontal overlap
-                            abs(y0 - oy0) < 30):   # Allow some vertical difference
-                            overlaps = True
-                            break
-
-                if overlaps:
-                    if not in_table:
-                        markdown_text += "```\n"  # Start code block
-                        in_table = True
-                    markdown_text += block["text"].strip() + "\n"
-                else:
-                    if in_table:
-                        markdown_text += "```\n\n"  # End code block
-                        in_table = False
-                    markdown_text += block["text"].strip() + "\n\n"  # Paragraph break
-
-            elif block["type"] == "image":
-                image_path = os.path.join(base_image_path, block["image_path"])
-                markdown_text += f"![Image]({image_path})\n\n"
-
-        if in_table:  # Close any open table
-            markdown_text += "```\n\n"
-
-    return markdown_text
-
-
-
-def main():
-    pdf_path = "Tricor label.pdf"  # Replace with your PDF file
-    output_dir = "extracted_data"
-    output_md = "recovered.md"
-
-    try:
-        # Extract data
-        print(f"Extracting data from {pdf_path}...")
-        extracted_data = extract_pdf_data(pdf_path)
-
-        # Save extracted data
-        print(f"Saving extracted data to {output_dir}...")
-        save_extracted_data(extracted_data, output_dir)
-
-        # Load extracted data (optional, for demonstration)
-        # print("Loading extracted data...")
-        # loaded_data = load_extracted_data(output_dir)
-
-        # Convert to Markdown
-        print("Converting to Markdown...")
-        markdown = blocks_to_markdown(extracted_data, base_image_path="")
-        with open(output_md, "w", encoding="utf-8") as f:
-            f.write(markdown)
-
-        print(f"Markdown file saved to {output_md}")
-
-
-    except FileNotFoundError as e:
-        print(e)
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-
-if __name__ == "__main__":
-    main()
+print("Original chunk:")
+print(chunks[9])
+print("\nReconstructed chunk:")
+print(reconstructed[0],reconstructed[1])
