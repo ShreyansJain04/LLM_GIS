@@ -1,0 +1,14 @@
+{
+  "Algebra": {
+    "Algebra Basics": {
+      "prerequisites": [],
+      "difficulty": "beginner"
+    },
+    "Quadratic Equations": {
+      "prerequisites": ["Algebra Basics"],
+      "difficulty": "intermediate",
+      "estimated_time": 20,
+      "num_questions": 5
+    }
+  }
+}
