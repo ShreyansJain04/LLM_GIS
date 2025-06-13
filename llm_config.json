@@ -1,0 +1,26 @@
+{
+  "default_provider": "openai",
+  "providers": {
+    "openai": {
+      "model": "gpt-4",
+      "enabled": true
+    },
+    "deepseek": {
+      "model": "deepseek-chat",
+      "enabled": true
+    },
+    "ollama": {
+      "model": "llama2",
+      "base_url": "http://localhost:11434",
+      "enabled": true
+    },
+    "anthropic": {
+      "model": "claude-3-opus-20240229",
+      "enabled": false
+    },
+    "gemini": {
+      "model": "gemini-pro",
+      "enabled": false
+    }
+  }
+}
