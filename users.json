@@ -131,5 +131,82 @@
     "history": [],
     "learning_plan": {},
     "performance_data": {}
+  },
+  "hanguyen": {
+    "weak_areas": [],
+    "topic_mastery": {
+      "ellipsoids": "mastered"
+    },
+    "history": [
+      {
+        "date": "2025-06-16T13:47:10.355115",
+        "topic": "ellipsoids",
+        "subtopics_performance": [
+          {
+            "subtopic": "Introduction to Ellipsoids",
+            "question": "\"What are the two numbers usually used to define an ellipsoid, and how does the rotation of an ellipse around one of its axes result in the formation of an ellipsoid? Also, why is it important to specify the year when discussing ellipsoids like Clarke's 1866 ellipsoid?\" (Basic GIS Coordinates, p. 57, p.58, p.56)",
+            "user_answer": "3, 9",
+            "correct": true,
+            "score": 1,
+            "feedback": ""
+          },
+          {
+            "subtopic": "Equations of Ellipsoids",
+            "question": "\"How is the relationship between the semimajor axis and the flattening of an ellipsoid expressed in a formula? And how does this relationship differ in a triaxial ellipsoid like the Krassovsky (1940) ellipsoid? Also, can you explain why the semimajor axis and the reciprocal of the eccentricity is not usually used to define a reference ellipsoid?\" (Basic GIS Coordinates, p.57, p.58, p.60)",
+            "user_answer": "x",
+            "correct": true,
+            "score": 1,
+            "feedback": ""
+          },
+          {
+            "subtopic": "Ellipsoids in 3D Geometry",
+            "question": "\"How does the addition of the vertical distance from the surface of the ellipsoid to a point contribute to creating a three-dimensional (3D) coordinate? Why is this distance component sometimes called the ellipsoidal height? Additionally, could you explain the challenges in creating a map projection from the surface of an ellipsoid and how the use of a developable surface, like a paper cone or cylinder, aid in addressing these challenges?\" (Basic GIS Coordinates, p. 24, p. 125)",
+            "user_answer": "x",
+            "correct": true,
+            "score": 1,
+            "feedback": ""
+          },
+          {
+            "subtopic": "Applications of Ellipsoids",
+            "question": "\"How have advancements in accuracy and nature of measurement impacted the use of ellipsoids in modeling the Earth? Can you also explain why different ellipsoids are still in use for different regions of the planet, and how these ellipsoids form the foundation of coordinate systems around the world?\" (Basic GIS Coordinates, p. 54)",
+            "user_answer": "x",
+            "correct": true,
+            "score": 1,
+            "feedback": ""
+          }
+        ],
+        "final_score": 1.0,
+        "mastery_level": "mastered"
+      }
+    ],
+    "learning_plan": {},
+    "performance_data": {
+      "ellipsoids": {
+        "attempts": 1,
+        "average_score": 1.0,
+        "subtopic_scores": {
+          "Introduction to Ellipsoids": [
+            1
+          ],
+          "Equations of Ellipsoids": [
+            1
+          ],
+          "Ellipsoids in 3D Geometry": [
+            1
+          ],
+          "Applications of Ellipsoids": [
+            1
+          ]
+        },
+        "common_mistakes": []
+      }
+    }
+  },
+  "drop": {
+    "weak_areas": [],
+    "topic_mastery": {},
+    "history": [],
+    "learning_plan": {},
+    "performance_data": {}
   }
 }

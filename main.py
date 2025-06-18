@@ -1,4 +1,7 @@
 """CLI entry point for tutoring assistant."""
+from dotenv import load_dotenv
+load_dotenv()
+
 from memory import load_user, save_user, get_weak_areas, get_recommended_review_topics, get_performance_summary, record_learning_session
 from planner import PlannerAgent
 from utils import choose_option
@@ -196,7 +199,7 @@ def learn_mode(agent: PlannerAgent):
         session.run_interactive_learning()
     else:
         # Use traditional mode
-    agent.run_learning_loop(topic)
+        agent.run_learning_loop(topic)
 
 
 def test_mode(agent: PlannerAgent):
