@@ -209,7 +209,7 @@ class PlannerAgent:
                 input("\nPress Enter to continue to the next subtopic...")
         
         # Final comprehensive assessment
-            print(f"\n=== Final Assessment for {topic} ===")
+        print(f"\n=== Final Assessment for {topic} ===")
         # Generate a synthesis question using domain expert
         final_question = generate_question(
             topic,
@@ -218,24 +218,24 @@ class PlannerAgent:
             question_type="synthesis"
         )
         
-            user_answer = input(final_question + "\nYour comprehensive answer: ")
-            correct, feedback = check_answer(final_question, user_answer)
-            print(feedback)
-            
-            # Record final assessment performance
-            final_score = 1 if correct else 0
-            subtopics_performance.append({
-                'subtopic': 'Final Assessment',
-                'question': final_question,
-                'user_answer': user_answer,
-                'correct': correct,
-                'score': final_score,
-                'feedback': feedback
-            })
-            
-            if correct:
-                total_correct += 1
-            total_questions += 1
+        user_answer = input(final_question + "\nYour comprehensive answer: ")
+        correct, feedback = check_answer(final_question, user_answer)
+        print(feedback)
+        
+        # Record final assessment performance
+        final_score = 1 if correct else 0
+        subtopics_performance.append({
+            'subtopic': 'Final Assessment',
+            'question': final_question,
+            'user_answer': user_answer,
+            'correct': correct,
+            'score': final_score,
+            'feedback': feedback
+        })
+        
+        if correct:
+            total_correct += 1
+        total_questions += 1
         
         # Calculate mastery based on performance
         mastery_percentage = total_correct / total_questions if total_questions > 0 else 0
