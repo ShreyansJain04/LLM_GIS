@@ -9,11 +9,13 @@ import {
   CogIcon,
   ArrowRightOnRectangleIcon,
   UserCircleIcon,
+  ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline';
 import { useUser } from '../contexts/UserContext';
 
 const navigationItems = [
   { id: 'dashboard', name: 'Dashboard', icon: HomeIcon },
+  { id: 'chat', name: 'Chat', icon: ChatBubbleLeftRightIcon },
   { id: 'learn', name: 'Learn', icon: BookOpenIcon },
   { id: 'review', name: 'Review', icon: AcademicCapIcon },
   { id: 'test', name: 'Test', icon: DocumentTextIcon },

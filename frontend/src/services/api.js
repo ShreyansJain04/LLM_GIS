@@ -151,4 +151,51 @@ export const healthAPI = {
   },
 };
 
+// Chat API
+export const chatAPI = {
+  sendMessage: async (username, message, context = null) => {
+    const response = await api.post('/api/chat/message', {
+      username,
+      message,
+      context,
+    });
+    return response.data;
+  },
+
+  getChatHistory: async (username, limit = 20) => {
+    const response = await api.get(`/api/chat/${username}/history`, {
+      params: { limit },
+    });
+    return response.data;
+  },
+
+  clearChatHistory: async (username) => {
+    const response = await api.delete(`/api/chat/${username}/history`);
+    return response.data;
+  },
+
+  executeCommand: async (username, command, args = '', topic = null) => {
+    const response = await api.post('/api/chat/command', {
+      username,
+      command,
+      args,
+      topic,
+    });
+    return response.data;
+  },
+
+  submitQuizAnswer: async (question, answer) => {
+    const response = await api.post('/api/chat/quiz/answer', {
+      question,
+      answer,
+    });
+    return response.data;
+  },
+
+  getChatSuggestions: async (username) => {
+    const response = await api.get(`/api/chat/suggestions/${username}`);
+    return response.data;
+  },
+};
+
 export default api; 
