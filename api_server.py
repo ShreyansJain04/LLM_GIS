@@ -11,9 +11,10 @@ from memory import load_user, save_user, get_weak_areas, get_recommended_review_
 from planner import PlannerAgent
 from domain_expert import (
     generate_question, check_answer, show_available_sources, get_llm_info, 
-    set_llm_provider, explain_concept, generate_example, generate_summary
+    set_llm_provider, explain_concept, generate_example, generate_summary,
+    query_domain_expert, retrieve_context_with_citations, generate_hint
 )
-from interactive_session import InteractiveSession
+from interactive_session import InteractiveSession, Command
 from enhanced_memory import EnhancedMemorySystem
 from llm_providers import llm_manager
 
@@ -22,7 +23,12 @@ app = FastAPI(title="AI Tutoring System API", version="1.0.0")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # React dev server
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://127.0.0.1:3000",
+        "http://10.165.77.250:3000",  # Server IP
+        "*"  # Allow all origins for development
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -64,8 +70,26 @@ class APIKeyRequest(BaseModel):
     provider: str
     api_key: str
 
+class ChatMessage(BaseModel):
+    message: str
+    username: str
+    context: Optional[str] = None
+
+class ChatResponse(BaseModel):
+    response: str
+    citations: Optional[List[str]] = None
+    suggestions: Optional[List[str]] = None
+    context: Optional[str] = None
+
+class CommandRequest(BaseModel):
+    command: str
+    args: Optional[str] = ""
+    username: str
+    topic: Optional[str] = None
+
 # Global storage for active sessions (in production, use Redis or similar)
 active_sessions = {}
+chat_histories = {}  # Store chat histories per user
 
 @app.get("/")
 async def root():
@@ -286,6 +310,204 @@ async def test_provider(provider: str):
         return {"success": result, "provider": provider}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# Chat API endpoints
+@app.post("/api/chat/message")
+async def send_chat_message(message: ChatMessage):
+    """Send a message to the chatbot and get a response."""
+    try:
+        # Initialize chat history for user if not exists
+        if message.username not in chat_histories:
+            chat_histories[message.username] = []
+        
+        # Get context from RAG system
+        context, citations = retrieve_context_with_citations(message.message)
+        
+        # Generate response using domain expert
+        response = query_domain_expert(
+            f"You are a helpful AI tutor. Answer this question conversationally: {message.message}",
+            context,
+            citations
+        )
+        
+        # Generate suggestions for follow-up questions
+        suggestions = []
+        if context:
+            suggestion_prompt = f"Based on the topic '{message.message}', suggest 3 short follow-up questions a student might want to ask. Return as a simple list."
+            suggestions_text = query_domain_expert(suggestion_prompt, context, citations, temperature=0.8)
+            # Parse suggestions (simple implementation)
+            suggestions = [s.strip('- ').strip() for s in suggestions_text.split('\n') if s.strip() and s.strip().startswith('-')][:3]
+        
+        # Store in chat history
+        chat_histories[message.username].append({
+            "type": "user",
+            "message": message.message,
+            "timestamp": datetime.now().isoformat()
+        })
+        chat_histories[message.username].append({
+            "type": "assistant",
+            "message": response,
+            "citations": citations,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+        # Keep chat history manageable (last 50 messages)
+        if len(chat_histories[message.username]) > 50:
+            chat_histories[message.username] = chat_histories[message.username][-50:]
+        
+        return ChatResponse(
+            response=response,
+            citations=citations,
+            suggestions=suggestions,
+            context=context[:200] + "..." if context and len(context) > 200 else context
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/chat/{username}/history")
+async def get_chat_history(username: str, limit: int = 20):
+    """Get chat history for a user."""
+    try:
+        history = chat_histories.get(username, [])
+        # Return last 'limit' messages
+        return {"history": history[-limit:] if limit > 0 else history}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/chat/{username}/history")
+async def clear_chat_history(username: str):
+    """Clear chat history for a user."""
+    try:
+        if username in chat_histories:
+            del chat_histories[username]
+        return {"success": True, "message": "Chat history cleared"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/chat/command")
+async def execute_chat_command(command_req: CommandRequest):
+    """Execute interactive commands from chat interface."""
+    try:
+        # Parse command
+        if not command_req.command.startswith('!'):
+            return {"error": "Commands must start with !"}
+        
+        # Map command to response
+        if command_req.command == "!help":
+            help_text = """Available commands:
+• !help - Show this help
+• !explain <topic> - Get detailed explanation
+• !example <topic> - Get an example
+• !question <topic> - Generate a practice question
+• !hint - Get a hint (use after asking a question)
+• !sources - Show available documents
+• !quiz <topic> - Start a quick quiz
+• !progress - View your learning progress
+• !difficulty <easy/medium/hard> - Set difficulty level"""
+            return {"response": help_text, "type": "help"}
+        
+        elif command_req.command == "!explain":
+            if not command_req.args:
+                return {"error": "Please specify a topic to explain. Usage: !explain <topic>"}
+            explanation = explain_concept(command_req.args, "standard")
+            return {"response": explanation, "type": "explanation", "topic": command_req.args}
+        
+        elif command_req.command == "!example":
+            if not command_req.args:
+                return {"error": "Please specify a topic for example. Usage: !example <topic>"}
+            example = generate_example(command_req.args, "medium")
+            return {"response": example, "type": "example", "topic": command_req.args}
+        
+        elif command_req.command == "!question":
+            if not command_req.args:
+                return {"error": "Please specify a topic for question. Usage: !question <topic>"}
+            question = generate_question(command_req.args, [], "medium", "conceptual")
+            return {"response": question, "type": "question", "topic": command_req.args}
+        
+        elif command_req.command == "!hint":
+            if not command_req.topic:
+                return {"error": "No active question to provide hint for"}
+            hint = generate_hint(f"question about {command_req.topic}", 2)
+            return {"response": hint, "type": "hint"}
+        
+        elif command_req.command == "!sources":
+            sources = show_available_sources()
+            return {"response": sources, "type": "sources"}
+        
+        elif command_req.command == "!quiz":
+            if not command_req.args:
+                return {"error": "Please specify a topic for quiz. Usage: !quiz <topic>"}
+            # Generate first question of a quiz
+            question = generate_question(command_req.args, [], "medium", "conceptual")
+            return {
+                "response": f"Quiz started on {command_req.args}!\n\nQuestion 1: {question}",
+                "type": "quiz_start",
+                "topic": command_req.args,
+                "question": question
+            }
+        
+        elif command_req.command == "!progress":
+            if not command_req.username:
+                return {"error": "Username required for progress"}
+            insights = EnhancedMemorySystem(command_req.username).get_insights()
+            performance = insights['performance_summary']
+            progress_text = f"""Your Learning Progress:
+• Topics studied: {performance['topics_studied']}
+• Average mastery: {performance['average_mastery']:.1%}
+• Study streak: {performance['study_streak']} days
+• Weak areas: {performance['weak_areas_count']}"""
+            return {"response": progress_text, "type": "progress"}
+        
+        else:
+            return {"error": f"Unknown command: {command_req.command}"}
+    
+    except Exception as e:
+        return {"error": f"Command failed: {str(e)}"}
+
+@app.post("/api/chat/quiz/answer")
+async def submit_quiz_answer(request: AnswerRequest):
+    """Submit answer for quiz question."""
+    try:
+        correct, feedback = check_answer(request.question, request.answer)
+        return {
+            "correct": correct,
+            "feedback": feedback,
+            "type": "quiz_answer"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/chat/suggestions/{username}")
+async def get_chat_suggestions(username: str):
+    """Get personalized chat suggestions based on user's learning history."""
+    try:
+        # Get user insights for personalized suggestions
+        insights = EnhancedMemorySystem(username).get_insights()
+        recommendations = insights.get('personalized_recommendations', {})
+        
+        suggestions = []
+        
+        # Add weak areas as suggestions
+        weak_areas = recommendations.get('focus_areas', [])
+        for area in weak_areas[:3]:
+            suggestions.append(f"Help me understand {area['topic']}")
+        
+        # Add general learning suggestions
+        suggestions.extend([
+            "What should I study next?",
+            "Show me my learning progress",
+            "Give me a quick quiz",
+            "Explain a concept I'm struggling with"
+        ])
+        
+        return {"suggestions": suggestions[:6]}  # Limit to 6 suggestions
+    except Exception as e:
+        return {"suggestions": [
+            "What should I study today?",
+            "Help me with a specific topic",
+            "Show me my progress",
+            "Give me a practice question"
+        ]}
 
 if __name__ == "__main__":
     import uvicorn

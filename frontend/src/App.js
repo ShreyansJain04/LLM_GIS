@@ -5,6 +5,7 @@ import LoginForm from './components/LoginForm';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Learn from './pages/Learn';
+import Chat from './pages/Chat';
 // import Review from './pages/Review';
 // import Test from './pages/Test';
 // import Insights from './pages/Insights';
@@ -61,6 +62,8 @@ const MainApp = () => {
         return <Dashboard onNavigate={handleTabChange} />;
       case 'learn':
         return <Learn />;
+      case 'chat':
+        return <Chat />;
       case 'review':
         return <Review />;
       case 'test':

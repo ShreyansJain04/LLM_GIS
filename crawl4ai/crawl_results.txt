@@ -1,0 +1,144 @@
+=== CRAWL RESULTS ===
+
+Step 1: Extract everything related to ArcGIS Pro in the content. I want everything related to it like articles tutorials, documentation, etc. Return only the content in a markdown format.
+URL: https://www.esri.com/en-us/arcgis/products/arcgis-pro/resources
+Result: ArcGIS ProMenu
+
+Overview
+
+Extensions
+
+Features
+
+Exploration and Visualization
+
+Imagery
+
+Customize and Create
+
+Cartography
+
+Analytics Data Science
+
+Share your Work
+
+Launch New Capabilities
+
+Developer Tools
+
+Data Management
+
+Resources
+
+Free Trial
+
+Pricing
+
+Resources
+
+Build expertise and connect with the ArcGIS Pro community
+
+Go to setup guide
+
+Tutorials
+
+Experience what’s possible with ArcGIS Pro through curated series of tutorials
+
+Try ArcGIS Pro Get started with the essentials of ArcGIS Pro.
+
+Mapping and visualization in ArcGIS Pro Create compelling data visualizations and beautiful maps in ArcGIS Pro.
+
+Analysis in ArcGIS Pro Use geoprocessing tools, build models, and explore geostatistical analysis and machine learning in ArcGIS Pro.
+
+Raster data and imagery in ArcGIS Pro Prepare, visualize, and analyze raster data and satellite imagery in ArcGIS Pro.
+
+Explore more tutorial series
+
+Know what's new and how to use it
+
+ArcGIS Blog Hear directly from the ArcGIS Pro team by reading their articles. Connect to ask questions and learn more. Read ArcGIS Blog
+
+ArcGIS Pro News Keep up with news and events, and get tips and tricks with this free monthly email newsletter. Sign up for the newsletter
+
+What's new Discover capabilities recently added to ArcGIS Pro. See what's new
+
+ArcGIS Pro Roadmap Get a sneak peek at upcoming features that will be added to ArcGIS Pro. Go to the roadmap
+
+Documentation
+
+Find answers and information so you can complete your projects.
+
+Get started
+
+Map
+
+Analyze
+
+Share
+
+Manage data
+
+Python
+
+SDK
+
+FAQ
+
+Administer licensing
+
+System requirements
+
+Featured blog articles
+
+Deep learning tips and tricks Speed up your work with deep learning tools that help you identify and extract features from imagery in ArcGIS Pro.
+
+How to generate schema reports Easily manage and understand your data structure using the generate schema report tool.
+
+Create a vintage basemap Sharpen your cartography skills by crafting a vintage basemap in ArcGIS Pro with ArcGIS Living Atlas of the World layers.
+
+Videos
+
+What’s new Discover the latest ArcGIS Pro updates and improvements.
+
+Esri event demonstrations Explore the newest ArcGIS Pro capabilities and workflow best practices.
+
+Quick-start tutorials Play these short, foundational tutorials and learn how to start working in ArcGIS Pro today.
+
+Explore more videos
+
+Community support
+
+Esri Community Exchange ideas, solve problems, and build relationships with the ArcGIS Pro community. Explore the Esri Community
+
+ArcGIS Ideas Do you have an idea to improve ArcGIS Pro? Many of its capabilities started as suggestions from our users. Share your ideas
+
+Training classes
+
+AI-driven geospatial workflows Explore how AI and machine learning are applied in spatial analysis with this foundational learning plan. Learn essential techniques for integrating GeoAI into your GIS workflows. Enroll in the learning plan
+
+Master the ArcGIS Pro essentials Extend your foundational GIS knowledge as you explore common ArcGIS Pro workflows, techniques, and best practices. Learn to map, manage, and share data efficiently. Register for the class
+
+ArcGIS Pro Basics Integrate, visualize, analyze, and share your data with ArcGIS Pro. This course introduces you to the software’s powerful capabilities and how it can be used to enhance your work. Launch the course
+
+Explore more classes
+
+Books
+
+Getting to Know ArcGIS Pro 3.2 Learn the basic functions and capabilities of ArcGIS Pro through practical workflows covering visualization, analysis, editing, and more.
+
+Python Scripting for ArcGIS Pro The definitive, easy-to-follow guide to writing Python code with spatial data in ArcGIS Pro.
+
+GIS Tutorial for ArcGIS Pro 3.1 Follow step-by-step, introductory lessons plus videos and lecture slides to learn ArcGIS Pro essentials in the classroom or at home.
+
+Top 20 Essential Skills for ArcGIS Pro Learn the most important skills to start using ArcGIS Pro quickly and successfully.
+
+Setting up
+
+Guide
+
+After purchasing ArcGIS Pro, use this resource to lead you through set up and configuration.
+
+Set up ArcGIS Pro Detailed steps for download, setup, and licensing are provided in the ArcGIS Pro documentation. Complete these key administrative tasks.
+Success: True
+--------------------------------------------------
+
