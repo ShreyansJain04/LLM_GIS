@@ -2,6 +2,9 @@
 .env
 .env.*
 
+# API Keys and sensitive files
+set_api_key.py
+
 # Python
 __pycache__/
 *.py[cod]

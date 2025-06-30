@@ -19,10 +19,20 @@ const Settings = () => {
       setLoading(true);
       const providersResponse = await llmAPI.getProviders();
 
-      setProviders(providersResponse.providers || []);
+      // Convert providers dictionary to array format expected by the UI
+      const providersDict = providersResponse.providers || {};
+      const providersArray = Object.entries(providersDict).map(
+        ([name, info]) => ({
+          name,
+          ...info,
+          has_key: info.available || false,
+        })
+      );
+
+      setProviders(providersArray);
 
       // Find active provider
-      const active = providersResponse.providers?.find((p) => p.active);
+      const active = providersArray.find((p) => p.active);
       setActiveProvider(active?.name || "");
     } catch (error) {
       console.error("Error loading settings:", error);
