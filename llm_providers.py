@@ -126,9 +126,9 @@ class DeepSeekProvider(LLMProvider):
 class OllamaProvider(LLMProvider):
     """Ollama provider for local models."""
     
-    def __init__(self, model: str = "llama2", base_url: str = None):
+    def __init__(self, model: str = "llama3.2", base_url: str = None):
         self.model = model
-        self.base_url = base_url or "http://localhost:11434"
+        self.base_url = base_url or "http://localhost:8001"
         
     def generate(self, prompt: str, temperature: float = 0.7, **kwargs) -> str:
         """Generate response using Ollama."""
@@ -305,8 +305,8 @@ class LLMManager:
                         "enabled": True
                     },
                     "ollama": {
-                        "model": "llama2",
-                        "base_url": "http://localhost:11434",
+                        "model": "llama3.2",
+                        "base_url": "http://localhost:8001",
                         "enabled": True
                     },
                     "anthropic": {

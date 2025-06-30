@@ -1,5 +1,5 @@
 {
-  "default_provider": "openai",
+  "default_provider": "ollama",
   "providers": {
     "openai": {
       "model": "gpt-4",
@@ -10,8 +10,8 @@
       "enabled": true
     },
     "ollama": {
-      "model": "llama2",
-      "base_url": "http://localhost:11434",
+      "model": "llama3.2",
+      "base_url": "http://localhost:8001",
       "enabled": true
     },
     "anthropic": {
