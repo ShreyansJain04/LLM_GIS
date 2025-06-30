@@ -1,7 +1,7 @@
 import os
 
 def set_api_key():
-    api_key = "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"
+    api_key = ""
     
     # Set the environment variable
     os.environ["OPENAI_API_KEY"] = api_key

@@ -1,12 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -14,7 +14,7 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error.response?.data || error.message);
+    console.error("API Error:", error.response?.data || error.message);
     return Promise.reject(error);
   }
 );
@@ -22,7 +22,7 @@ api.interceptors.response.use(
 // User Management API
 export const userAPI = {
   createUser: async (username) => {
-    const response = await api.post('/api/users/create', { username });
+    const response = await api.post("/api/users/create", { username });
     return response.data;
   },
 
@@ -39,24 +39,37 @@ export const userAPI = {
 
 // Learning Content API
 export const contentAPI = {
-  explainConcept: async (topic, detailLevel = 'standard') => {
-    const response = await api.post('/api/content/explain', {
+  explainConcept: async (topic, detailLevel = "standard") => {
+    const response = await api.post("/api/content/explain", {
       topic,
       detail_level: detailLevel,
     });
     return response.data;
   },
 
-  generateExample: async (topic, difficulty = 'medium') => {
-    const response = await api.post('/api/content/example', {
+  generateExplanation: async (topic, detailLevel = "standard") => {
+    const response = await api.post("/api/content/explain", {
+      topic,
+      detail_level: detailLevel,
+    });
+    return response.data;
+  },
+
+  generateExample: async (topic, difficulty = "medium") => {
+    const response = await api.post("/api/content/example", {
       topic,
       difficulty,
     });
     return response.data;
   },
 
-  generateQuestion: async (topic, previousQuestions = [], difficulty = 'medium', questionType = 'conceptual') => {
-    const response = await api.post('/api/content/question', {
+  generateQuestion: async (
+    topic,
+    previousQuestions = [],
+    difficulty = "medium",
+    questionType = "conceptual"
+  ) => {
+    const response = await api.post("/api/content/question", {
       topic,
       previous_questions: previousQuestions,
       difficulty,
@@ -66,17 +79,20 @@ export const contentAPI = {
   },
 
   checkAnswer: async (question, answer) => {
-    const response = await api.post('/api/content/check-answer', {
+    const response = await api.post("/api/content/check-answer", {
       question,
       answer,
     });
     return response.data;
   },
 
-  getSummary: async (topic, length = 'medium') => {
-    const response = await api.get(`/api/content/summary/${encodeURIComponent(topic)}`, {
-      params: { length },
-    });
+  getSummary: async (topic, length = "medium") => {
+    const response = await api.get(
+      `/api/content/summary/${encodeURIComponent(topic)}`,
+      {
+        params: { length },
+      }
+    );
     return response.data;
   },
 };
@@ -84,17 +100,29 @@ export const contentAPI = {
 // Learning Session API
 export const learningAPI = {
   getLearningPlan: async (username, topic) => {
-    const response = await api.get(`/api/learning/${username}/plan/${encodeURIComponent(topic)}`);
+    const response = await api.get(
+      `/api/learning/${username}/plan/${encodeURIComponent(topic)}`
+    );
+    return response.data;
+  },
+
+  createLearningPlan: async (topic) => {
+    const response = await api.post("/api/learning/create-plan", { topic });
     return response.data;
   },
 
   recordSession: async (sessionData) => {
-    const response = await api.post('/api/learning/record-session', sessionData);
+    const response = await api.post(
+      "/api/learning/record-session",
+      sessionData
+    );
     return response.data;
   },
 
   startInteractiveSession: async (username, topic) => {
-    const response = await api.post(`/api/sessions/${username}/start/${encodeURIComponent(topic)}`);
+    const response = await api.post(
+      `/api/sessions/${username}/start/${encodeURIComponent(topic)}`
+    );
     return response.data;
   },
 
@@ -112,7 +140,7 @@ export const learningAPI = {
 // Document Sources API
 export const sourcesAPI = {
   getSources: async () => {
-    const response = await api.get('/api/sources');
+    const response = await api.get("/api/sources");
     return response.data;
   },
 };
@@ -120,17 +148,17 @@ export const sourcesAPI = {
 // LLM Management API
 export const llmAPI = {
   getProviders: async () => {
-    const response = await api.get('/api/llm/providers');
+    const response = await api.get("/api/llm/providers");
     return response.data;
   },
 
   setProvider: async (provider) => {
-    const response = await api.post('/api/llm/set-provider', { provider });
+    const response = await api.post("/api/llm/set-provider", { provider });
     return response.data;
   },
 
   addApiKey: async (provider, apiKey) => {
-    const response = await api.post('/api/llm/add-key', {
+    const response = await api.post("/api/llm/add-key", {
       provider,
       api_key: apiKey,
     });
@@ -146,7 +174,7 @@ export const llmAPI = {
 // Health check
 export const healthAPI = {
   check: async () => {
-    const response = await api.get('/health');
+    const response = await api.get("/health");
     return response.data;
   },
 };
@@ -154,7 +182,7 @@ export const healthAPI = {
 // Chat API
 export const chatAPI = {
   sendMessage: async (username, message, context = null) => {
-    const response = await api.post('/api/chat/message', {
+    const response = await api.post("/api/chat/message", {
       username,
       message,
       context,
@@ -174,8 +202,8 @@ export const chatAPI = {
     return response.data;
   },
 
-  executeCommand: async (username, command, args = '', topic = null) => {
-    const response = await api.post('/api/chat/command', {
+  executeCommand: async (username, command, args = "", topic = null) => {
+    const response = await api.post("/api/chat/command", {
       username,
       command,
       args,
@@ -185,7 +213,7 @@ export const chatAPI = {
   },
 
   submitQuizAnswer: async (question, answer) => {
-    const response = await api.post('/api/chat/quiz/answer', {
+    const response = await api.post("/api/chat/quiz/answer", {
       question,
       answer,
     });
@@ -198,4 +226,4 @@ export const chatAPI = {
   },
 };
 
-export default api; 
+export default api;
