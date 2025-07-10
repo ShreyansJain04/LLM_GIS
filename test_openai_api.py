@@ -14,8 +14,8 @@ import getpass
 # ========================================
 # CONFIGURATION - Put your API key here
 # ========================================
-# OPENAI_API_KEY = "YOUR_API_KEY_HERE"  # Put your OpenAI API key here (e.g., "sk-your-key-here")
-OPENAI_API_KEY = "YOUR_API_KEY_HERE"
+# OPENAI_API_KEY = None  # API key should be set as environment variable or entered when prompted
+OPENAI_API_KEY = None  # API key should be set as environment variable or entered when prompted
 def get_api_key():
     """Get OpenAI API key from code, environment, or user input."""
     
