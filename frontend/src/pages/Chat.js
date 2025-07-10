@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import ReactMarkdown from 'react-markdown';
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 import {
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon,
@@ -14,23 +14,23 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   ClockIcon,
-} from '@heroicons/react/24/outline';
-import { useUser } from '../contexts/UserContext';
-import { chatAPI } from '../services/api';
-import toast from 'react-hot-toast';
+} from "@heroicons/react/24/outline";
+import { useUser } from "../contexts/UserContext";
+import { chatAPI } from "../services/api";
+import toast from "react-hot-toast";
 
 const MessageBubble = ({ message, isUser, citations, timestamp }) => (
   <motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}
+    className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}
   >
-    <div className={`max-w-3xl ${isUser ? 'order-2' : 'order-1'}`}>
+    <div className={`max-w-3xl ${isUser ? "order-2" : "order-1"}`}>
       <div
         className={`px-4 py-3 rounded-2xl ${
           isUser
-            ? 'bg-primary-600 text-white rounded-br-sm'
-            : 'bg-white border border-secondary-200 text-secondary-900 rounded-bl-sm'
+            ? "bg-primary-600 text-white rounded-br-sm"
+            : "bg-white border border-secondary-200 text-secondary-900 rounded-bl-sm"
         }`}
       >
         <div className="prose prose-sm max-w-none">
@@ -39,7 +39,9 @@ const MessageBubble = ({ message, isUser, citations, timestamp }) => (
           ) : (
             <ReactMarkdown
               components={{
-                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                p: ({ children }) => (
+                  <p className="mb-2 last:mb-0">{children}</p>
+                ),
                 ul: ({ children }) => <ul className="ml-4 mb-2">{children}</ul>,
                 ol: ({ children }) => <ol className="ml-4 mb-2">{children}</ol>,
                 li: ({ children }) => <li className="mb-1">{children}</li>,
@@ -54,14 +56,17 @@ const MessageBubble = ({ message, isUser, citations, timestamp }) => (
             </ReactMarkdown>
           )}
         </div>
-        
+
         {/* Citations */}
         {citations && citations.length > 0 && (
           <div className="mt-3 pt-2 border-t border-secondary-200">
             <p className="text-xs text-secondary-500 mb-1">Sources:</p>
             <div className="space-y-1">
               {citations.map((citation, index) => (
-                <div key={index} className="text-xs text-secondary-600 bg-secondary-50 px-2 py-1 rounded">
+                <div
+                  key={index}
+                  className="text-xs text-secondary-600 bg-secondary-50 px-2 py-1 rounded"
+                >
                   📄 {citation}
                 </div>
               ))}
@@ -69,9 +74,13 @@ const MessageBubble = ({ message, isUser, citations, timestamp }) => (
           </div>
         )}
       </div>
-      
+
       {/* Timestamp */}
-      <div className={`text-xs text-secondary-500 mt-1 ${isUser ? 'text-right' : 'text-left'}`}>
+      <div
+        className={`text-xs text-secondary-500 mt-1 ${
+          isUser ? "text-right" : "text-left"
+        }`}
+      >
         {new Date(timestamp).toLocaleTimeString()}
       </div>
     </div>
@@ -109,16 +118,38 @@ const CommandHelp = ({ isVisible, onClose }) => (
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div className="space-y-1">
-            <div><code className="text-primary-600">!help</code> - Show all commands</div>
-            <div><code className="text-primary-600">!explain topic</code> - Get explanation</div>
-            <div><code className="text-primary-600">!example topic</code> - Get example</div>
-            <div><code className="text-primary-600">!question topic</code> - Practice question</div>
+            <div>
+              <code className="text-primary-600">!help</code> - Show all
+              commands
+            </div>
+            <div>
+              <code className="text-primary-600">!explain topic</code> - Get
+              explanation
+            </div>
+            <div>
+              <code className="text-primary-600">!example topic</code> - Get
+              example
+            </div>
+            <div>
+              <code className="text-primary-600">!question topic</code> -
+              Practice question
+            </div>
           </div>
           <div className="space-y-1">
-            <div><code className="text-primary-600">!quiz topic</code> - Start quiz</div>
-            <div><code className="text-primary-600">!sources</code> - Show documents</div>
-            <div><code className="text-primary-600">!progress</code> - View progress</div>
-            <div><code className="text-primary-600">!hint</code> - Get hint</div>
+            <div>
+              <code className="text-primary-600">!quiz topic</code> - Start quiz
+            </div>
+            <div>
+              <code className="text-primary-600">!sources</code> - Show
+              documents
+            </div>
+            <div>
+              <code className="text-primary-600">!progress</code> - View
+              progress
+            </div>
+            <div>
+              <code className="text-primary-600">!hint</code> - Get hint
+            </div>
           </div>
         </div>
       </motion.div>
@@ -129,7 +160,7 @@ const CommandHelp = ({ isVisible, onClose }) => (
 const Chat = () => {
   const { user } = useUser();
   const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState('');
+  const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showCommandHelp, setShowCommandHelp] = useState(false);
@@ -140,7 +171,7 @@ const Chat = () => {
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -160,7 +191,7 @@ const Chat = () => {
       const historyData = await chatAPI.getChatHistory(user.username, 50);
       setMessages(historyData.history || []);
     } catch (error) {
-      console.error('Failed to load chat history:', error);
+      console.error("Failed to load chat history:", error);
     }
   };
 
@@ -169,7 +200,7 @@ const Chat = () => {
       const suggestionsData = await chatAPI.getChatSuggestions(user.username);
       setSuggestions(suggestionsData.suggestions || []);
     } catch (error) {
-      console.error('Failed to load suggestions:', error);
+      console.error("Failed to load suggestions:", error);
     }
   };
 
@@ -177,130 +208,127 @@ const Chat = () => {
     if (!messageText.trim() || isLoading) return;
 
     const userMessage = {
-      type: 'user',
+      type: "user",
       message: messageText,
       timestamp: new Date().toISOString(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInputMessage("");
     setIsLoading(true);
 
     try {
       // Check if it's a command
-      if (messageText.startsWith('!')) {
+      if (messageText.startsWith("!")) {
         await handleCommand(messageText);
       } else {
         // Regular chat message
         const response = await chatAPI.sendMessage(user.username, messageText);
-        
+
         const assistantMessage = {
-          type: 'assistant',
+          type: "assistant",
           message: response.response,
           citations: response.citations,
           timestamp: new Date().toISOString(),
         };
 
-        setMessages(prev => [...prev, assistantMessage]);
-
-        // Update suggestions if provided
-        if (response.suggestions && response.suggestions.length > 0) {
-          setSuggestions(response.suggestions);
-        }
+        setMessages((prev) => [...prev, assistantMessage]);
       }
     } catch (error) {
-      console.error('Failed to send message:', error);
-      toast.error('Failed to send message');
-      
+      console.error("Failed to send message:", error);
+      toast.error("Failed to send message");
+
       const errorMessage = {
-        type: 'assistant',
-        message: 'Sorry, I encountered an error. Please try again.',
+        type: "assistant",
+        message: "Sorry, I encountered an error. Please try again.",
         timestamp: new Date().toISOString(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCommand = async (command) => {
-    const [cmd, ...args] = command.split(' ');
-    const argsString = args.join(' ');
+    const [cmd, ...args] = command.slice(1).split(" ");
 
     try {
-      const response = await chatAPI.executeCommand(
-        user.username,
-        cmd,
-        argsString,
-        currentQuizTopic
-      );
-
-      if (response.error) {
-        const errorMessage = {
-          type: 'assistant',
-          message: `❌ ${response.error}`,
-          timestamp: new Date().toISOString(),
-        };
-        setMessages(prev => [...prev, errorMessage]);
-        return;
-      }
-
-      const assistantMessage = {
-        type: 'assistant',
-        message: response.response,
-        timestamp: new Date().toISOString(),
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-
-      // Handle special command types
-      if (response.type === 'quiz_start') {
-        setCurrentQuizQuestion(response.question);
-        setCurrentQuizTopic(response.topic);
+      switch (cmd.toLowerCase()) {
+        case "help":
+          toast.success("Check the commands panel for available commands");
+          break;
+        case "explain":
+          if (args.length > 0) {
+            const topic = args.join(" ");
+            const response = await chatAPI.sendMessage(
+              user.username,
+              `Please explain ${topic}`
+            );
+            const assistantMessage = {
+              type: "assistant",
+              message: response.response,
+              citations: response.citations,
+              timestamp: new Date().toISOString(),
+            };
+            setMessages((prev) => [...prev, assistantMessage]);
+          }
+          break;
+        case "quiz":
+          if (args.length > 0) {
+            const topic = args.join(" ");
+            const quizData = await chatAPI.startQuiz(user.username, topic);
+            setCurrentQuizQuestion(quizData.question);
+            setCurrentQuizTopic(topic);
+            const assistantMessage = {
+              type: "assistant",
+              message: `Quiz started for "${topic}":\n\n${quizData.question}`,
+              timestamp: new Date().toISOString(),
+            };
+            setMessages((prev) => [...prev, assistantMessage]);
+          }
+          break;
+        default:
+          toast.error(`Unknown command: ${cmd}`);
       }
     } catch (error) {
-      console.error('Command failed:', error);
-      toast.error('Command failed');
+      console.error("Command error:", error);
+      toast.error("Failed to execute command");
     }
   };
 
   const handleQuizAnswer = async (answer) => {
-    if (!currentQuizQuestion) return;
+    if (!currentQuizQuestion || !currentQuizTopic) return;
 
+    setIsLoading(true);
     try {
-      const response = await chatAPI.submitQuizAnswer(currentQuizQuestion, answer);
-      
-      const feedbackMessage = {
-        type: 'assistant',
-        message: `${response.correct ? '✅' : '❌'} ${response.feedback}`,
+      const result = await chatAPI.submitQuizAnswer(
+        user.username,
+        currentQuizTopic,
+        answer
+      );
+
+      const assistantMessage = {
+        type: "assistant",
+        message: result.feedback,
         timestamp: new Date().toISOString(),
       };
 
-      setMessages(prev => [...prev, feedbackMessage]);
-      
-      // Clear current quiz question
+      setMessages((prev) => [...prev, assistantMessage]);
       setCurrentQuizQuestion(null);
       setCurrentQuizTopic(null);
     } catch (error) {
-      console.error('Failed to submit quiz answer:', error);
-      toast.error('Failed to submit answer');
+      console.error("Failed to submit quiz answer:", error);
+      toast.error("Failed to submit answer");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (currentQuizQuestion && inputMessage.trim()) {
-        // If there's an active quiz question, treat input as quiz answer
-        const userMessage = {
-          type: 'user',
-          message: inputMessage,
-          timestamp: new Date().toISOString(),
-        };
-        setMessages(prev => [...prev, userMessage]);
-        handleQuizAnswer(inputMessage);
-        setInputMessage('');
-      } else {
+      if (inputMessage.trim() && !isLoading) {
         handleSendMessage();
       }
     }
@@ -312,10 +340,10 @@ const Chat = () => {
       setMessages([]);
       setCurrentQuizQuestion(null);
       setCurrentQuizTopic(null);
-      toast.success('Chat history cleared');
+      toast.success("Chat history cleared");
     } catch (error) {
-      console.error('Failed to clear chat:', error);
-      toast.error('Failed to clear chat');
+      console.error("Failed to clear chat:", error);
+      toast.error("Failed to clear chat");
     }
   };
 
@@ -333,13 +361,16 @@ const Chat = () => {
               <ChatBubbleLeftRightIcon className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-secondary-900">AI Tutor Chat</h1>
+              <h1 className="text-xl font-semibold text-secondary-900">
+                AI Tutor Chat
+              </h1>
               <p className="text-sm text-secondary-600">
-                Ask questions, get explanations, or use commands (type ! for help)
+                Ask questions, get explanations, or use commands (type ! for
+                help)
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setShowCommandHelp(!showCommandHelp)}
@@ -376,9 +407,9 @@ const Chat = () => {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-auto px-6 py-4">
+      <div className="flex-1 overflow-y-auto px-6 py-8">
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center">
+          <div className="flex flex-col items-center text-center mt-24 mb-8">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -391,14 +422,15 @@ const Chat = () => {
               Welcome to your AI Tutor!
             </h2>
             <p className="text-secondary-600 mb-6 max-w-md">
-              I'm here to help you learn. Ask me anything, request explanations, 
+              I'm here to help you learn. Ask me anything, request explanations,
               or use commands like !quiz or !explain.
             </p>
-            
             {/* Suggestion chips */}
             {suggestions.length > 0 && (
               <div className="space-y-3">
-                <p className="text-sm font-medium text-secondary-700">Try asking:</p>
+                <p className="text-sm font-medium text-secondary-700">
+                  Try asking:
+                </p>
                 <div className="flex flex-wrap gap-2 justify-center">
                   {suggestions.map((suggestion, index) => (
                     <SuggestionChip
@@ -417,12 +449,11 @@ const Chat = () => {
               <MessageBubble
                 key={index}
                 message={message.message}
-                isUser={message.type === 'user'}
+                isUser={message.type === "user"}
                 citations={message.citations}
                 timestamp={message.timestamp}
               />
             ))}
-            
             {/* Loading indicator */}
             {isLoading && (
               <motion.div
@@ -434,15 +465,22 @@ const Chat = () => {
                   <div className="flex items-center space-x-2">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div
+                        className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
                     </div>
-                    <span className="text-xs text-secondary-500">AI is thinking...</span>
+                    <span className="text-xs text-secondary-500">
+                      AI is thinking...
+                    </span>
                   </div>
                 </div>
               </motion.div>
             )}
-            
             <div ref={messagesEndRef} />
           </div>
         )}
@@ -454,7 +492,7 @@ const Chat = () => {
           isVisible={showCommandHelp}
           onClose={() => setShowCommandHelp(false)}
         />
-        
+
         <div className="flex items-end space-x-3">
           <div className="flex-1 relative">
             <textarea
@@ -463,8 +501,8 @@ const Chat = () => {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder={
-                currentQuizQuestion 
-                  ? "Type your answer to the quiz question..." 
+                currentQuizQuestion
+                  ? "Type your answer to the quiz question..."
                   : "Ask a question, request help, or type ! for commands..."
               }
               className="w-full resize-none px-4 py-3 pr-12 border border-secondary-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 max-h-32"
@@ -480,11 +518,13 @@ const Chat = () => {
             </button>
           </div>
         </div>
-        
+
         {/* Quick suggestions */}
         {suggestions.length > 0 && messages.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
-            <span className="text-xs text-secondary-600 py-2">Quick suggestions:</span>
+            <span className="text-xs text-secondary-600 py-2">
+              Quick suggestions:
+            </span>
             {suggestions.slice(0, 3).map((suggestion, index) => (
               <SuggestionChip
                 key={index}
@@ -499,4 +539,4 @@ const Chat = () => {
   );
 };
 
-export default Chat; 
+export default Chat;

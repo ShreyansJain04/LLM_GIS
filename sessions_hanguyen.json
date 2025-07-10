@@ -24,28 +24,28 @@
           "question": "\"What are the two numbers usually used to define an ellipsoid, and how does the rotation of an ellipse around one of its axes result in the formation of an ellipsoid? Also, why is it important to specify the year when discussing ellipsoids like Clarke's 1866 ellipsoid?\" (Basic GIS Coordinates, p. 57, p.58, p.56)",
           "answer": "3, 9",
           "correct": true,
-          "timestamp": "2025-06-30T13:43:55.848211"
+          "timestamp": "2025-06-16T13:43:55.848211"
         },
         {
           "subtopic": "Equations of Ellipsoids",
           "question": "\"How is the relationship between the semimajor axis and the flattening of an ellipsoid expressed in a formula? And how does this relationship differ in a triaxial ellipsoid like the Krassovsky (1940) ellipsoid? Also, can you explain why the semimajor axis and the reciprocal of the eccentricity is not usually used to define a reference ellipsoid?\" (Basic GIS Coordinates, p.57, p.58, p.60)",
           "answer": "x",
           "correct": true,
-          "timestamp": "2025-06-30T13:45:39.371377"
+          "timestamp": "2025-06-16T13:45:39.371377"
         },
         {
           "subtopic": "Ellipsoids in 3D Geometry",
           "question": "\"How does the addition of the vertical distance from the surface of the ellipsoid to a point contribute to creating a three-dimensional (3D) coordinate? Why is this distance component sometimes called the ellipsoidal height? Additionally, could you explain the challenges in creating a map projection from the surface of an ellipsoid and how the use of a developable surface, like a paper cone or cylinder, aid in addressing these challenges?\" (Basic GIS Coordinates, p. 24, p. 125)",
           "answer": "x",
           "correct": true,
-          "timestamp": "2025-06-30T13:46:30.006060"
+          "timestamp": "2025-06-16T13:46:16.006060"
         },
         {
           "subtopic": "Applications of Ellipsoids",
           "question": "\"How have advancements in accuracy and nature of measurement impacted the use of ellipsoids in modeling the Earth? Can you also explain why different ellipsoids are still in use for different regions of the planet, and how these ellipsoids form the foundation of coordinate systems around the world?\" (Basic GIS Coordinates, p. 54)",
           "answer": "x",
           "correct": true,
-          "timestamp": "2025-06-30T13:47:10.349819"
+          "timestamp": "2025-06-16T13:47:10.349819"
         }
       ],
       "total_score": 4,
@@ -53,7 +53,7 @@
       "user_questions": [],
       "difficulty_adjustments": [],
       "final_score": 1.0,
-      "completed_at": "2025-06-30T13:47:10.356361"
+      "completed_at": "2025-06-16T13:47:10.356361"
     }
   ]
 }

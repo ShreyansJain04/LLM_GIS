@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   BookOpenIcon,
   AcademicCapIcon,
@@ -7,42 +8,58 @@ import {
   ClockIcon,
   TrophyIcon,
   FireIcon,
-} from '@heroicons/react/24/outline';
-import { useUser } from '../contexts/UserContext';
-import { userAPI } from '../services/api';
+} from "@heroicons/react/24/outline";
+import { useUser } from "../contexts/UserContext";
+import { userAPI } from "../services/api";
 
 const StatCard = ({ title, value, subtitle, icon: Icon, color, trend }) => (
-  <motion.div
-    whileHover={{ scale: 1.02 }}
-    className="card"
-  >
+  <motion.div whileHover={{ scale: 1.02 }} className="card">
     <div className="flex items-center justify-between">
       <div>
         <p className="text-sm font-medium text-secondary-600">{title}</p>
         <div className="flex items-baseline space-x-2">
           <p className={`text-2xl font-bold ${color}`}>{value}</p>
           {trend && (
-            <span className={`text-sm ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {trend > 0 ? '+' : ''}{trend}%
+            <span
+              className={`text-sm ${
+                trend > 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {trend > 0 ? "+" : ""}
+              {trend}%
             </span>
           )}
         </div>
-        {subtitle && <p className="text-xs text-secondary-500 mt-1">{subtitle}</p>}
+        {subtitle && (
+          <p className="text-xs text-secondary-500 mt-1">{subtitle}</p>
+        )}
       </div>
-      <div className={`p-3 rounded-full ${color.replace('text-', 'bg-').replace('-600', '-100')}`}>
+      <div
+        className={`p-3 rounded-full ${color
+          .replace("text-", "bg-")
+          .replace("-600", "-100")}`}
+      >
         <Icon className={`w-6 h-6 ${color}`} />
       </div>
     </div>
   </motion.div>
 );
 
-const QuickActionCard = ({ title, description, buttonText, onClick, icon: Icon, color }) => (
-  <motion.div
-    whileHover={{ scale: 1.02 }}
-    className="card"
-  >
+const QuickActionCard = ({
+  title,
+  description,
+  buttonText,
+  onClick,
+  icon: Icon,
+  color,
+}) => (
+  <motion.div whileHover={{ scale: 1.02 }} className="card">
     <div className="flex items-start space-x-4">
-      <div className={`p-2 rounded-lg ${color.replace('text-', 'bg-').replace('-600', '-100')}`}>
+      <div
+        className={`p-2 rounded-lg ${color
+          .replace("text-", "bg-")
+          .replace("-600", "-100")}`}
+      >
         <Icon className={`w-5 h-5 ${color}`} />
       </div>
       <div className="flex-1">
@@ -59,20 +76,21 @@ const QuickActionCard = ({ title, description, buttonText, onClick, icon: Icon, 
   </motion.div>
 );
 
-const Dashboard = ({ onNavigate }) => {
+const Dashboard = () => {
   const { user, profile } = useUser();
+  const navigate = useNavigate();
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchInsights = async () => {
       if (!user?.username) return;
-      
+
       try {
         const data = await userAPI.getUserInsights(user.username);
         setInsights(data);
       } catch (error) {
-        console.error('Failed to fetch insights:', error);
+        console.error("Failed to fetch insights:", error);
       } finally {
         setLoading(false);
       }
@@ -80,6 +98,10 @@ const Dashboard = ({ onNavigate }) => {
 
     fetchInsights();
   }, [user]);
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
 
   if (loading) {
     return (
@@ -104,7 +126,7 @@ const Dashboard = ({ onNavigate }) => {
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div>
+      <div className="mt-16">
         <h1 className="text-2xl font-bold text-secondary-900">
           Welcome back, {user?.username}!
         </h1>
@@ -161,7 +183,7 @@ const Dashboard = ({ onNavigate }) => {
       )}
 
       {/* Quick Actions */}
-      <div>
+      <div className="mb-8">
         <h2 className="text-lg font-semibold text-secondary-900 mb-4">
           Recommended Actions
         </h2>
@@ -169,28 +191,30 @@ const Dashboard = ({ onNavigate }) => {
           {profile?.recommended_topics?.length > 0 && (
             <QuickActionCard
               title="Review Weak Areas"
-              description={`Focus on: ${profile.recommended_topics.slice(0, 2).join(', ')}`}
+              description={`Focus on: ${profile.recommended_topics
+                .slice(0, 2)
+                .join(", ")}`}
               buttonText="Start Review"
-              onClick={() => onNavigate('review')}
+              onClick={() => handleNavigation("/review")}
               icon={AcademicCapIcon}
               color="text-orange-600"
             />
           )}
-          
+
           <QuickActionCard
             title="Learn New Topic"
             description="Explore new concepts and expand your knowledge"
             buttonText="Start Learning"
-            onClick={() => onNavigate('learn')}
+            onClick={() => handleNavigation("/learn")}
             icon={BookOpenIcon}
             color="text-primary-600"
           />
-          
+
           <QuickActionCard
             title="Take a Test"
             description="Evaluate your understanding with practice questions"
             buttonText="Take Test"
-            onClick={() => onNavigate('test')}
+            onClick={() => handleNavigation("/test")}
             icon={ClockIcon}
             color="text-green-600"
           />
@@ -212,16 +236,20 @@ const Dashboard = ({ onNavigate }) => {
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-primary-50 rounded-lg">
                 <div>
-                  <p className="font-medium text-secondary-900">Optimal Study Time</p>
+                  <p className="font-medium text-secondary-900">
+                    Optimal Study Time
+                  </p>
                   <p className="text-sm text-secondary-600">
-                    {recommendations.optimal_study_time || 'Morning'}
+                    {recommendations.optimal_study_time || "Morning"}
                   </p>
                 </div>
                 <ClockIcon className="w-5 h-5 text-primary-600" />
               </div>
               <div className="flex items-center justify-between p-3 bg-primary-50 rounded-lg">
                 <div>
-                  <p className="font-medium text-secondary-900">Session Length</p>
+                  <p className="font-medium text-secondary-900">
+                    Session Length
+                  </p>
                   <p className="text-sm text-secondary-600">
                     {recommendations.suggested_session_length || 30} minutes
                   </p>
@@ -237,13 +265,17 @@ const Dashboard = ({ onNavigate }) => {
               Learning Tips
             </h3>
             <div className="space-y-2">
-              {recommendations.learning_style_adjustments?.slice(0, 3).map((tip, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0"></div>
-                  <p className="text-sm text-secondary-700">{tip}</p>
-                </div>
-              )) || (
-                <p className="text-sm text-secondary-500">No specific tips available yet. Keep learning!</p>
+              {recommendations.learning_style_adjustments
+                ?.slice(0, 3)
+                .map((tip, index) => (
+                  <div key={index} className="flex items-start space-x-3">
+                    <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <p className="text-sm text-secondary-700">{tip}</p>
+                  </div>
+                )) || (
+                <p className="text-sm text-secondary-500">
+                  No specific tips available yet. Keep learning!
+                </p>
               )}
             </div>
           </div>
@@ -253,4 +285,4 @@ const Dashboard = ({ onNavigate }) => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
