@@ -3714,3 +3714,11 @@ INFO:     Application startup complete.
 INFO:     Started server process [468490]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+WARNING:  WatchFiles detected changes in 'eval/sdf.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [468490]
+INFO:     Started server process [469358]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
