@@ -1,437 +1,540 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import ReactMarkdown from 'react-markdown';
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 import {
-  BookOpenIcon,
-  PlayIcon,
-  PauseIcon,
-  ArrowRightIcon,
+  ChatBubbleLeftRightIcon,
+  PaperAirplaneIcon,
+  CommandLineIcon,
   LightBulbIcon,
+  TrashIcon,
+  BookOpenIcon,
   QuestionMarkCircleIcon,
+  SparklesIcon,
+  ExclamationTriangleIcon,
   CheckCircleIcon,
   XCircleIcon,
   ClockIcon,
-} from '@heroicons/react/24/outline';
-import { contentAPI, learningAPI } from '../services/api';
-import { useUser } from '../contexts/UserContext';
-import toast from 'react-hot-toast';
+} from "@heroicons/react/24/outline";
+import { useUser } from "../contexts/UserContext";
+import { contentAPI, learningAPI } from "../services/api";
+import toast from "react-hot-toast";
 
-const LearningPlan = ({ plan, onStartSubtopic, currentStep, totalSteps }) => (
-  <div className="card mb-6">
-    <div className="flex items-center justify-between mb-4">
-      <h2 className="text-xl font-semibold text-secondary-900">{plan.topic}</h2>
-      <div className="flex items-center space-x-2 text-sm text-secondary-600">
-        <ClockIcon className="w-4 h-4" />
-        <span>{plan.estimated_time} min</span>
-      </div>
-    </div>
-    
-    <div className="space-y-3">
-      {plan.subtopics?.map((subtopic, index) => (
-        <motion.div
-          key={index}
-          className={`p-4 rounded-lg border transition-all duration-200 cursor-pointer ${
-            index === currentStep
-              ? 'border-primary-200 bg-primary-50'
-              : index < currentStep
-              ? 'border-green-200 bg-green-50'
-              : 'border-secondary-200 bg-white hover:bg-secondary-50'
-          }`}
-          onClick={() => onStartSubtopic(index)}
-          whileHover={{ scale: 1.01 }}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                index === currentStep
-                  ? 'bg-primary-600 text-white'
-                  : index < currentStep
-                  ? 'bg-green-600 text-white'
-                  : 'bg-secondary-200 text-secondary-600'
-              }`}>
-                {index < currentStep ? (
-                  <CheckCircleIcon className="w-5 h-5" />
-                ) : (
-                  index + 1
-                )}
-              </div>
-              <div>
-                <h3 className="font-medium text-secondary-900">{subtopic.name}</h3>
-                <p className="text-sm text-secondary-600">{subtopic.description}</p>
-              </div>
-            </div>
-            <ArrowRightIcon className="w-5 h-5 text-secondary-400" />
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  </div>
-);
-
-const ContentSection = ({ title, content, type, loading }) => (
+const MessageBubble = ({ message, isUser, citations, timestamp }) => (
   <motion.div
-    initial={{ opacity: 0, y: 20 }}
+    initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    className="card mb-6"
+    className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}
   >
-    <div className="flex items-center space-x-2 mb-4">
-      {type === 'explanation' && <BookOpenIcon className="w-5 h-5 text-primary-600" />}
-      {type === 'example' && <LightBulbIcon className="w-5 h-5 text-yellow-600" />}
-      {type === 'question' && <QuestionMarkCircleIcon className="w-5 h-5 text-purple-600" />}
-      <h3 className="text-lg font-semibold text-secondary-900">{title}</h3>
+    <div className={`max-w-3xl ${isUser ? "order-2" : "order-1"}`}>
+      <div
+        className={`px-4 py-3 rounded-2xl ${
+          isUser
+            ? "bg-primary-600 text-white rounded-br-sm"
+            : "bg-white border border-secondary-200 text-secondary-900 rounded-bl-sm"
+        }`}
+      >
+        <div className="prose prose-sm max-w-none">
+          {isUser ? (
+            <p className="text-white mb-0">{message}</p>
+          ) : (
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => (
+                  <p className="mb-2 last:mb-0">{children}</p>
+                ),
+                ul: ({ children }) => <ul className="ml-4 mb-2">{children}</ul>,
+                ol: ({ children }) => <ol className="ml-4 mb-2">{children}</ol>,
+                li: ({ children }) => <li className="mb-1">{children}</li>,
+                code: ({ children }) => (
+                  <code className="bg-secondary-100 px-1 py-0.5 rounded text-xs">
+                    {children}
+                  </code>
+                ),
+              }}
+            >
+              {message}
+            </ReactMarkdown>
+          )}
+        </div>
+
+        {/* Citations */}
+        {citations && citations.length > 0 && (
+          <div className="mt-3 pt-2 border-t border-secondary-200">
+            <p className="text-xs text-secondary-500 mb-1">Sources:</p>
+            <div className="space-y-1">
+              {citations.map((citation, index) => (
+                <div
+                  key={index}
+                  className="text-xs text-secondary-600 bg-secondary-50 px-2 py-1 rounded"
+                >
+                  📄 {citation}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Timestamp */}
+      <div
+        className={`text-xs text-secondary-500 mt-1 ${
+          isUser ? "text-right" : "text-left"
+        }`}
+      >
+        {new Date(timestamp).toLocaleTimeString()}
+      </div>
     </div>
-    
-    {loading ? (
-      <div className="animate-pulse">
-        <div className="h-4 bg-secondary-200 rounded w-3/4 mb-2"></div>
-        <div className="h-4 bg-secondary-200 rounded w-1/2 mb-2"></div>
-        <div className="h-4 bg-secondary-200 rounded w-2/3"></div>
-      </div>
-    ) : (
-      <div className="prose prose-secondary max-w-none">
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </div>
-    )}
   </motion.div>
 );
 
-const QuestionCard = ({ question, onAnswer, loading, feedback, isCorrect }) => {
-  const [answer, setAnswer] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+const SuggestionChip = ({ suggestion, onClick }) => (
+  <motion.button
+    whileHover={{ scale: 1.02 }}
+    whileTap={{ scale: 0.98 }}
+    onClick={() => onClick(suggestion)}
+    className="px-3 py-2 bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-full text-sm border border-primary-200 transition-colors duration-200"
+  >
+    {suggestion}
+  </motion.button>
+);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!answer.trim()) return;
-    
-    setSubmitted(true);
-    onAnswer(answer);
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="card mb-6"
-    >
-      <div className="flex items-center space-x-2 mb-4">
-        <QuestionMarkCircleIcon className="w-5 h-5 text-purple-600" />
-        <h3 className="text-lg font-semibold text-secondary-900">Check Your Understanding</h3>
-      </div>
-      
-      <div className="space-y-4">
-        <p className="text-secondary-700">{question}</p>
-        
-        <form onSubmit={handleSubmit}>
-          <textarea
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            placeholder="Type your answer here..."
-            className="input-field h-24 resize-none"
-            disabled={submitted || loading}
-            required
-          />
-          
+const CommandHelp = ({ isVisible, onClose }) => (
+  <AnimatePresence>
+    {isVisible && (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-secondary-200 rounded-lg shadow-lg p-4 z-10"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-medium text-secondary-900">Quick Commands</h3>
           <button
-            type="submit"
-            disabled={!answer.trim() || submitted || loading}
-            className="mt-3 btn-primary disabled:opacity-50"
+            onClick={onClose}
+            className="text-secondary-400 hover:text-secondary-600"
           >
-            {loading ? 'Checking...' : 'Submit Answer'}
+            <XCircleIcon className="w-5 h-5" />
           </button>
-        </form>
-        
-        <AnimatePresence>
-          {feedback && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className={`p-4 rounded-lg border ${
-                isCorrect
-                  ? 'border-green-200 bg-green-50 text-green-800'
-                  : 'border-yellow-200 bg-yellow-50 text-yellow-800'
-              }`}
-            >
-              <div className="flex items-start space-x-2">
-                {isCorrect ? (
-                  <CheckCircleIcon className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                ) : (
-                  <XCircleIcon className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                )}
-                <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown>{feedback}</ReactMarkdown>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.div>
-  );
-};
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="space-y-1">
+            <div>
+              <code className="text-primary-600">!help</code> - Show all
+              commands
+            </div>
+            <div>
+              <code className="text-primary-600">!explain topic</code> - Get
+              explanation
+            </div>
+            <div>
+              <code className="text-primary-600">!example topic</code> - Get
+              example
+            </div>
+            <div>
+              <code className="text-primary-600">!question topic</code> -
+              Practice question
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div>
+              <code className="text-primary-600">!quiz topic</code> - Start quiz
+            </div>
+            <div>
+              <code className="text-primary-600">!sources</code> - Show
+              documents
+            </div>
+            <div>
+              <code className="text-primary-600">!progress</code> - View
+              progress
+            </div>
+            <div>
+              <code className="text-primary-600">!hint</code> - Get hint
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
 
 const Learn = () => {
   const { user } = useUser();
-  const [topic, setTopic] = useState('');
-  const [plan, setPlan] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [showCommandHelp, setShowCommandHelp] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [learningPlan, setLearningPlan] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
-  const [sessionState, setSessionState] = useState('input'); // input, planning, learning, question
-  const [loading, setLoading] = useState(false);
-  
-  // Content states
-  const [explanation, setExplanation] = useState('');
-  const [example, setExample] = useState('');
-  const [question, setQuestion] = useState('');
-  const [feedback, setFeedback] = useState('');
-  const [isCorrect, setIsCorrect] = useState(false);
-  
-  const [loadingContent, setLoadingContent] = useState({
-    explanation: false,
-    example: false,
-    question: false,
-    answer: false,
-  });
+  const [isLearning, setIsLearning] = useState(false);
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
-  const handleStartLearning = async (e) => {
-    e.preventDefault();
-    if (!topic.trim()) return;
+  // Scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
-    setLoading(true);
-    setSessionState('planning');
-    
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Load suggestions on mount
+  useEffect(() => {
+    setSuggestions([
+      "Learn about GIS coordinates",
+      "Start learning about map projections",
+      "Teach me about spatial data",
+    ]);
+  }, []);
+
+  // Handle sending a message
+  const handleSendMessage = async (messageText = inputMessage) => {
+    if (!messageText.trim() || isLoading) return;
+    setInputMessage("");
+    const userMessage = {
+      type: "user",
+      message: messageText,
+      timestamp: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setIsLoading(true);
+
     try {
-      const learningPlan = await learningAPI.getLearningPlan(user.username, topic);
-      setPlan(learningPlan);
-      setCurrentStep(0);
-      setSessionState('learning');
-      
-      // Start with first subtopic
-      if (learningPlan.subtopics?.length > 0) {
-        await loadSubtopicContent(learningPlan.subtopics[0]);
+      if (messageText.startsWith("!")) {
+        // Pause learning and process command
+        setIsLearning(false);
+        await handleCommand(messageText);
+      } else if (!isLearning) {
+        // Start learning session with topic
+        await startLearningSession(messageText);
+      } else {
+        // In learning session, treat as answer
+        await handleLearningAnswer(messageText);
       }
     } catch (error) {
-      console.error('Failed to create learning plan:', error);
-      toast.error('Failed to create learning plan');
-      setSessionState('input');
+      toast.error("Something went wrong");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const loadSubtopicContent = async (subtopic) => {
-    setExplanation('');
-    setExample('');
-    setQuestion('');
-    setFeedback('');
-    
-    // Load explanation
-    setLoadingContent(prev => ({ ...prev, explanation: true }));
+  // Start a new learning session
+  const startLearningSession = async (topic) => {
+    setIsLearning(true);
+    setCurrentStep(0);
+    setLearningPlan(null);
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "assistant",
+        message: `Great! Let's start learning about **${topic}**. Generating your learning plan...`,
+        timestamp: new Date().toISOString(),
+      },
+    ]);
     try {
-      const explainData = await contentAPI.explainConcept(subtopic.name, 'standard');
-      setExplanation(explainData.explanation);
+      const planData = await learningAPI.getLearningPlan(user.username, topic);
+      setLearningPlan(planData);
+      presentSubtopic(planData, 0);
     } catch (error) {
-      console.error('Failed to load explanation:', error);
-    } finally {
-      setLoadingContent(prev => ({ ...prev, explanation: false }));
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "assistant",
+          message: "Sorry, I couldn't generate a learning plan for that topic.",
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+      setIsLearning(false);
     }
+  };
 
-    // Load example
-    setLoadingContent(prev => ({ ...prev, example: true }));
+  // Present a subtopic as chat messages
+  const presentSubtopic = async (plan, step) => {
+    if (!plan || !plan.subtopics || step >= plan.subtopics.length) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "assistant",
+          message:
+            "🎉 You've completed the learning session! Type a new topic to start again.",
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+      setIsLearning(false);
+      return;
+    }
+    setCurrentStep(step);
+    const subtopic = plan.subtopics[step];
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "assistant",
+        message: `**Step ${step + 1}: ${subtopic.name}**\n${
+          subtopic.description
+        }`,
+        timestamp: new Date().toISOString(),
+      },
+    ]);
+    // Explanation
     try {
-      const exampleData = await contentAPI.generateExample(subtopic.name, 'medium');
-      setExample(exampleData.example);
-    } catch (error) {
-      console.error('Failed to load example:', error);
-    } finally {
-      setLoadingContent(prev => ({ ...prev, example: false }));
-    }
-
-    // Load question
-    setLoadingContent(prev => ({ ...prev, question: true }));
+      const explanationData = await contentAPI.generateExplanation(
+        subtopic.name,
+        "medium"
+      );
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "assistant",
+          message: `**Explanation:**\n${explanationData.explanation}`,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+    } catch {}
+    // Example
+    try {
+      const exampleData = await contentAPI.generateExample(
+        subtopic.name,
+        "medium"
+      );
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "assistant",
+          message: `**Example:**\n${exampleData.example}`,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+    } catch {}
+    // Question
     try {
       const questionData = await contentAPI.generateQuestion(
-        subtopic.name, 
-        [], 
-        'medium', 
-        'objective'  // Always use objective questions during learning
+        subtopic.name,
+        [],
+        "medium",
+        "analytical"
       );
-      setQuestion(questionData.question);
-    } catch (error) {
-      console.error('Failed to load question:', error);
-    } finally {
-      setLoadingContent(prev => ({ ...prev, question: false }));
-    }
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "assistant",
+          message: `**Practice Question:**\n${questionData.question}\n\nPlease provide your answer below.`,
+          timestamp: new Date().toISOString(),
+          expectAnswer: true,
+        },
+      ]);
+    } catch {}
   };
 
-  const handleAnswer = async (answer) => {
-    setLoadingContent(prev => ({ ...prev, answer: true }));
-    
+  // Handle answer in learning session
+  const handleLearningAnswer = async (answer) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "user",
+        message: answer,
+        timestamp: new Date().toISOString(),
+      },
+    ]);
     try {
-      const result = await contentAPI.checkAnswer(question, answer);
-      setFeedback(result.feedback);
-      setIsCorrect(result.correct);
-      
-      // After showing feedback, allow moving to next subtopic
-      setTimeout(() => {
-        if (currentStep < (plan?.subtopics?.length || 0) - 1) {
-          // Move to next subtopic
-          setCurrentStep(prev => prev + 1);
-          loadSubtopicContent(plan.subtopics[currentStep + 1]);
-          setFeedback('');
-        } else {
-          // Learning complete
-          toast.success('Learning session completed!');
-        }
-      }, 3000);
-    } catch (error) {
-      console.error('Failed to check answer:', error);
-      toast.error('Failed to check answer');
-    } finally {
-      setLoadingContent(prev => ({ ...prev, answer: false }));
+      const lastSubtopic = learningPlan.subtopics[currentStep];
+      const questionData = await contentAPI.generateQuestion(
+        lastSubtopic.name,
+        [],
+        "medium",
+        "analytical"
+      );
+      const result = await contentAPI.checkAnswer(
+        questionData.question,
+        answer
+      );
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "assistant",
+          message: result.feedback,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+      // Move to next subtopic
+      presentSubtopic(learningPlan, currentStep + 1);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "assistant",
+          message: "Sorry, I couldn't check your answer. Let's move on.",
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+      presentSubtopic(learningPlan, currentStep + 1);
     }
   };
 
-  const handleSubtopicClick = (index) => {
-    if (index <= currentStep && plan?.subtopics?.[index]) {
-      setCurrentStep(index);
-      loadSubtopicContent(plan.subtopics[index]);
-      setFeedback('');
+  // Handle commands (pause learning)
+  const handleCommand = async (command) => {
+    setIsLearning(false);
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "assistant",
+        message: `Learning paused. Processed command: ${command}`,
+        timestamp: new Date().toISOString(),
+      },
+    ]);
+    // You can add more command handling logic here
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (inputMessage.trim() && !isLoading) {
+        handleSendMessage();
+      }
     }
   };
-
-  const resetSession = () => {
-    setSessionState('input');
-    setPlan(null);
-    setCurrentStep(0);
-    setTopic('');
-    setExplanation('');
-    setExample('');
-    setQuestion('');
-    setFeedback('');
-  };
-
-  if (sessionState === 'input') {
-    return (
-      <div className="p-6">
-        <div className="max-w-2xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-8"
-          >
-            <BookOpenIcon className="w-16 h-16 text-primary-600 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-secondary-900 mb-2">
-              Start Learning
-            </h1>
-            <p className="text-secondary-600">
-              Enter a topic to begin your personalized learning journey
-            </p>
-          </motion.div>
-
-          <motion.form
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            onSubmit={handleStartLearning}
-            className="card"
-          >
-            <label htmlFor="topic" className="block text-sm font-medium text-secondary-700 mb-2">
-              What would you like to learn?
-            </label>
-            <input
-              type="text"
-              id="topic"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder="e.g., Machine Learning, Photosynthesis, French Grammar..."
-              className="input-field mb-4"
-              disabled={loading}
-              required
-            />
-            
-            <button
-              type="submit"
-              disabled={!topic.trim() || loading}
-              className="w-full btn-primary flex items-center justify-center space-x-2"
-            >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span>Creating Learning Plan...</span>
-                </>
-              ) : (
-                <>
-                  <PlayIcon className="w-5 h-5" />
-                  <span>Start Learning</span>
-                </>
-              )}
-            </button>
-          </motion.form>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-secondary-900">
-          Learning: {plan?.topic}
-        </h1>
+    <div className="flex flex-col h-screen bg-secondary-50">
+      {/* Top bar with Quick Commands button */}
+      <div className="flex items-center justify-end px-6 pt-4">
         <button
-          onClick={resetSession}
-          className="btn-secondary"
+          className="flex items-center space-x-2 px-3 py-1 bg-secondary-100 text-secondary-700 rounded hover:bg-secondary-200 transition-colors"
+          onClick={() => setShowCommandHelp((v) => !v)}
         >
-          New Topic
+          <CommandLineIcon className="w-5 h-5" />
+          <span>Quick Commands</span>
         </button>
+        <CommandHelp
+          isVisible={showCommandHelp}
+          onClose={() => setShowCommandHelp(false)}
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Learning Plan Sidebar */}
-        <div className="lg:col-span-1">
-          {plan && (
-            <LearningPlan
-              plan={plan}
-              onStartSubtopic={handleSubtopicClick}
-              currentStep={currentStep}
-              totalSteps={plan.subtopics?.length || 0}
+      {/* Chat area */}
+      <div className="flex-1 overflow-y-auto px-6 py-8">
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center text-center mt-24 mb-8">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="w-20 h-20 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full flex items-center justify-center mb-4"
+            >
+              <SparklesIcon className="w-10 h-10 text-white" />
+            </motion.div>
+            <h2 className="text-2xl font-bold text-secondary-900 mb-2">
+              Welcome to your AI Tutor!
+            </h2>
+            <p className="text-secondary-600 mb-6 max-w-md">
+              I'm here to help you learn. Ask me anything, request explanations,
+              or use commands like !quiz or !explain.
+            </p>
+            {/* Suggestion chips */}
+            {suggestions.length > 0 && (
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-secondary-700">
+                  Try asking:
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {suggestions.map((suggestion, index) => (
+                    <SuggestionChip
+                      key={index}
+                      suggestion={suggestion}
+                      onClick={handleSendMessage}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {messages.map((message, index) => (
+              <MessageBubble
+                key={index}
+                message={message.message}
+                isUser={message.type === "user"}
+                citations={message.citations}
+                timestamp={message.timestamp}
+              />
+            ))}
+            {/* Loading indicator */}
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex justify-start mb-4"
+              >
+                <div className="bg-white border border-secondary-200 rounded-2xl rounded-bl-sm px-4 py-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"></div>
+                      <div
+                        className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
+                    </div>
+                    <span className="text-xs text-secondary-500">
+                      AI is thinking...
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
+      </div>
+      {/* Input Area */}
+      <div className="bg-white border-t border-secondary-200 p-4 relative">
+        <div className="flex items-end space-x-3">
+          <div className="flex-1 relative">
+            <textarea
+              ref={inputRef}
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={
+                isLearning
+                  ? "Type your answer to the question or enter a command..."
+                  : "Type a topic to start learning, or enter a command..."
+              }
+              className="w-full resize-none px-4 py-3 pr-12 border border-secondary-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 max-h-32"
+              rows={1}
+              disabled={isLoading}
             />
-          )}
+            <button
+              onClick={() => handleSendMessage()}
+              disabled={!inputMessage.trim() || isLoading}
+              className="absolute right-2 bottom-2 p-2 bg-primary-600 hover:bg-primary-700 disabled:bg-secondary-300 disabled:cursor-not-allowed text-white rounded-full transition-colors duration-200"
+            >
+              <PaperAirplaneIcon className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-
-        {/* Content Area */}
-        <div className="lg:col-span-2">
-          {explanation && (
-            <ContentSection
-              title="Explanation"
-              content={explanation}
-              type="explanation"
-              loading={loadingContent.explanation}
-            />
-          )}
-          
-          {example && (
-            <ContentSection
-              title="Example"
-              content={example}
-              type="example"
-              loading={loadingContent.example}
-            />
-          )}
-          
-          {question && (
-            <QuestionCard
-              question={question}
-              onAnswer={handleAnswer}
-              loading={loadingContent.answer}
-              feedback={feedback}
-              isCorrect={isCorrect}
-            />
-          )}
-        </div>
+        {/* Quick suggestions */}
+        {suggestions.length > 0 && messages.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span className="text-xs text-secondary-600 py-2">
+              Quick suggestions:
+            </span>
+            {suggestions.slice(0, 3).map((suggestion, index) => (
+              <SuggestionChip
+                key={index}
+                suggestion={suggestion}
+                onClick={handleSendMessage}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default Learn; 
+export default Learn;
