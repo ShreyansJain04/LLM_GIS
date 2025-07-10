@@ -1,0 +1,45 @@
+{
+  "learning_patterns": {
+    "time_of_day_performance": {
+      "13": [
+        0.25
+      ]
+    },
+    "session_duration_patterns": [],
+    "mistake_patterns": {},
+    "improvement_velocity": {},
+    "concept_relationships": {}
+  },
+  "personalization": {
+    "preferred_learning_style": "unknown",
+    "optimal_session_length": 20,
+    "best_time_of_day": "unknown",
+    "difficulty_preference": "medium"
+  },
+  "detailed_weaknesses": {
+    "coordinate system::Introduction to Coordinate Systems": {
+      "error_types": {
+        "incomplete_answer": 1
+      },
+      "confusion_indicators": [],
+      "required_repetitions": 1,
+      "last_reviewed": "2025-07-08T14:15:20.597700"
+    },
+    "coordinate system::Types of Coordinate Systems": {
+      "error_types": {
+        "incomplete_answer": 1
+      },
+      "confusion_indicators": [],
+      "required_repetitions": 1,
+      "last_reviewed": "2025-07-08T14:15:20.597718"
+    },
+    "coordinate system::Coordinate Systems in Real Life": {
+      "error_types": {
+        "incomplete_answer": 1
+      },
+      "confusion_indicators": [],
+      "required_repetitions": 1,
+      "last_reviewed": "2025-07-08T14:15:20.597728"
+    }
+  }
+}

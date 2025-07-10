@@ -1,0 +1,128 @@
+{
+  "weak_areas": [
+    "coordinate system - Coordinate Systems in Real Life",
+    "coordinate system - Types of Coordinate Systems",
+    "coordinate system - Introduction to Coordinate Systems",
+    "coordinate system"
+  ],
+  "topic_mastery": {
+    "coordinate system": "beginner"
+  },
+  "history": [
+    {
+      "date": "2025-07-08T14:15:20.603041",
+      "topic": "coordinate system",
+      "subtopics_performance": [
+        {
+          "subtopic": "Introduction to Coordinate Systems",
+          "question": "What is a fundamental principle of the Cartesian coordinate system in relation to the x and y-axis?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Types of Coordinate Systems",
+          "question": "Can you explain the differences and applications between the geographic coordinate system, the Cartesian coordinate system, and local coordinate systems, including how their origins and datums are established?",
+          "user_answer": "NO",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Using Coordinate Systems",
+          "question": "What is typically the method for establishing an independent local coordinate system according to the provided context?",
+          "user_answer": "3",
+          "correct": true,
+          "score": 1,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Coordinate Systems in Real Life",
+          "question": "How do coordinate systems play a role in everyday life, such as in construction or map-making, and why might different types of coordinate systems be used in these instances?",
+          "user_answer": "N",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        }
+      ],
+      "final_score": 0.25,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 4,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.25,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 4,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    }
+  ],
+  "learning_plan": {},
+  "performance_data": {
+    "coordinate system": {
+      "attempts": 1,
+      "average_score": 0.25,
+      "subtopic_scores": {
+        "Introduction to Coordinate Systems": [
+          0
+        ],
+        "Types of Coordinate Systems": [
+          0
+        ],
+        "Using Coordinate Systems": [
+          1
+        ],
+        "Coordinate Systems in Real Life": [
+          0
+        ]
+      },
+      "question_type_performance": {
+        "objective": {
+          "total": 0,
+          "correct": 0,
+          "trend": []
+        },
+        "subjective": {
+          "total": 4,
+          "correct": 1,
+          "trend": [
+            0.25
+          ]
+        }
+      },
+      "difficulty_performance": {
+        "easy": {
+          "total": 0,
+          "correct": 0
+        },
+        "medium": {
+          "total": 4,
+          "correct": 1
+        },
+        "hard": {
+          "total": 0,
+          "correct": 0
+        }
+      },
+      "common_mistakes": [],
+      "last_attempt": "2025-07-08T14:15:20.603058",
+      "improvement_rate": 0
+    }
+  },
+  "last_active": "2025-07-08T14:15:20.607683"
+}

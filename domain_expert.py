@@ -160,101 +160,167 @@ def generate_example(topic: str, difficulty: str = "medium") -> str:
     return query_domain_expert(prompt, context, citations)
 
 
-def generate_question(
-    topic: str, 
-    previous_questions: List[str] = None,
-    difficulty: str = "medium",
-    question_type: str = "conceptual"
-) -> str:
-    """
-    Generate a question based on source documents.
+def generate_question(topic: str, previous_questions: List[str] = None, difficulty: str = "medium", question_type: str = "objective") -> Dict:
+    """Generate a question for a given topic.
     
     Args:
-        topic: The topic for the question
+        topic: The topic to generate a question for
         previous_questions: List of previously asked questions to avoid repetition
-        difficulty: "easy", "medium", or "hard"
-        question_type: "conceptual", "analytical", "application", or "synthesis"
+        difficulty: Difficulty level ("easy", "medium", "hard")
+        question_type: Type of question ("objective", "analytical", "synthesis")
+        
+    Returns:
+        Dict containing question text and options if objective
     """
     if previous_questions is None:
         previous_questions = []
     
-    context, citations = retrieve_context_with_citations(topic)
+    # Get context for the topic
+    context = _retrieve_context(topic)
     
-    if not context:
-        # Fallback to general question if no context available
-        return f"What do you know about {topic}? (Note: No source documents available for this topic)"
-    
-    # Build prompt based on question type and difficulty
-    type_instructions = {
-        "conceptual": "that tests understanding of key concepts",
-        "analytical": "that requires analysis and critical thinking",
-        "application": "that applies the concept to a practical scenario",
-        "synthesis": "that combines multiple aspects or relates to other concepts"
-    }
-    
-    difficulty_instructions = {
-        "easy": "Make it straightforward and direct",
-        "medium": "Make it moderately challenging",
-        "hard": "Make it challenging and thought-provoking"
-    }
-    
-    base_prompt = (
-        f"Create a {question_type} question about '{topic}' {type_instructions[question_type]}. "
-        f"{difficulty_instructions[difficulty]}. Base the question on the provided context."
-    )
-    
-    if previous_questions:
-        previous_q_text = "\n".join([f"- {q}" for q in previous_questions[-5:]])  # Last 5 questions
+    if question_type == "objective":
+        # Build prompt for multiple choice question
         prompt = (
-            f"{base_prompt}\n\n"
-            f"Avoid repeating these previously asked questions:\n{previous_q_text}\n\n"
-            f"Generate a different question that covers a different aspect."
+            f"Create a multiple choice question about '{topic}' based on the provided context.\n"
+            f"Difficulty level: {difficulty}\n"
+            "Requirements:\n"
+            "1. Question should test understanding, not just recall\n"
+            "2. All options should be plausible and related to the topic\n"
+            "3. Only one option should be correct\n"
+            "4. Options should be clear and concise\n"
+            "Format:\n"
+            "QUESTION: <question text>\n"
+            "CORRECT: <correct answer>\n"
+            "WRONG1: <plausible wrong answer 1>\n"
+            "WRONG2: <plausible wrong answer 2>\n"
+            "WRONG3: <plausible wrong answer 3>\n"
+            "EXPLANATION: <brief explanation of why the correct answer is right>"
         )
+        
+        if previous_questions:
+            prompt += "\nAvoid these previous questions:\n" + "\n".join(previous_questions)
+        
+        # Get response from LLM
+        response = query_domain_expert(prompt, context)
+        
+        # Parse response
+        try:
+            lines = response.split('\n')
+            question_text = next(line.replace('QUESTION: ', '') for line in lines if line.startswith('QUESTION:'))
+            correct_ans = next(line.replace('CORRECT: ', '') for line in lines if line.startswith('CORRECT:'))
+            wrong1 = next(line.replace('WRONG1: ', '') for line in lines if line.startswith('WRONG1:'))
+            wrong2 = next(line.replace('WRONG2: ', '') for line in lines if line.startswith('WRONG2:'))
+            wrong3 = next(line.replace('WRONG3: ', '') for line in lines if line.startswith('WRONG3:'))
+            explanation = next(line.replace('EXPLANATION: ', '') for line in lines if line.startswith('EXPLANATION:'))
+            
+            # Randomize option order
+            options = [correct_ans, wrong1, wrong2, wrong3]
+            correct_idx = 0  # Index of correct answer before shuffling
+            import random
+            random.shuffle(options)
+            correct_idx = options.index(correct_ans)  # New index after shuffling
+            
+            return {
+                "text": question_text,
+                "options": options,
+                "correct_option": correct_idx,
+                "explanation": explanation,
+                "type": "objective",
+                "difficulty": difficulty
+            }
+        except Exception as e:
+            print(f"Error parsing LLM response: {e}")
+            # Fallback to basic question if parsing fails
+            return {
+                "text": f"Which of the following best describes {topic}?",
+                "options": [
+                    "The correct description",
+                    "An incorrect description",
+                    "Another incorrect description",
+                    "Yet another incorrect description"
+                ],
+                "correct_option": 0,
+                "explanation": "Please refer to the course materials.",
+                "type": "objective",
+                "difficulty": difficulty
+            }
     else:
-        prompt = base_prompt
-    
-    return query_domain_expert(prompt, context, citations)
+        # Generate subjective/analytical question
+        prompt = (
+            f"Create a {question_type} question about '{topic}' that requires {difficulty} level understanding.\n"
+            "The question should encourage critical thinking and detailed explanation."
+        )
+        if previous_questions:
+            prompt += "\nAvoid these previous questions:\n" + "\n".join(previous_questions)
+        
+        question_text = query_domain_expert(prompt, context)
+        return {
+            "text": question_text,
+            "type": "subjective",
+            "difficulty": difficulty
+        }
 
 
-def check_answer(question: str, answer: str, provide_hints: bool = True) -> Tuple[bool, str]:
-    """
-    Check answer against source documents with detailed feedback.
+def check_answer(question: Dict, answer: str) -> Tuple[bool, str]:
+    """Check if the answer is correct.
     
     Args:
-        question: The question that was asked
-        answer: The user's answer
-        provide_hints: Whether to provide hints for incorrect answers
-    
+        question: Question dict containing text and options if objective
+        answer: User's answer
+        
     Returns:
         Tuple of (is_correct, feedback)
     """
-    # Get context relevant to both question and answer
-    combined_query = f"{question} {answer}"
-    context, citations = retrieve_context_with_citations(combined_query)
-    
-    prompt = (
-        f"Question: {question}\n"
-        f"User answer: {answer}\n\n"
-        f"Based on the provided context, evaluate the answer:\n"
-        f"1. Is it correct according to the source materials?\n"
-        f"2. What aspects are correct or incorrect?\n"
-        f"3. What key points might be missing?\n"
-    )
-    
-    if provide_hints and answer.lower() in ['i dont know', 'idk', '?', 'no idea']:
-        prompt += "\n4. Provide a helpful hint to guide the learner."
-    
-    feedback = query_domain_expert(prompt, context, citations)
-    
-    # Determine correctness based on feedback
-    feedback_lower = feedback.lower()
-    correct = any(word in feedback_lower for word in ['correct', 'right', 'accurate', 'excellent', 'perfect'])
-    partially_correct = any(word in feedback_lower for word in ['partially', 'somewhat', 'mostly'])
-    
-    if partially_correct and not correct:
-        correct = False  # Partial credit could be implemented later
-    
-    return correct, feedback
+    if question.get("type") == "objective":
+        try:
+            selected_option = int(answer)
+            is_correct = selected_option == question["correct_option"]
+            
+            feedback = question.get("explanation", "")
+            if is_correct:
+                feedback = "✅ Correct! " + feedback
+            else:
+                correct_text = question["options"][question["correct_option"]]
+                feedback = f"❌ Incorrect. The correct answer was: {correct_text}\n\nExplanation: {feedback}"
+            
+            return is_correct, feedback
+        except ValueError:
+            return False, "Please enter a valid option number (0-3)"
+    else:
+        # For subjective questions, use semantic similarity
+        context = _retrieve_context(question["text"])
+        
+        # Build evaluation prompt
+        prompt = (
+            f"Question: {question['text']}\n"
+            f"Student's answer: {answer}\n\n"
+            "Evaluate the answer based on:\n"
+            "1. Accuracy of information\n"
+            "2. Completeness of explanation\n"
+            "3. Understanding of concepts\n\n"
+            "Provide:\n"
+            "SCORE: (number between 0 and 1)\n"
+            "FEEDBACK: (constructive feedback explaining the score)"
+        )
+        
+        response = query_domain_expert(prompt, context)
+        
+        try:
+            # Parse score and feedback
+            score_line = next(line for line in response.split('\n') if line.startswith('SCORE:'))
+            score = float(score_line.replace('SCORE:', '').strip())
+            
+            feedback_line = next(line for line in response.split('\n') if line.startswith('FEEDBACK:'))
+            feedback = feedback_line.replace('FEEDBACK:', '').strip()
+            
+            # Consider score >= 0.8 as correct for subjective questions
+            is_correct = score >= 0.8
+            
+            return is_correct, feedback
+        except Exception as e:
+            print(f"Error parsing evaluation response: {e}")
+            # Fallback scoring
+            return False, "Unable to evaluate answer. Please try again."
 
 
 def generate_hint(question: str, difficulty_level: int = 1) -> str:

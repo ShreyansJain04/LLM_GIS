@@ -251,6 +251,12 @@ class InteractiveSession:
         # Resume from saved position if applicable
         start_index = self.session_state.get('current_subtopic_index', 0)
         
+        # Initialize session state if needed
+        if 'difficulty' not in self.session_state:
+            self.session_state['difficulty'] = 'medium'
+        if 'question_types' not in self.session_state:
+            self.session_state['question_types'] = ['objective', 'subjective']
+        
         for i in range(start_index, len(subtopics)):
             self.session_state['current_subtopic_index'] = i
             self.current_subtopic = subtopics[i]
@@ -294,15 +300,24 @@ class InteractiveSession:
                     else:
                         ready = True
             
-            # Generate and ask question
-            question = generate_question(subtopic_name, self.session_state['questions_asked'])
+            # Generate and ask objective question for learning
+            previous_questions = [q['text'] for q in self.session_state['questions_asked']] if self.session_state['questions_asked'] else []
+            question = generate_question(
+                subtopic_name,
+                previous_questions,
+                difficulty=self.session_state['difficulty'],
+                question_type='objective'  # Always use objective questions during learning
+            )
             self.session_state['questions_asked'].append(question)
             
-            print(f"\n❓ Question: {question}")
+            print(f"\n❓ Question: {question['text']}")
+            print("\nOptions:")
+            for i, option in enumerate(question["options"]):
+                print(f"{i}. {option}")
             
             answered = False
             while not answered:
-                answer = input("Your answer: ")
+                answer = input("Enter option number (0-3): ")
                 
                 # Check for commands in answer
                 cmd, args = self.parse_command(answer)
@@ -312,34 +327,71 @@ class InteractiveSession:
                 else:
                     # Process the answer
                     correct, feedback = check_answer(question, answer)
-                    print(f"\n{'✅' if correct else '❌'} {feedback}")
+                    print(f"\n{feedback}")
                     
                     # Update session state
                     self.session_state['total_questions'] += 1
                     if correct:
                         self.session_state['total_score'] += 1
                     
-                    self.session_state['performance'].append({
+                    # Record detailed performance data
+                    performance_entry = {
                         'subtopic': subtopic_name,
-                        'question': question,
+                        'question': question["text"],
                         'answer': answer,
                         'correct': correct,
-                        'timestamp': datetime.now().isoformat()
-                    })
+                        'question_type': question["type"],
+                        'difficulty': question["difficulty"],
+                        'timestamp': datetime.now().isoformat(),
+                        'options': question["options"],
+                        'correct_option': question["correct_option"],
+                        'selected_option': int(answer) if answer.isdigit() else None,
+                        'explanation': question.get("explanation", "")
+                    }
                     
+                    self.session_state['performance'].append(performance_entry)
                     answered = True
             
-            # Mark subtopic as completed
-            self.session_state['subtopics_completed'].append(subtopic_name)
+            # Add to completed subtopics
+            if subtopic_name not in self.session_state['subtopics_completed']:
+                self.session_state['subtopics_completed'].append(subtopic_name)
             
-            # Continue or pause?
-            if i < len(subtopics) - 1:
-                user_input = input("\n[Press Enter for next topic, or type a command] ")
-                if user_input:
-                    cmd, args = self.parse_command(user_input)
-                    if cmd:
-                        if not self.handle_command(cmd, args):
-                            return
+            # Save progress
+            save_user(self.username, self.user_profile)
+            
+            # Show progress
+            self._show_progress()
+            
+            # Ask if ready to continue
+            if i < len(subtopics) - 1:  # Not the last subtopic
+                ready = False
+                while not ready:
+                    user_input = input("\n[Press Enter to continue to next subtopic, or type a command] ")
+                    if not user_input:
+                        ready = True
+                    else:
+                        cmd, args = self.parse_command(user_input)
+                        if cmd:
+                            if not self.handle_command(cmd, args):
+                                return
+                        else:
+                            ready = True
+            elif i == len(subtopics) - 1:  # Last subtopic
+                print("\n🎉 Congratulations! You've completed all subtopics!")
+                
+                # Optional subjective question at the end
+                print("\nWould you like to answer a reflective question about what you've learned? (This won't affect your grade)")
+                if input("Type 'y' for yes, any other key to skip: ").lower().strip() == 'y':
+                    reflection_q = generate_question(
+                        self.topic,
+                        previous_questions,
+                        difficulty='medium',
+                        question_type='subjective'
+                    )
+                    print(f"\n💭 Reflection Question: {reflection_q['text']}")
+                    reflection_ans = input("Your thoughts: ")
+                    _, feedback = check_answer(reflection_q, reflection_ans)
+                    print(f"\nThank you for sharing! {feedback}")
         
         # Session completed
         self._complete_session()

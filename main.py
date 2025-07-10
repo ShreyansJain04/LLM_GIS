@@ -9,6 +9,7 @@ from domain_expert import generate_question, check_answer, show_available_source
 from interactive_session import InteractiveSession
 from enhanced_memory import EnhancedMemorySystem
 from llm_providers import llm_manager
+from typing import List, Dict
 
 
 def show_sources():
@@ -23,8 +24,13 @@ def show_sources():
 
 
 def review_mode(agent: PlannerAgent):
-    """Enhanced review mode that focuses on user's actual weak areas"""
+    """Enhanced review mode with integrated spaced repetition and adaptive difficulty"""
     print("\n=== Review Mode ===")
+    
+    # Get enhanced memory insights 
+    enhanced_memory = EnhancedMemorySystem(agent.username)
+    insights = enhanced_memory.get_insights()
+    recommendations = insights['personalized_recommendations']
     
     # Get performance summary
     summary = get_performance_summary(agent.username)
@@ -32,113 +38,444 @@ def review_mode(agent: PlannerAgent):
     print(f"Topics mastered: {summary['topics_mastered']}")
     print(f"Weak areas: {summary['weak_areas_count']}")
     
-    # Get recommended topics for review
-    recommended_topics = get_recommended_review_topics(agent.username, limit=5)
+    # Check for due spaced repetition items first
+    spaced_schedule = recommendations.get('spaced_repetition_schedule', [])
+    due_items = [item for item in spaced_schedule if item['days_until_review'] <= 0]
     
-    if not recommended_topics:
+    if due_items:
+        print(f"\n🔔 You have {len(due_items)} items due for spaced repetition review!")
+        for item in due_items[:3]:  # Show top 3
+            priority_emoji = "🔴" if item['priority'] == 'high' else "🟡"
+            print(f"  {priority_emoji} {item['topic']} - {item['subtopic']}")
+        
+        use_spaced = input("\nStart with spaced repetition items? (y/n): ").strip().lower()
+        if use_spaced == 'y':
+            _spaced_repetition_review(agent, due_items)
+            return
+    
+    # Get focus areas from enhanced memory
+    focus_areas = recommendations.get('focus_areas', [])
+    if not focus_areas:
         print("Great! No weak areas found. You're doing well!")
         return
     
-    print(f"\nRecommended topics to review: {', '.join(recommended_topics)}")
+    print(f"\n🎯 Priority Focus Areas:")
+    for i, area in enumerate(focus_areas[:5], 1):
+        print(f"{i}. {area['topic']} - {area['subtopic']} (Priority: {area['priority_score']})")
     
-    # Let user choose what to review
+    # Enhanced review options
     print("\nWhat would you like to review?")
-    print("1. Focus on weakest topics")
-    print("2. Choose specific topic")
-    print("3. Quick review of all weak areas")
+    print("1. Adaptive review (recommended) - AI adjusts difficulty based on performance")
+    print("2. Focus on highest priority weakness")
+    print("3. Choose specific topic")
+    print("4. Quick review of all weak areas")
+    print("5. Flashcard review mode")
     
-    choice = input("Select option (1-3): ").strip()
+    choice = input("Select option (1-5): ").strip()
     
     if choice == "1":
-        # Focus on the weakest topic
-        focus_topic = recommended_topics[0]
-        print(f"\nFocusing on: {focus_topic}")
-        _review_topic_intensively(agent, focus_topic)
-        
+        _adaptive_review_session(agent, focus_areas)
     elif choice == "2":
+        if focus_areas:
+            highest_priority = focus_areas[0]
+            print(f"\nFocusing on: {highest_priority['topic']} - {highest_priority['subtopic']}")
+            _review_topic_intensively(agent, highest_priority['topic'], adaptive=True)
+    elif choice == "3":
         # Let user choose specific topic
         print("\nWeak areas:")
-        for i, topic in enumerate(recommended_topics, 1):
-            print(f"{i}. {topic}")
+        for i, area in enumerate(focus_areas, 1):
+            print(f"{i}. {area['topic']} - {area['subtopic']}")
         
         try:
             topic_choice = int(input("Choose topic number: ")) - 1
-            if 0 <= topic_choice < len(recommended_topics):
-                selected_topic = recommended_topics[topic_choice]
-                _review_topic_intensively(agent, selected_topic)
+            if 0 <= topic_choice < len(focus_areas):
+                selected_area = focus_areas[topic_choice]
+                _review_topic_intensively(agent, selected_area['topic'], adaptive=True)
             else:
                 print("Invalid choice.")
         except ValueError:
             print("Invalid input.")
-            
-    elif choice == "3":
-        # Quick review of all weak areas
-        _quick_review_all(agent, recommended_topics)
+    elif choice == "4":
+        _quick_review_all(agent, [area['topic'] for area in focus_areas])
+    elif choice == "5":
+        _flashcard_review(agent, [area['topic'] for area in focus_areas])
     else:
         print("Invalid choice.")
 
 
-def _review_topic_intensively(agent: PlannerAgent, topic: str):
-    """Intensive review of a specific topic"""
-    print(f"\n=== Intensive Review: {topic} ===")
+def _spaced_repetition_review(agent: PlannerAgent, due_items: List[Dict]):
+    """Review items due for spaced repetition"""
+    from flashcards import FlashcardDeck
     
-    # Generate multiple questions for this topic
-    questions_asked = 0
-    correct_answers = 0
-    max_questions = 3
-    asked_questions = []  # Track previously asked questions to avoid repetition
-    subtopics_performance = []  # Track performance for memory system
+    print(f"\n=== Spaced Repetition Review ===")
+    print(f"Reviewing {len(due_items)} due items...")
     
-    while questions_asked < max_questions:
-        question = generate_question(topic, asked_questions)
-        asked_questions.append(question)  # Add to the list to avoid repetition
-        answer = input(f"\nQuestion {questions_asked + 1}: {question}\nYour answer: ")
+    total_reviewed = 0
+    total_correct = 0
+    
+    for item in due_items:
+        topic = item['topic']
+        print(f"\n--- {topic} - {item['subtopic']} ---")
+        print(f"Last reviewed: {item.get('days_until_review', 0)} days ago")
         
-        correct, feedback = check_answer(question, answer)
+        # Check if we have flashcards for this topic
+        deck = FlashcardDeck(agent.username, topic)
+        due_cards = deck.get_due_cards(limit=2)  # Limit to 2 cards per topic
+        
+        if due_cards:
+            # Use flashcard system
+            for card in due_cards:
+                print(f"\nFlashcard: {card['front']}")
+                input("Press Enter to see answer...")
+                print(f"Answer: {card['back']}")
+                
+                while True:
+                    try:
+                        quality = int(input(
+                            "\nRate your recall (0-5):\n"
+                            "0 - Couldn't remember at all\n"
+                            "1 - Wrong, but had some memory\n" 
+                            "2 - Wrong, but felt familiar\n"
+                            "3 - Correct after some effort\n"
+                            "4 - Correct with slight hesitation\n"
+                            "5 - Perfect recall\n"
+                            "Choice: "
+                        ))
+                        if 0 <= quality <= 5:
+                            break
+                        print("Please enter a number between 0 and 5")
+                    except ValueError:
+                        print("Please enter a valid number")
+                
+                # Update card with spaced repetition algorithm
+                deck.update_card_schedule(card, quality)
+                deck.update_stats(quality >= 3)
+                
+                if quality >= 3:
+                    total_correct += 1
+                total_reviewed += 1
+        else:
+            # Generate a question for this topic
+            question = generate_question(topic, [], difficulty="medium")
+            answer = input(f"\nQuestion: {question}\nYour answer: ")
+            
+            correct, feedback = check_answer(question, answer)
+            print(feedback)
+            
+            if correct:
+                total_correct += 1
+            total_reviewed += 1
+            
+            # Create a flashcard from this Q&A for future spaced repetition
+            if not deck.get_stats()['total_cards']:
+                deck.add_card(question, feedback.split('\n')[0], item['subtopic'])
+    
+    # Show results
+    accuracy = total_correct / total_reviewed if total_reviewed > 0 else 0
+    print(f"\n=== Spaced Repetition Results ===")
+    print(f"Items reviewed: {total_reviewed}")
+    print(f"Accuracy: {total_correct}/{total_reviewed} ({accuracy:.1%})")
+    
+    if accuracy >= 0.8:
+        print("🎉 Excellent retention! Your spaced repetition is working well.")
+    elif accuracy >= 0.6:
+        print("👍 Good progress. Keep up the regular reviews.")
+    else:
+        print("📚 These topics need more frequent review. Consider studying them again.")
+
+
+def _adaptive_review_session(agent: PlannerAgent, focus_areas: List[Dict]):
+    """Adaptive review that adjusts difficulty based on performance"""
+    print(f"\n=== Adaptive Review Session ===")
+    print("AI will adjust question difficulty based on your performance...")
+    
+    # Start with mixed topics and adaptive difficulty
+    total_questions = 0
+    total_correct = 0
+    difficulty_level = "medium"  # Start with medium
+    consecutive_correct = 0
+    consecutive_wrong = 0
+    
+    subtopics_performance = []
+    asked_questions = []
+    
+    for round_num in range(1, 8):  # Up to 7 questions 
+        # Select topic based on priority and recent performance
+        if round_num <= 3:
+            # First 3 questions: highest priority areas
+            current_area = focus_areas[min(round_num-1, len(focus_areas)-1)]
+        else:
+            # Later questions: rotate through areas
+            current_area = focus_areas[(round_num-1) % len(focus_areas)]
+        
+        topic = current_area['topic']
+        print(f"\n--- Round {round_num}: {topic} ---")
+        print(f"Difficulty: {difficulty_level.upper()}")
+        
+        # Generate adaptive question
+        question = generate_question(
+            topic, 
+            asked_questions, 
+            difficulty=difficulty_level,
+            question_type="objective"
+        )
+        asked_questions.append(question)
+        
+        # Handle different question types
+        if isinstance(question, dict) and 'options' in question:
+            # Multiple choice question
+            print(f"\nQuestion: {question['text']}")
+            for i, option in enumerate(question['options']):
+                print(f"{i}. {option}")
+            
+            user_answer = input("Enter option number (0-3): ")
+        else:
+            # Text question
+            user_answer = input(f"\nQuestion: {question}\nYour answer: ")
+        
+        correct, feedback = check_answer(question, user_answer)
         print(feedback)
         
-        # Record performance for this question
+        # Update counters
+        total_questions += 1
+        if correct:
+            total_correct += 1
+            consecutive_correct += 1
+            consecutive_wrong = 0
+        else:
+            consecutive_correct = 0
+            consecutive_wrong += 1
+        
+        # Record performance
         subtopics_performance.append({
-            'subtopic': f"Review Question {questions_asked + 1}",
+            'subtopic': f"{topic} - Round {round_num}",
             'question': question,
-            'user_answer': answer,
+            'user_answer': user_answer,
             'correct': correct,
             'score': 1 if correct else 0,
-            'feedback': feedback
+            'feedback': feedback,
+            'difficulty': difficulty_level
         })
         
+        # Auto-create flashcard for correct answers at medium+ difficulty
+        if correct and difficulty_level in ["medium", "hard"]:
+            from flashcards import auto_create_flashcard_from_review
+            auto_create_flashcard_from_review(
+                agent.username, 
+                topic, 
+                str(question),
+                feedback.split('\n')[0] if '\n' in feedback else feedback,
+                difficulty_level
+            )
+        
+        # Adapt difficulty based on performance
+        if consecutive_correct >= 2 and difficulty_level != "hard":
+            if difficulty_level == "easy":
+                difficulty_level = "medium"
+            elif difficulty_level == "medium":
+                difficulty_level = "hard"
+            print(f"📈 Performance good! Increasing difficulty to {difficulty_level.upper()}")
+            consecutive_correct = 0
+        elif consecutive_wrong >= 2 and difficulty_level != "easy":
+            if difficulty_level == "hard":
+                difficulty_level = "medium"
+            elif difficulty_level == "medium":
+                difficulty_level = "easy"
+            print(f"📉 Adjusting difficulty to {difficulty_level.upper()} for better learning")
+            consecutive_wrong = 0
+        
+        # Ask if user wants to continue (after round 3)
+        if round_num >= 3 and round_num < 7:
+            continue_review = input(f"\nContinue review? ({7-round_num} questions remaining) (y/n): ").lower().strip()
+            if continue_review != 'y':
+                break
+    
+    # Final results with adaptive insights
+    final_score = total_correct / total_questions if total_questions > 0 else 0
+    print(f"\n=== Adaptive Review Results ===")
+    print(f"Questions answered: {total_questions}")
+    print(f"Final accuracy: {total_correct}/{total_questions} ({final_score:.1%})")
+    print(f"Final difficulty level: {difficulty_level.upper()}")
+    
+    # Determine mastery improvements
+    improved_topics = set()
+    for perf in subtopics_performance:
+        if perf['correct'] and perf['difficulty'] in ["medium", "hard"]:
+            improved_topics.add(perf['subtopic'].split(' - ')[0])
+    
+    if final_score >= 0.8:
+        mastery_level = 'mastered'
+        print(f"🎉 Excellent! You've shown strong understanding.")
+        # Update mastery for topics that were answered correctly at medium/hard difficulty
+        profile = agent.profile
+        for topic in improved_topics:
+            if topic in profile.get('weak_areas', []):
+                weak_areas = set(profile.get('weak_areas', []))
+                weak_areas.discard(topic)
+                profile['weak_areas'] = list(weak_areas)
+        agent.save_profile(profile)
+    elif final_score >= 0.6:
+        mastery_level = 'intermediate'
+        print(f"👍 Good progress! Keep practicing these topics.")
+    else:
+        mastery_level = 'beginner'
+        print(f"📚 These topics need more study. Try learning mode for deeper understanding.")
+    
+    # Record the adaptive session
+    record_learning_session(
+        username=agent.username,
+        topic="Adaptive Review Session",
+        subtopics_performance=subtopics_performance,
+        final_score=final_score,
+        mastery_level=mastery_level
+    )
+
+
+def _review_topic_intensively(agent: PlannerAgent, topic: str, adaptive: bool = False):
+    """Enhanced intensive review with optional adaptive difficulty"""
+    print(f"\n=== Intensive Review: {topic} ===")
+    
+    # Start with user's current level for this topic
+    profile = agent.profile
+    topic_mastery = profile.get('performance_data', {}).get(topic, {})
+    avg_score = topic_mastery.get('average_score', 0.5)
+    
+    # Set initial difficulty based on past performance
+    if avg_score >= 0.8:
+        difficulty = "hard"
+    elif avg_score >= 0.6:
+        difficulty = "medium"
+    else:
+        difficulty = "easy"
+    
+    print(f"Starting difficulty: {difficulty.upper()} (based on your past performance)")
+    
+    questions_asked = 0
+    correct_answers = 0
+    max_questions = 5 if adaptive else 3
+    asked_questions = []
+    subtopics_performance = []
+    consecutive_correct = 0
+    consecutive_wrong = 0
+    
+    while questions_asked < max_questions:
+        print(f"\n--- Question {questions_asked + 1}/{max_questions} ---")
+        
+        # Generate question with current difficulty
+        question = generate_question(topic, asked_questions, difficulty=difficulty)
+        asked_questions.append(question)
+        
+        # Handle different question formats
+        if isinstance(question, dict) and 'options' in question:
+            print(f"\nQuestion: {question['text']}")
+            for i, option in enumerate(question['options']):
+                print(f"{i}. {option}")
+            user_answer = input("Enter option number (0-3): ")
+        else:
+            user_answer = input(f"\nQuestion: {question}\nYour answer: ")
+        
+        correct, feedback = check_answer(question, user_answer)
+        print(feedback)
+        
+        # Update performance tracking
         if correct:
             correct_answers += 1
+            consecutive_correct += 1
+            consecutive_wrong = 0
+        else:
+            consecutive_correct = 0
+            consecutive_wrong += 1
             
+        # Record performance with difficulty level
+        subtopics_performance.append({
+            'subtopic': f"{topic} - Question {questions_asked + 1}",
+            'question': question,
+            'user_answer': user_answer,
+            'correct': correct,
+            'score': 1 if correct else 0,
+            'feedback': feedback,
+            'difficulty': difficulty
+        })
+        
+        # Auto-create flashcard for correct answers at medium+ difficulty
+        if correct and difficulty in ["medium", "hard"]:
+            from flashcards import auto_create_flashcard_from_review
+            auto_create_flashcard_from_review(
+                agent.username, 
+                topic, 
+                str(question),
+                feedback.split('\n')[0] if '\n' in feedback else feedback,
+                difficulty
+            )
+        
         questions_asked += 1
         
+        # Adaptive difficulty adjustment
+        if adaptive and questions_asked < max_questions:
+            if consecutive_correct >= 2 and difficulty != "hard":
+                old_difficulty = difficulty
+                if difficulty == "easy":
+                    difficulty = "medium"
+                elif difficulty == "medium":
+                    difficulty = "hard"
+                print(f"\n📈 Great! Increasing difficulty from {old_difficulty.upper()} to {difficulty.upper()}")
+                consecutive_correct = 0
+            elif consecutive_wrong >= 2 and difficulty != "easy":
+                old_difficulty = difficulty
+                if difficulty == "hard":
+                    difficulty = "medium"
+                elif difficulty == "medium":
+                    difficulty = "easy"
+                print(f"\n📉 Let's adjust difficulty from {old_difficulty.upper()} to {difficulty.upper()}")
+                consecutive_wrong = 0
+        
+        # Ask to continue (except for last question)
         if questions_asked < max_questions:
             continue_review = input("\nContinue with another question? (y/n): ").lower().strip()
             if continue_review != 'y':
                 break
     
-    # Show results
+    # Enhanced results analysis
     score = correct_answers / questions_asked if questions_asked > 0 else 0
-    print(f"\nReview Results: {correct_answers}/{questions_asked} ({score:.1%})")
+    print(f"\n=== Review Results ===")
+    print(f"Questions answered: {questions_asked}")
+    print(f"Accuracy: {correct_answers}/{questions_asked} ({score:.1%})")
+    print(f"Final difficulty level: {difficulty.upper()}")
     
-    # Determine mastery level
-    if score >= 0.8:
+    # Improved mastery determination - considers difficulty and consistency
+    high_difficulty_correct = sum(1 for perf in subtopics_performance 
+                                 if perf['correct'] and perf['difficulty'] in ['medium', 'hard'])
+    
+    if score >= 0.8 and high_difficulty_correct >= 2:
         mastery_level = 'mastered'
-        print(f"Excellent! You've improved in {topic}")
-        # Update the topic as no longer weak
+        print(f"🎉 Excellent! You've mastered {topic}")
+        # Remove from weak areas only if consistently good at medium+ difficulty
         profile = agent.profile
         weak_areas = set(profile.get('weak_areas', []))
         weak_areas.discard(topic)
         profile['weak_areas'] = list(weak_areas)
         agent.save_profile(profile)
+        
+        # Create flashcards for future spaced repetition
+        from flashcards import FlashcardDeck
+        deck = FlashcardDeck(agent.username, topic)
+        if deck.get_stats()['total_cards'] < 3:  # Add some cards for retention
+            for perf in subtopics_performance[:2]:  # Use best 2 questions
+                if perf['correct']:
+                    deck.add_card(
+                        str(perf['question']),
+                        perf['feedback'].split('\n')[0],
+                        topic
+                    )
+                    
     elif score >= 0.6:
         mastery_level = 'intermediate'
-        print(f"Good progress in {topic}. Keep practicing!")
+        print(f"👍 Good progress in {topic}. A few more practice sessions should help!")
     else:
         mastery_level = 'beginner'
-        print(f"Keep working on {topic}. Consider studying it again.")
+        print(f"📚 {topic} needs more study. Consider using learning mode first.")
     
-    # Record the review session in memory
+    # Record the intensive review session
     record_learning_session(
         username=agent.username,
         topic=topic,
@@ -181,6 +518,104 @@ def _quick_review_all(agent: PlannerAgent, weak_topics: list):
         print("Good progress! Keep reviewing these topics.")
     else:
         print("These topics need more study. Consider focused learning sessions.")
+
+
+def _flashcard_review(agent: PlannerAgent, topics: List[str]):
+    """Review topics using flashcards with spaced repetition."""
+    from flashcards import FlashcardDeck, create_flashcards_from_qa
+    
+    print("\n=== Flashcard Review ===")
+    
+    # Let user choose topic
+    print("\nAvailable topics:")
+    for i, topic in enumerate(topics, 1):
+        deck = FlashcardDeck(agent.username, topic)
+        stats = deck.get_stats()
+        due_cards = stats['cards_due']
+        print(f"{i}. {topic} ({due_cards} cards due)")
+    
+    try:
+        topic_choice = int(input("\nChoose topic number (or 0 for all): ")) - 1
+        
+        if topic_choice == -1:
+            # Review all due cards across topics
+            selected_topics = topics
+        elif 0 <= topic_choice < len(topics):
+            selected_topics = [topics[topic_choice]]
+        else:
+            print("Invalid choice.")
+            return
+            
+        total_reviewed = 0
+        for topic in selected_topics:
+            deck = FlashcardDeck(agent.username, topic)
+            
+            # Check if we need to generate cards
+            if deck.get_stats()['total_cards'] == 0:
+                print(f"\nGenerating flashcards for {topic}...")
+                # Generate QA pairs for the topic
+                qa_pairs = []
+                for _ in range(5):  # Generate 5 cards per topic
+                    question = generate_question(topic, [])
+                    correct_answer, _ = check_answer(question, "GENERATE_ANSWER")
+                    qa_pairs.append({
+                        'question': question,
+                        'answer': correct_answer,
+                        'subtopic': topic
+                    })
+                deck = create_flashcards_from_qa(agent.username, topic, qa_pairs)
+            
+            # Get due cards
+            due_cards = deck.get_due_cards()
+            if not due_cards:
+                print(f"\nNo cards due for review in {topic}")
+                continue
+            
+            print(f"\nReviewing {topic}...")
+            for card in due_cards:
+                print(f"\nCard front: {card['front']}")
+                input("Press Enter to see answer...")
+                print(f"Answer: {card['back']}")
+                
+                while True:
+                    try:
+                        quality = int(input(
+                            "\nRate your answer (0-5):\n"
+                            "0 - Complete blackout\n"
+                            "1 - Incorrect, but remembered\n"
+                            "2 - Incorrect, but seemed easy\n"
+                            "3 - Correct, but difficult\n"
+                            "4 - Correct\n"
+                            "5 - Correct and easy\n"
+                            "Choice: "
+                        ))
+                        if 0 <= quality <= 5:
+                            break
+                        print("Please enter a number between 0 and 5")
+                    except ValueError:
+                        print("Please enter a valid number")
+                
+                # Update card scheduling
+                deck.update_card_schedule(card, quality)
+                deck.update_stats(quality >= 3)
+                total_reviewed += 1
+                
+                if total_reviewed % 5 == 0:
+                    continue_review = input("\nContinue reviewing? (y/n): ").lower().strip()
+                    if continue_review != 'y':
+                        break
+            
+            # Show progress
+            stats = deck.get_stats()
+            print(f"\nProgress for {topic}:")
+            print(f"Cards studied: {stats['cards_studied']}")
+            print(f"Correct answers: {stats['correct_answers']}")
+            accuracy = stats['correct_answers'] / stats['cards_studied'] if stats['cards_studied'] > 0 else 0
+            print(f"Accuracy: {accuracy:.1%}")
+            
+    except ValueError:
+        print("Invalid input.")
+        return
 
 
 def learn_mode(agent: PlannerAgent):

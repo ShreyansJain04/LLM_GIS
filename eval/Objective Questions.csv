@@ -1,0 +1,601 @@
+Question,Option A,Option B,Option C,Option D,Answer,Category
+"____ is a computerized system that facilitates the phases of data entry, data management, and data analysis and data presentation specifically for dealing with georeferenced data.",geo-information science,geology science,geographic information system,life science,geographic information system,Geodatabase
+_____ imaging systems use conventional type cameras,multispectral,infra red,thermal,microwave,multispectral,Remote Sensing
+_____ visualisation helps the researcher to explore models and refine hypotheses.,static,interactive,planar,optical,interactive,Cartography
+_____ can remotely trigger special photographs.,mounted cameras,cameras,digital device,none of the above,mounted cameras,Remote Sensing
+_____ Coordinate Systems are used to locate data on the Earth's surface in a 3D space.,planar,global,local,parallel,global,Spatial Analysis
+_____ determines the fidelity of the represented colors in raster graphics.,color depth,color brightness,color dimensions,all the above,color depth,Remote Sensing
+_____ determines the range of the color coverage in raster graphics.,color space,color brightness,color dimensions,all the above,color space,Remote Sensing
+_____ is a case of estimating 3D coordinates of points on an object employing measurements made in 2 or more photographic images taken from different positions.,stereophotogrammetry,geometry,coordinate photogrammetry,all the above,stereophotogrammetry,Surveying
+_____ is a specific type of information resulting from the interpretation of spatial data.,geo-referenced data,geospatial,geoinformation,numeric data,geoinformation,Spatial Analysis
+_____ is calculated as the number of cells multiplied by the cell area size,location of an individual cell,size of individual cell,width of cell,area of raster,area of raster,Spatial Analysis
+_____ is defined as the difference in maximum and minimum altitude within an area or facet,relief,relative relief,slope,topology,relative relief,Spatial Analysis
+_____ is not considered in a data capturing process.,creating map,using sensor,manually collecting data,buying data from some organization,creating map,Geodatabase
+_____ is technology and science of obtaining reliable information regarding environment and physical objects.,photogrammetry,image interpretation,both a and b,none of the above,photogrammetry,Remote Sensing
+"_____ is the science and art of map making, functions as an interpreter, translating real world phenomena (primary data) into correct, clear and understandable representations for our use.",cartography,photography,data analyst,biologist,cartography,Cartography
+_____ model is used to approximate the surface behaviour in DTM,parametric,slope,interpolation,both a and b,interpolation,Spatial Analysis
+_____ orientation defines geometric parameters of the imaging process.,inner orientation,exterior orientation,both a and b,none of the above,inner orientation,Remote Sensing
+_____ orientation of camera defines the space location and view direction.,inner orientation,exterior orientation,both a and b,none of the above,exterior orientation,Remote Sensing
+"_____ projection is used for mapping small, regular shaped areas like quadrangle",transverse,polyconic,oblique,lambertis,polyconic,Cartography
+_____ refers to the shape of the surface.,application map,thematic map,calligraphy,topography map,topography map,Spatial Analysis
+_____ Should be indicated at the bottom of the map,details,scale,states,countries,scale,Cartography
+_____ works like a filter.,intersection,join,attribute projection,tuple selection,tuple selection,Spatial Analysis
+_____ works like tuple formatter.,attribute projection,join,intersection,tuple selection,attribute projection,Geodatabase
+_____accuracy refers to the difference in the values of its coordinates at two different times,temporal accuracy,attribute accuracy,positional accuracy,data accuracy,temporal accuracy,Surveying
+_____allows the assignment of features to a class on the basis of attribute values,classification,retrieval,generalization,estimation,classification,Spatial Analysis
+_____are properties of spatial features that remain invariant under topological mappings :,network,polygon,interior and boundary,boundary values,interior and boundary,Spatial Analysis
+_____can be defined as the ratio between the distance on a paper map and the distance of the same stretch in the terrain.,ratio scale,nominal scale,interval scale,map scale,map scale,Cartography
+_____Convert street addresses or street interpolation into point feature.,geocoding,path distance,networking,coding,geocoding,Spatial Analysis
+_____data values are values that allow simple forms of computation.,nominal,ordinal,ratio,interval,interval,Geodatabase
+_____data values are values that can be put in some sequence.,nominal,ordinal,ratio,interval,ordinal,Geodatabase
+_____data values are values that provide a name or identifier,nominal,ordinal,ratio,interval,nominal,Geodatabase
+_____deals with spatial properties that do not change under certain transformations.,node,shapefile,topology,model,topology,Spatial Analysis
+"_____function allows the combination of two (or more) spatial data layers comparing them position by position, and treating areas of overlap and of non-overlap in distinct ways",classification,retrieval,generalization,overlay,overlay,Spatial Analysis
+"_____functions allow the calculation of distances, lengths, or areas",classification,retrieval,generalization,measurement,measurement,Spatial Analysis
+_____functions allow the selective search of data,classification,retrieval,generalization,estimation,retrieval,Geodatabase
+_____is a database system,spatial database,special database,data warehouse,geographical database,spatial database,Geodatabase
+_____is a proprietary “ESRI” format for raster data,esri grod,x and y grod,doq,geospatial,esri grod,Geodatabase
+_____is a technique of purposefully removing detail from an input data set to reveal important patterns of spatial distribution,classification,regression,retrieval,derivation,classification,Cartography
+"_____is an integrated, systematic network of reference receivers covering a large area.",native positioning,differential positioning,network positioning,reference positioning,network positioning,Surveying
+_____is the scientific field that attempts to integrate different disciplines studying the methods and techniques of handling spatial information.,geo-information science,geo-information system,geology science,life science,geo-information science,Spatial Analysis
+_____models (as in a database or GIS) have enormous advantages over paper models (such as maps).,structural,digital,analog,data,digital,Geodatabase
+_____produces a vector data set from a raster,bundling of data,data cleaning,vectorization,pattern recognition,vectorization,Remote Sensing
+"_____provides users with facilities for finding, viewing, downloading and processing data",spatial data interface,spatial data international,spatial data intention,spatial data infrastructure,spatial data infrastructure,Geodatabase
+_____representation is an efficient representation of a topology,raster,tessellation,vector,image,vector,Geodatabase
+‘Boundary model’ is also called ?,temporal data model,topological discrete model,geodatabases,topological data model,topological data model,Cartography
+‘Metadata’ means?,data about data,meteorological data,oceanic data,contour data,data about data,Geodatabase
+‘Spatial databases’ also known as ?,monodatabases,concurrent databases,geodatabases,all of the above,geodatabases,Geodatabase
+3D coordinates defines object location in _____ space.,3d,2d,1d,both a and b,3d,Spatial Analysis
+3D mapping can be used in socio-economic applications such as population or retail studies?,TRUE,FALSE,nan,nan,1,Cartography
+"A (geographic) field is a geographic phenomena for which, for every point in the study area",a value can be determined,a value cannot be determined,a value is not relevant,a value is missing,a value can be determined,Spatial Analysis
+"A ____ is a computer-based system that provides the following four sets of capabilities to handle georeferenced data: 1)Data capture and preparation 2) Data management, including storage and maintenance 3) Data manipulation and analysis 4) Data presentation",kis,bis,mis,gis,gis,Geodatabase
+A _____ is a mathematically described technique to represent Earth’s curved surface on a flat map,map selection,map projection,map distortion,map reference,map projection,Cartography
+A _____ is a miniature representation of some part of the real world.,model,data,attribute,map,map,Cartography
+A _____ is a repository for storing large amounts of data,structure,database,data,information,database,Geodatabase
+A _____in a relation represents a relationship among a set of values.,tuple,attribute,key,domain,tuple,Geodatabase
+A ‘data model’ is a language that allows the definition of,the ‘structures’ that will be used to store the base data,the ‘integrity constraints’ that the stored data has to obey at all moments in time,the ‘computer programs’ used to manipulate the data,all of the above,all of the above,Geodatabase
+A better option for representing continuous phenomenon is the_____,raster data model,vector data model,binary data model,digital data model,raster data model,Cartography
+A bitmap image is represented as _____ grid.,circular,rectangular,square,all the above,rectangular,Cartography
+A CAD tool graphically represents the information in _____ dimensions.,2d,3d,both a and b,none of the above,both a and b,Surveying
+A cartographic grammar represents _____,cartographic data,cartographic maps,cartographic rules,cartographic locations,cartographic rules,Cartography
+A chase plane is a _____.,satellite,aircraft,boat,none of the above,aircraft,Remote Sensing
+"A common map projection, which is the basis for the SPC system for many states.",lambert conformal conic projection,azimuthal projection,parallel projection,cylindrical projection,lambert conformal conic projection,Cartography
+"A computer program to acquire, store, manipulate, analyze and manage spatial data is:",rs,gis,gps,none of the above,gis,Geodatabase
+A data model that uses objects to organize spatial data and stores spatial data and attribute data in a single system.,vector based data model,raster based data model,object-based data model,none of the above,object-based data model,Geodatabase
+"A digital image prepared from aerial photograph or other remotely sensed data, in which the displacement, caused by camera tilt and terrain relief has been removed is called .",digital on/off service,double orthophoto quad,digital orthophoto quad,double on/off service,digital orthophoto quad,Remote Sensing
+A digitized tablet uses which of the following peripherals to feed data?,magnetic pen,puck,mouse,all the above,all the above,Surveying
+"A geographic field is a phenomena for which every point in the study, a value can be:",can't be determined,determined,not relevant,missing,determined,Spatial Analysis
+A GIS package offer the following capabilities:,data capturing,data storage,data analysis & presentation,all of the above,all of the above,Geodatabase
+A location reference system for spatial features on the Eanh's surface.,quadratic system,geodetic coordinates,geographic coordinate system,all of the above,geographic coordinate system,Cartography
+A measurement system for longitude and latitude values such as 42.5°.,datum,wms,decimal degrees (dd) system,all of the above,decimal degrees (dd) system,Cartography
+"A measuring system for longitude and latitude values such as 42°30'00"", in which 1 degree equals 60 minutes and 1 minute equals 60 seconds.",datum,wms,decimal degrees (dd) system,degrees-minutes-seconds (dais) system,degrees-minutes-seconds (dais) system,Cartography
+A model that approximates the Earth. Also called spheroid.,ellipsoid,equivalent projection,equidistant projection,all of the above,ellipsoid,Cartography
+A paper map use the form representation is:,analog,digital,binary,decimel,analog,Cartography
+A process where a survey plan or hard copy is a map and is represented digital medium using geo-referencing capabilities and CAD tool is called _____ technique.,digitization,modulation,demodulation,none of the above,digitization,Cartography
+A puck has small size window with _____ hairs.,straight,cross,vertical,horizontal,cross,Surveying
+A raster that contains cells of continuous values is called_____.,floating point raster,georeference raster,contiguous raster,poly raster,floating point raster,Remote Sensing
+"A reduced model of the Earth, from which map projections are made. Also called a nominal or generating _____.",projection globe,parallel globe,reference globe,all of the above,reference globe,Cartography
+A reference tool showing the outlines of selected natural and man-made features of the Earth is_____.,topographic map,thematic map,world map,digital map,topographic map,Cartography
+A representation of some part of the real world can be considered a _____ because the representation will have certain characteristics in common with the real world.,attribute,data,model,metadata,model,Cartography
+A row in a table is also known as _____.,attribute,tuple,relation,domain,tuple,Geodatabase
+"A satellite equipped with a clock, at a specific moment sends a radio message that includes",clock reading,space reading,hours reading,seconds reading,clock reading,Remote Sensing
+A satellite-determined spheroid for the Geodetic Reference System 1980.,gps80,nad80,nad87,grs80,grs80,Remote Sensing
+A scale printed as line and divided into units in a map is called as _____ scale,verbal,fractional,graphic,spatial,graphic,Cartography
+A sensing system that generates and uses it’s own energy to illuminate the target is ____ sensing system,passive,active,radio active,piezoelectric,active,Remote Sensing
+A systematic arrangement of parallels and meridians on a plane surface.,meridians,equator,surface,map projection,map projection,Cartography
+A thematic map that displays a quantitative attribute using ordinal classes is called a choropleth map?,1,0,nan,nan,1,Cartography
+A traditional method sketches geographical form using ?,directly sketch,indirectly sketch,digitizing tablet,none of the above,digitizing tablet,Cartography
+A two-way relationship between data tables is a,join.,relate.,union.,representation.,relate.,Geodatabase
+A vector data model that uses a split system to store spatial data and attribute data.,geospatial data model,spatial data model,mis data model,georelational data model,georelational data model,Geodatabase
+A vector data model uses one of the following coordinate pair types to build curvature within a line:,points,floating points,vertices,nodes,vertices,Cartography
+"According to Kirchhoff’s law of physics, Absorbance is replaced with _____",reflectivity,scattering constant,diffusion constant,emissivity,emissivity,Remote Sensing
+"according to optical theory, brightness of any small area of a perfectly diffuse undulating surface varies as the _____ parallel light",cosine of the angle of incident,sine of the angle of incident,tangent of the angle of incident,secant of the angle of incident,cosine of the angle of incident,Remote Sensing
+Across track scanning systems are also called as _____ scanner systems,push broom,pull broom,lateral broom,whisk broom,whisk broom,Remote Sensing
+Aerial photography is also called as _____.,airborne imagery,airborne sheet,air imagery,all the above,airborne imagery,Remote Sensing
+Age of data can act as a source of error.,0,1,nan,nan,1,Geodatabase
+Air to air photography uses _____ number of aircraft.,0,2,3,1 or more,1 or more,Remote Sensing
+Airborne imagery takes aerial photographs using _____ resources.,balloons,aircrafts,blimps,all the above,all the above,Remote Sensing
+ALOS stands for:,air land observation satellite,air land observation system,advanced land observation satellite,advanced land observation syetem,advanced land observation satellite,Remote Sensing
+"Among the available formats, which are most commonly used in case of GIS?",gif,tiff,jpeg,dxf,tiff,Geodatabase
+Among the following which do not come under the components of GIS?,hardware,software,data,compiler,compiler,Geodatabase
+An _____is a linear feature that connects the points with equal field value,isotope,isolines,isocool,isotherm,isolines,Cartography
+An accurate measurement has mean,close to the true value,far from true value,equal to true value,equal to median value,close to the true value,Surveying
+An ESRI data format for topological vector data.,coordinate system,coverage,segmentation model,none of the above,coverage,Geodatabase
+"Analysis and visualizations of events, reading over time is known as:",multi dimension,temporal dimension,spatial dimension,geopositional dimension,temporal dimension,Cartography
+Analytical capabilities of a GIS use _____data to answer questions about real-world,spatial and non-spatial,static and dynamic,true and false,new and old,spatial and non-spatial,Spatial Analysis
+Animated GIF can be seen as a,draw only version of dynamic map,view only version of dynamic map,draw only version of static map,view only version of static map,view only version of dynamic map,Cartography
+Area < 400000 AND Land use = 80 is which type of query?,interactive spatial selection,spatial selection by attribute,combined attribute condition,spatial selection using topological selection,combined attribute condition,Geodatabase
+Area < 400000 is which type of query?,interactive spatial selection,spatial selection by attribute,combined attribute condition,spatial selection using topological selection,spatial selection by attribute,Geodatabase
+A spatial query relates to _____,coordinates,pixels,attributes,all of the above,attributes,Geodatabase
+Attribute projection operation can work on _____ input relation/relations.,four,three,two,one,one,Geodatabase
+Baseline information regarding landslides in India can be obtained from,landsat etm,irs p6,aster,all of the above,all of the above,Remote Sensing
+Basic units of spatial information _____.,point line arc,data,graph,design,point line arc,Geodatabase
+By ‘spatial data’we mean data that has,complex values,positional values,graphic values,decimal values,positional values,Geodatabase
+CAD in CAD tool stands for _____.,computer-aided design,computer alters design,control aided design,none of the above,computer-aided design,Surveying
+CAD is also named as _____.,cadd,cadb,ccad,none of the above,cadd,Surveying
+CADD is abbreviated as _____.,computer-aided design drafting,computer alter design drafting,computer-aided develop drafting,none of the above,computer-aided design drafting,Surveying
+"Calculations (sum, average, median, etc.) can’t be performed on the type of field:",integer,character,floating,blob,character,Geodatabase
+Carrier Phase Measurement works on ____ Positioning.,relative positioning,absolute positioning,carrier wave,pseudo ranging,relative positioning,Surveying
+Cartographic visualisation process is_____.,conversion of spatial data into graphics,conversion of spatial data into other form of data,conversion of spatial data into facts and figures,conversion of spatial data into reports,conversion of spatial data into graphics,Cartography
+Cartography is the science and art of,map making,spatial resolution,vector analysis,data analysis,map making,Cartography
+Cartography mainly deals with which of the functionality of GIS?,spatial data capture and preparation,spatial data analysis,spatial data storage and maintenance,spatial data presentation,spatial data presentation,Cartography
+Choice of representing geographic phenomena depends on _____.,analysis performed on data,software and hardware components,developer,kind of data available and data manipulation required,kind of data available and data manipulation required,Cartography
+Collection and maintenance of base data remain the responsibility of government agencies such as_____.,national mapping agencies,central bureau of investigation,reserve bank of india,nuclear fuel complex,national mapping agencies,Geodatabase
+Collection of connected lines may represent phenomena that are best viewed as _____,graph,network,vector,raster,network,Cartography
+Comparison & logical operators will store values in output raster as,imaginary values,numerical values,true & false,zero,true & false,Spatial Analysis
+Completeness refers to _____,comparison of real world data with the database,comparison of various data,thematic study of data,tier study,comparison of real world data with the database,Geodatabase
+Computation that can be performed by topographic function is,determination of slope angle,determination of slope aspect,determination of slope length,all of the above,all of the above,Spatial Analysis
+Condition Analysis in pavement management system includes _____,ride,distress,surface friction,all of the above,all of the above,Spatial Analysis
+"Contiguity function, network analytic function and visibility function are a part of _____function",connectivity,overlay,classification,retrieval,connectivity,Spatial Analysis
+Continuous fields are represented by _____,tin,point,line,polygon,tin,Spatial Analysis
+Contour lines are also called as _____,equilateral,mesolines,isolines,metalines,isolines,Cartography
+Contour lines are used to show?,elevation,latitude,longitude,altitude,elevation,Cartography
+Control points are best described on map as:,areas where projection can easily change,points that do not have a spatial reference,common locations used in aligning two datasets,points in the data that share the same datum,common locations used in aligning two datasets,Cartography
+Conversion of maps from one scale to another may lead to problems of _____,visualization,cartographic generalization,map characteristics,map presentation,cartographic generalization,Cartography
+Convolution window in spatial filtering are also called as ___,kernel,template,mask,all of the above,all of the above,Remote Sensing
+"Currently, GIS software packages are able to store spatial data in database software with the help of _____.",dbms,oracle,spatial extensions,sybase,spatial extensions,Geodatabase
+Data can be shared in the process of GIS.,1,0,nan,nan,0,Geodatabase
+Data format of the digital images are?,gif,tiff,bmp,all of above,all of above,Remote Sensing
+Data integrity constraints are used to _____.,control who is allowed access to the data,prevent users from changing the values stored in the table,ensure that duplicate records are not entered into the table,improve the quality of data entered for a specific property,improve the quality of data entered for a specific property,Geodatabase
+Data that describe both the locations and characteristics of spatial features on the Earth's surface.,geospatial data,spatial data model,mis data model,georelational data model,geospatial data,Spatial Analysis
+Data that describe the characteristics of spatial features.,coverage,data exploration,geospatial data,attribute data,attribute data,Geodatabase
+Data-centered query and analysis is known as _____.,discrete structure,gis modeling,data exploration,attribute data,data exploration,Geodatabase
+DBMS offers the facilities of:,data model,data backup,data redundancy,all of the above,all of the above,Geodatabase
+Determine the scale of the map if the distance on the map is given as 2cm which is equal to 1km on the ground.,1: 50000,3.51388888888889,1: 100000,0.388888888888889,1: 50000,Cartography
+Digital data in GIS is represented using _____ data creation methods.,analog,digital,both a and b,none of the above,digital,Geodatabase
+Dissolve operation combines boundaries based on _____,relevant attributes,features,original attributes,dimensions,relevant attributes,Spatial Analysis
+"Distance between two feature points say p and q, is calculated by_____",root mean square error,pythagorean distance function,regression,integration,pythagorean distance function,Spatial Analysis
+Do GIS represent a non existing object?,yes,no,maybe,nan,no,Spatial Analysis
+Does UAV have a pilot driver?,yes,no,maybe,nan,no,Remote Sensing
+"Dr Jhon Snow first spatially locate and identify the Cholera outbreak in London, UK in:",1853,1854,1855,1856,1854,Spatial Analysis
+DSM stands for:,digital surface module,digital surface model,digital safe model,digital surface mechanism,digital surface model,Remote Sensing
+DTM data generation involves,ground surveys,photogrammetric data,laser,all of the above,all of the above,Remote Sensing
+DTM is _____ model,2.5 d,3d,2d,4d,2.5 d,Remote Sensing
+DTM manipulation involves,editing,filtering,merging,all of the above,all of the above,Remote Sensing
+DTM stands for:,digital terrain model,digital traffic model,digital terrain mode,digital terrain mechanism,digital terrain model,Remote Sensing
+"During the _____, object-oriented and object relational data models were developed to represent and manage spatial data",1990's,1980's,1970's,1960's,1990's,Geodatabase
+Earths location can be recorded in terms of _____ parameters.,date,time,calendar,both a and b,both a and b,Spatial Analysis
+Earth's location recorded in terms of time and date parameters are based on which of the following reference.,latitude,longitude,elevation,all the above,all the above,Spatial Analysis
+Elevation is _____?,a compass,the height of ground above sea level,coordinates,a map,the height of ground above sea level,Surveying
+Elevations with respect to GIS are referred to as_____.,discrete objects,continuous fields,geographic object,gis object,continuous fields,Spatial Analysis
+Equal area projections are used in ?,small areas example: street,small areas example: a city,large areas example:a state,large areas example: a continent,large areas example: a continent,Cartography
+ESRI stands for:,environmental systems research institute,environmental systematic research institute,environmental science renewal institute,environmental science research institute,environmental systems research institute,Geodatabase
+Explanatory list of symbols on a map _____.,topology,navigational map,legends,objects,legends,Cartography
+F. Arago was a _____ surveyor.,french,german,indian,dutch,french,Surveying
+Fields can be,discrete only,continuous only,discrete or continuous,none of the above,discrete or continuous,Geodatabase
+Flat representation of Earth's surface called ?,map,globe,graph,sketch,map,Cartography
+For ‘Discrete fields’ which one is true,‘land classification’ are discrete fields,discrete fields make use of ‘bounded’ features,discrete fields divide the study space in mutually exclusive having all the locations in one part with same field value,all of the above,all of the above,Spatial Analysis
+"For a constantly revised, accessed and manipulated GIS dataset by multiple users in a given project the best practice approach for storing the data is:",kml files,shapefiles,enterprise geodatabase,personal geodatabase,kml files,Geodatabase
+"For each attribute of a relation, there is a set of permitted values, called as the _____ of that attribute.",relation,domain,set,schema,domain,Geodatabase
+GCP stands for _____,global control points,ground control points,global communication points,ground communication points,ground control points,Surveying
+Geographic coordinates that are based on a spheroid.,quadratic system,geodetic coordinates,vector data,raster data,geodetic coordinates,Spatial Analysis
+Geographic fields can be _____and _____,raster and grid,discrete & continuous,fast & slow,fixed and raw,discrete & continuous,Spatial Analysis
+Geographic objects are NOT distinguished by which of the following?,location,shape,size,database,database,Spatial Analysis
+Geographic phenomena cannot be _____.,named,assigned orientation,georeferenced,assigned a time,assigned orientation,Spatial Analysis
+Geoid is used to describe _____.,heights,width,ranges,weights,heights,Surveying
+Geometric measurement on spatial features includes which of the following computations?,counting,distance,area size,all of the above,all of the above,Surveying
+Geoprocessing operation includes which of the following process?,defining,management,analyses information,all the above,all the above,Spatial Analysis
+GIS accuracy depends on _____.,the encoded process,source data,both a and b,location,both a and b,Spatial Analysis
+GIS applications are _____ tools.,mobile,computer,machinery,none of the above,computer,Spatial Analysis
+GIS captures and analyses _____ data.,spatial,geographic,both a and b,none of the above,both a and b,Geodatabase
+GIS deals with which kind of data,numeric data,binary data,spatial data,complex data,spatial data,Geodatabase
+GIS differs from surveying and mapping by introducing:,spatial analysis,attribute descriptions,location determination,temporal information,spatial analysis,Spatial Analysis
+GIS handle usually types of data:,2,3,4,5,2,Geodatabase
+GIS has revolutionized the field of:,cartography,history,political science,geodesy,cartography,Spatial Analysis
+GIS maps were first used to control?,cholera epidemic,french flu,bird flu,all of the above,all of the above,Spatial Analysis
+GIS output can include graphs and tables?,1,0,nan,nan,1,Geodatabase
+GIS provides which of the following sets of capabilities?,data tracking database creation tool analysis,data capture data management data manipulation & analysis data presentation,dbms data analytics capacity handling,database creation tool management data presentation vector analysis,data capture data management data manipulation & analysis data presentation,Spatial Analysis
+GIS represents a location in _____ dimensional coordinates.,2,3,4,5,3,Spatial Analysis
+GIS represents data of _____.,trees,water bodies,lands,all the above,all the above,Spatial Analysis
+GIS represents unrelated information of location using _____.,key index,key index variable,key,none of the above,key index variable,Spatial Analysis
+GIS represents X-coordinate in _____ direction.,horizontal,vertical,tangentially,none of the above,horizontal,Spatial Analysis
+GIS represents Y-coordinate in _____ direction.,horizontal,vertical,tangentially,none of the above,vertical,Spatial Analysis
+GIS represents Z-coordinate in _____ direction.,horizontal,vertical,tangentially,none of the above,tangentially,Spatial Analysis
+GIS stands for _____.,geographic information system,geographic internal system,global information system,none of the above,geographic information system,Spatial Analysis
+GIS technology is based on _____framework,primitive,environmental,mathematical,traditional,mathematical,Spatial Analysis
+GIS tools allow the user to perform which of the following task?,create searches,store data,edit data,all the above,all the above,Spatial Analysis
+GIS tools are unable to help us making decision such as _____,finding area with high risk of flood,finding most likely sites for mosquito habitat,finding best bank for loan,finding area with variety of vegetation,finding best bank for loan,Spatial Analysis
+GIS use by Mapmakers to ?,store geographic information,use geographic information,store use and view geographic information,view geographic information,store use and view geographic information,Cartography
+GIS uses _____ as a key index variable for all other information.,space time,spatio temporal,both a and b,space,both a and b,Spatial Analysis
+GIS was coined by _____.,roger tomlinson,roger james,richard,none of the above,roger tomlinson,Spatial Analysis
+GISs that support raster processing usually have a language to express operations on raste. These languages are generally referred to as _____,map algebra,raster algebra,vector algebra,gis algebra,map algebra,Geodatabase
+GPS can be use to verify ?,boundaries,roads,towns,places,boundaries,Surveying
+GPS was invented by U.S Department of?,health,finance,defense,viation,defense,Surveying
+"GPS: US Military, GLONASS: _____?",indian military,uk military,australian military,russian military,russian military,Surveying
+GUI is the acronym for Graphical User Interface?,1,0,nan,nan,TRUE,Geodatabase
+Hardware component of GIS,keyboard,arc gis,digitalization,auto cad,keyboard,Spatial Analysis
+Head down digitizing is also called as _____.,digitizing tablet,manual digitizing,stylus,both a and b,both a and b,Cartography
+Head down digitizing tablet uses _____ component to feed information into the computer.,stylus,special pen,special magnetic pen,both a and c,both a and c,Surveying
+Head up digitizing traces geographical data _____ way on top of aerial imagery.,directly,indirectly,separately,none of the above,directly,Remote Sensing
+History of a data set is known as,geographical database,lineage,georeferencing,history,lineage,Geodatabase
+"House, Rainfall amount_____.",examples of discrete objects,examples of continues objects,examples of real objects,examples of unreal objects,examples of real objects,Spatial Analysis
+Human errors are referred to as :,capacity faults,blunders,data transmission errors,static,blunders,Surveying
+"If a pixel is insufficiently similar to any training data set, it is called as _____ data",trained,sampled,output,unknown,unknown,Remote Sensing
+If an oblique photograph is taken at a high angle relative then it is called as _____ oblique.,high,low,perpendicular,none of the above,high,Remote Sensing
+If an oblique photograph is taken at a low angle relative then it is called as _____ oblique.,high,low,perpendicular,none of the above,low,Remote Sensing
+If data are divided so that an equal number of observations fall into each class this is referred to as an equal interval classification system?,1,0,nan,nan,FALSE,Cartography
+If the number on scale is less then it represents a large scale map.,1,0,nan,nan,TRUE,Cartography
+"If you are making a web map of sampling locations, streams and watershed areas, in what order would you place the layers on the map?",sampling locations wetland areas streams,streams wetland areas sampling locations,sampling locations streams wetland areas,it doesn’t matter what order they are in,sampling locations streams wetland areas,Cartography
+IKONOS satellite was launched by?,nasa,roscosmos,space imaging inc.,usgs,space imaging inc.,Remote Sensing
+In _____classification user only specifies the number of classes in the output data set and system automatically determines the class break points,automatic,user controlled,static,dynamic,automatic,Remote Sensing
+"In _____classification, a user selects the attributes that will be used as the classification parameters and defines the classification method",automatic,equal interval,user-controlled,equal frequency,user-controlled,Remote Sensing
+"In a linked display, any action taken in one window will be reflected in other windows on the screen?",1,0,nan,nan,TRUE,Spatial Analysis
+"In a map showing contours, the name of the darker contour lines is",index contours,key contours,lines of deviation,lines of elevations,index contours,Cartography
+"In digitization, when the operator identifies the point to be captured by pressing a button, it is _____ mode.",stream,cursor,point,vector,point,Surveying
+"In DTM, the analysis and information extraction is called as _____",manipulation,interpretation,generation,visualisation,interpretation,Remote Sensing
+"In GIS urban planning, analysis , linking spatial data and attribute data leads to formation of _____",administration,jurisdiction,topology,land cover,topology,Spatial Analysis
+"In GIS, data are usually grouped into _____",tables,layers(themes),objects,set of tuples,layers(themes),Geodatabase
+"In GIS, digitalization is done for better output?",1,0,nan,nan,TRUE,Spatial Analysis
+"In GIS, filtering data based on the specific content stored in a field refers to one of the following:",spatial query,attribute query,locational query,cartographic query,attribute query,Geodatabase
+"In image registration , geographical coordinates are converted to _____coordinates",orthomorphic,conical orthomorphic,digital imagery,canonical,conical orthomorphic,Remote Sensing
+"In non-spatial domain, database has been in use since _____.",1970's,1989's,1960's,1950's,1960's,Geodatabase
+"In order to better understand representation of phenomena and output from any analysis, we can use GIS to create ____",audio,visualizations,text information,table,visualizations,Cartography
+"In raster approach cell values are stored in the list can be left to right, top to bottom (not always), so this encoding is known as _____.",column ordering,row ordering,indexing,spatial data ordering,row ordering,Geodatabase
+"In raster overlay, a cell does not contain information, it is represented as___",one,negative number,zero,positive number,zero,Spatial Analysis
+"In spatial data preparation, semi automatic digitizing method uses device called as _____.",digitizing tablet with cursor,mouse cursor on computer moniter,scanner,line following software,line following software,Geodatabase
+In SQL query join condition can be written in _____ clause.,from,group by,where,order by,where,Geodatabase
+"In the process of GIS, digitalization is done for better:",input,output,desingning,formating,output,Spatial Analysis
+"In the vectors TIN model, slope and aspect variables are usually calculated using _____",direction,a series of linear equations,a series of non linear equations,differential,a series of linear equations,Spatial Analysis
+"In Toolbox, under which list do we find the Merge tool?",analysis.,data management.,analyze tools for pro.,distributed geodatabase.,data management.,Geodatabase
+"In topology, simple elements can be combined to define more complex ones using _____",raster,vector,lines,simplices,simplices,Spatial Analysis
+"In vector data, the basic units of spatial information are_____.",points lines(arcs) and polygons,integer float char,sets bags and array,tuples tables structure,points lines(arcs) and polygons,Geodatabase
+In which aspect of agriculture GIS can be used?,pesticides,fertilizer,seed requirement,soil analysis,soil analysis,Spatial Analysis
+In which geographic information system program are subtype functions located?,map.,office.,catalog.,toolbox.,toolbox.,Geodatabase
+"In which of the following maps, the actual height of a region from the sea level is denoted by contour lines?",general relief map,land-form map,land-slope map,flatland-ratio map,general relief map,Cartography
+In which of the following sciences maps occupy the most important place?,oceanography,pedology,climatology,military science,military science,Cartography
+"In which of the following ways, meridians are projected in cylindrical projection?",mathematically,geometrically,horizontally,vertically,geometrically,Cartography
+Indirect hazard mapping _____ are used to predict landslide prone areas,statistical models,stochastic models,deterministic models,both a and c,both a and c,Remote Sensing
+Integration of _____ in GIS software directly reduces the need to create links to other models and software.,buffering,overlay,routing,all of the above,routing,Geodatabase
+Interpolation is made possible by a principle called_____.,spatial autocorrelation,spatial auto-correction,thematic autocorrelation,thematic auto-correction,spatial autocorrelation,Spatial Analysis
+"Intersection, union, difference and complement are the operations of which function?",classification,overlay,neighbourhood,connectivity,overlay,Geodatabase
+Is air-to-air photography and aerial photography similar?,yes,no,mybe,nan,no,Remote Sensing
+Join operator takes _____input relation/relations and produces _____output relation/relations.,two one,one two,three one,four two,two one,Geodatabase
+Key components of ‘spatial data’ quality include,positional accuracy,temporal accuracy,lineage and completeness,all of the above,all of the above,Geodatabase
+LAN stands for _____.,local area network,land area netwok,local attribute network,land attribute network,local area network,Surveying
+Land use = 80 is which type of query?,interactive spatial selection,spatial selection by attribute,combined attribute condition,spatial selection using topological selection,spatial selection by attribute,Geodatabase
+LANDSAT satellite series is of which country's ?,canada,european union,usa,russia,usa,Remote Sensing
+Line feature can represent?,road,river,plot,all of the avobe,all of the avobe,Cartography
+Lines of equal latitude are called as _____,parallels,perpendiculars,meridians,deviations,parallels,Cartography
+Lines of equal longitude are called as _____,parallels,perpendiculars,meridians,deviations,meridians,Cartography
+Lines of latitude that measure_____locations in the N-S direction on the geographic coordinate system.,perpendicular,intersects,crosses,parallels,parallels,Cartography
+Lines of longitude that measure locations in the E-W direction on the geographic coordinate system.,meridians,map projection,equator,surface,meridians,Cartography
+Logarithmic contrast enhancement is _____ process,non linear,k-means,decision tree,svm,non linear,Remote Sensing
+Logical aspects of topological relationships can be examined using _____,graph,set-theory,vector,points,set-theory,Geodatabase
+longitudes are used to represent which of the following directions?,north–east,south,north,east,east,Cartography
+Map algebra equation C1 := A + 10 denotes:,add a constant factor of 10 to all cell values of raster a and store the result as output raster c1,add a constant factor of 10 to first cell value of raster a and store the result as output raster c1,add a constant factor of 10 to all first row values of raster a and store the result as output raster c1,add a constant factor of 10 to all first column values of raster a and store the result as output raster c1,add a constant factor of 10 to all cell values of raster a and store the result as output raster c1,Spatial Analysis
+Map based scientific visualization refers to_____.,sci visualization,map visualization,geo visualization,point visualization,geo visualization,Cartography
+Map often represents _____,abstraction of geographic reality,abstraction of virtual reality,abstraction of data reality,abstraction of spatial reality,abstraction of geographic reality,Cartography
+Map scale can be defined as _____.,ration between number of pixel in column and row,ration between number of pixel in column and row,ration between the distance of stretch in the terrain and distance on paper map,ration between distance on paper map and the distance of same stretch in the terrain,ration between distance on paper map and the distance of same stretch in the terrain,Cartography
+"Map that shows mountains, plains, plateaus and rivers is called _____.",political map,physical map,thematic map,world map,physical map,Cartography
+Mapping involves which of the following?,soil details,boundary details,cadastral details,population details,cadastral details,Cartography
+Maps are always _____.,representing ordinal data,representation of nominal data,representation of time series,graphical representation of real world,graphical representation of real world,Cartography
+Maps from GIS can be output to mobile devices such as PDAs?,1,0,nan,nan,TRUE,Spatial Analysis
+Mark the incorrect statement from the following.,all major gis packages provide facility to link with a dbms,gis packages provide facility to exchange attributes data with a dbms,gis packages provide support for both spatial and attribute data,low level storage structures for vector data are much easier,low level storage structures for vector data are much easier,Surveying
+Mirror sweep error is caused by _____ effects,scene,sensor,platform,drift,sensor,Surveying
+Model that is object-based.,attribute data,geodatabase data model,spatial data,raw data,geodatabase data model,Geodatabase
+Modelling is also known as _____.,analysing data,representation of real world,finding errors,data capture,representation of real world,Spatial Analysis
+Modern GIS technology uses _____ type of information.,analog,digital,both a and b,none of the above,digital,Spatial Analysis
+Most appropriate way to represent any object in map which does not require information of shape and size is_____.,line,point,polygon,tin,point,Cartography
+Most common map projections ?,based on two shapes,based on three shapes,based on four shapes,based on five shapes,based on three shapes,Cartography
+Most LiDAR system uses,0.9 and 1.55 µm wavelengths,0.98 and 1.54 µm wavelengths,0.89 and 1.62 µm wavelengths,none of the above,0.9 and 1.55 µm wavelengths,Surveying
+"North American Datum of 1983, wind is based on the GRS80 spheroid and has its origin at the center of the spheroid.",nad88,nad1983,nad83,none of the above,nad83,Surveying
+NOT (LandUse = 80) can also be written as _____.,landuse < > 80,landuse > 80,landuse < 80,landuse = 80,landuse < > 80,Geodatabase
+NOT (LandUse = 80) would select,all areas with land use class 100,al areas with land use class 80,all areas with a different land use class than 80,all areas with land use class 80 & 100,all areas with a different land use class than 80,Geodatabase
+Oblique photographs are taken in an _____ direction.,horizontal,vertical,angled,none of the above,angled,Remote Sensing
+Once the data is entered it must be _____and_____,verified & edited,captured & organised,verified & generalized,edited & organized,verified & edited,Geodatabase
+One of the following is not a true relational database:,oracle,postgresql,sql server,access,access,Geodatabase
+One of the following method is used to align an unreferenced dataset with one that has spatial reference information:,scaling,reprojecting,defining projections,georeferencing,georeferencing,Spatial Analysis
+One of the following types of online information could not be referenced in a hyperlink field within a GIS data table:,assessment records for parcel polygons,city name for municipal polygons,construction project information for roadway lines,precipitation data for rain gauge points,city name for municipal polygons,Geodatabase
+One type of map projection that uses a cone as the projection surface.,azimuthal,cylindrical projection,parallel projection,conic projection,conic projection,Cartography
+One type of map projection that uses a cylinder as the projection surface.,cylindrical projection,parallel projection,conic projection,all of the above,cylindrical projection,Cartography
+On-screen maps are,interactive,have a link to database,best user guide,all the above,all the above,Cartography
+Ortho rectified imaginary collects data from which of the following.,uav,helikites,aircraft,all the above,all the above,Remote Sensing
+Output of visualization process cannot be _____,on computer screen,printed on paper,audio file,projected on screen,audio file,Cartography
+Output raster:= CON(condition; then expression; else expression) means:,condition is the tested condition then expression is evaluated if condition holds and else expression is evaluated if it does not hold,condition is the tested condition then expression is evaluated if condition does not hold and else expression is evaluated if it hold,none of the above,both are correct,condition is the tested condition then expression is evaluated if condition holds and else expression is evaluated if it does not hold,Remote Sensing
+Overlay analysis is based on:,spatial diffusion,boolean logic,principal component analysis,graph theory,boolean logic,Spatial Analysis
+Partitioning of space into mutually exclusive cells is known as_____.,tessellation,tracking,thematic study,tier,tessellation,Cartography
+Photogrammetry interprets which of the following data?,em radiation,photographic images,both a and b,radiation,both a and b,Remote Sensing
+Photogrammetry methods include which of the following data _____.,projective,optics,geometry,all the above,all the above,Remote Sensing
+Point can represent?,location,area,3d area,volume,location,Cartography
+Population forecast can be done by using GIS.,0,1,nan,nan,TRUE,Spatial Analysis
+PPS Stand for _____.,precise positioning services,point-point service,precise positin system,point to point system,precise positioning services,Surveying
+Process used for modifying map features to make them clear at a reduced scale is called?,cartographic generalization,topographical encoding,data filtering,database generalization,cartographic generalization,Cartography
+Projection of spatial data from one projected coordinate system to another.,projection globe,parallel globe,reference globe,reprojection,reprojection,Cartography
+Quadtrees are _____,natural,static,adaptive,parition,adaptive,Geodatabase
+Raster approach subdivides space into regular cells. These cells are called _____ in 2D and _____ in 3D.,pixels voxels,voxels pixels,2d cartesian coordinate 3d cartesian coordinate,2d geographic coordinate 3d geographic coordinate,pixels voxels,Spatial Analysis
+Raster GIS data is always:,oval,triangle,rectangular,square,rectangular,Spatial Analysis
+Raster graphic in GIS represents data in _____ data structure.,plane matrix,dot-matrix,continuous matrix,none of the above,dot-matrix,Geodatabase
+Raster graphic in GIS represents data in _____ grid of pixels.,circular,rectangular,square,all the above,rectangular,Remote Sensing
+Raster graphic in GIS stores image files with varying _____ formats.,dimensions,generation,production,all the above,all the above,Geodatabase
+"Raster’s anchor point, the cell resolution, and the position of the cell in the raster determine _____",location of an individual cell,size of individual cell,width of cell,height of cell,location of an individual cell,Remote Sensing
+Ratio of the local scale to the scale of the reference globe. The_____ is 1.0 along a standard line.,scale factor,vector,raster,none of the above,scale factor,Cartography
+Relative positioning is also known as _____,differ positioning,similar positioning,differential positioning,native positioning,differential positioning,Surveying
+relief shading is also called as _____,data shading,hill shading,perspective shading,all of the above,hill shading,Cartography
+Remote sensing is,contact recording of information,non – contact recording of information,both a and b,all of the avobe,non – contact recording of information,Remote Sensing
+RMSE stands for:,right method standard error,real mean standard error,root mean square error,regular major smooth error,root mean square error,Remote Sensing
+SAR stands for,synthetic array radar,synthetic aperture radar,synthetic apron radar,none of the above,synthetic aperture radar,Remote Sensing
+Satellite image use the _____ encoding method for data storage.,cell by cell,run length encoding,quad tree,spatial system,cell by cell,Remote Sensing
+SDI defines as _____.,field that attempts to integrate various techniques of handling spatial information,selection of tuples that meet the condition,the relevant base collection of technologies to provide access to spatial data,a technique to ctrate projection,the relevant base collection of technologies to provide access to spatial data,Geodatabase
+SDI full form ?,spatial data international,spatial data intention,spatial data infrastructure,spatial data interface,spatial data infrastructure,Geodatabase
+SDT means _____,specific data type,special data type,spatial data type,system data type,spatial data type,Geodatabase
+"Search function, buffer zone generation, interpolation and topographic function are a part of _____function",overlay,classification,retrieval,neighbourhood,neighbourhood,Spatial Analysis
+Second layer of buffering is called as _____ buffering,doughnut,line,point,area,doughnut,Spatial Analysis
+Select properties of vector features,location,length,area,all,all,Spatial Analysis
+Select spatial selection query from given options,interactive spatial selection,spatial selection by attribute condition,spatial selection using topological relationship,all of the above,all of the above,Geodatabase
+Series of standards relating to geodatabases are released by _____.,ogc,iso,echo,unesco,ogc,Geodatabase
+Several characteristics of GIS services that make it difficult to design GIS web services are:,gis requires heavy cpu usage,clients of gis services are often complex software packages,gis services sometimes transmit large images,all of the above,all of the above,Geodatabase
+Silver polygons occur due to excessive overlaying.,0,1,nan,nan,TRUE,Cartography
+Software used in the digitization technique is ?,gps,cad,java,c,cad,Cartography
+Spatial Analysis is also called one of these names?,spatial integration,spatial statistics,spatial unification,spatial system,spatial statistics,Spatial Analysis
+Spatial Data capturing involves _____.,surveying engineering photogrammetry remote sensing and digitization,digitization finding statistical values creating maps,rasterization creating maps and presenting on output device,surveying engineering and digitization,surveying engineering photogrammetry remote sensing and digitization,Surveying
+"Spatial database allows user to _____, _____ and _____ collections of spatial data.",analyse create map query,create graph map analysis,store represent create graph,store query manipulate,store query manipulate,Geodatabase
+"Spatial features that do not exist between observations, form separate entities, and are individually distinguishable.",gis modeling,data exploration,attribute data,discrete features,discrete features,Spatial Analysis
+Spatial information theory' is the field which focuses specifically on _____.,providing the spatial data,providing the background for the production of tools that can handle spatial data,creating maps using spatial tools,providing the background for the projection,providing the background for the production of tools that can handle spatial data,Spatial Analysis
+Spatial relationship can be established by using GIS.,0,1,nan,nan,TRUE,Spatial Analysis
+Spatiotemporal data models are way of organizing representations of _____ in GIS.,size and time,space and temperature,space and time,continuous field,space and time,Geodatabase
+Splitting of crossing lines and erasure of dangling lines are examples of :,non- spatial information system,position information system,global information system,data repairs,data repairs,Spatial Analysis
+SQL stands for _____.,spatial query language,structured query language,special query language,structural quality language,structured query language,Geodatabase
+Standard arithmetic operators in raster overlay operation are_____.,addition & subtraction,multiplication,integer & modulo division,all of the above,all of the above,Remote Sensing
+Standard line that follows a meridian.,middle line,tangent line,parallel line,standard meridian,standard meridian,Cartography
+Statement that is true for ‘Ratio Data Values’,they allow arithmetic computation.,continuous fields can have ratio values,division and multiplication are possible,all of the above,all of the above,Spatial Analysis
+Steep slopes have,close contour lines,distant contour lines,dotted contour lines,solid contour lines,close contour lines,Spatial Analysis
+Successful spatial analysis needs,appropriate software,appropriate hardware,competent user,all of the above,all of the above,Spatial Analysis
+Tessellations are also known as,volumes,rasters,type i tessellations,type ii tessellations,rasters,Cartography
+The _____phase deals with putting it all together into a format that communicates the result of data analysis in the best possible way.,data capture & preparation,data management,data manipulation &analysis,data presentation,data presentation,Cartography
+The altitudinal distance between geostationary satellite and the earth is,50000km,36000km,26000km,44000km,36000km,Remote Sensing
+The amount of offset in each spectral band in atmospheric correction is ____,bias,noise,threshold,mean,bias,Remote Sensing
+The anchor point is fixed by convention to be _____ location of the raster,lower left,lower right,upper right,center,lower left,Spatial Analysis
+The angle cast or west from the prime meridian.,equator,meridian,longitude,earth,longitude,Surveying
+The angle north or south of the equatorial plane.,globe,latitude,equator,meridian,latitude,Surveying
+The basic components of GIS are:,3,4,5,6,5,Geodatabase
+The benefits of spatially interrelating multiple types of information from different sources is given by _____,skeletonising,buffering,digitizing,overlay analysis,overlay analysis,Geodatabase
+The best option to represent a feature class for rivers in a State-wide GIS map is:,line feature,point feature,polygon feature,multi-patch feature,line feature,Cartography
+The best way to represent telephone booth and railway track on map are using _____ and_____ respectively.,point vector layer line vector layer,line vector layer area vector layer,area vector layer tetrahedron vector layer,line vector layer point vector layer,point vector layer line vector layer,Cartography
+"The cadastral maps, topographical maps and the city plans come under the category of_____",large scale maps,small scale maps,medium scale maps,all of the above,large scale maps,Cartography
+The cold front on a waether map represnted by:,an object,a table,a surface,a field,a field,Cartography
+The common type of query language used in vector overlay is _____,rdbms,sql,dbms,html,sql,Geodatabase
+The continuous fields can have a value:,ordinal,nominal,ratio,internal,ratio,Spatial Analysis
+The conversion of raster data into vector data is called_____.,rasterization,vectorization,spatial system,geospatial,vectorization,Remote Sensing
+The determination of a position based on three distances is called _____,triangulation,trilateration,trial,transformation,trilateration,Surveying
+The development of a city could be revealed using an animated series of maps?,1,0,nan,nan,TRUE,Cartography
+The Direction of gravity is known as _____.,pump-line,lumb-line,glumb-line,plumb-line,plumb-line,Surveying
+The distance between two points on the map to corresponding distance on ground is called _____.,scale,sketch,direction,nan,scale,Cartography
+The division or segregation of network links into segments that rea homogeneous for the specified set of link attributes is called as _____,overlay,dynamic segmentation,routing,surface modelling,dynamic segmentation,Spatial Analysis
+"The editing function allows the user to _____ points, lines, or polygons and change the attributes of these features",multiply,delete,add,both c and b,both c and b,Geodatabase
+The effect of smoothing to remove details and make the DTM surface smoother is done with _____ filters.,low pass,high pass,band pass,notch,low pass,Remote Sensing
+The entities of GIS vector data representation are,polygon,line,point,all of the above,all of the above,Geodatabase
+The example of 'Continuous Field' is:,air temperature,barometric pressure,soil salinity,all of the above,all of the above,Spatial Analysis
+The example of 'Discrete Field' is:,elevation,land classification,air temperature,barometric pressure,land classification,Spatial Analysis
+The first objective of DTM interpretation is the derivation of _____ parameters.,geomorphometric,geological,graphical,geometric,geomorphometric,Remote Sensing
+The following format is used for GIS output:,pdf,dxf,gif,html,gif,Geodatabase
+The following is (are) topological relationship:,direction,intersection,adjacency,all of the above,all of the above,Spatial Analysis
+The following is an example of geographic field:,air temperature,barometric pressure,elevation,all of the above,all of the above,Spatial Analysis
+The following is not used as a coding scheme for GIS images:,jpeg,gif,mp3,tiff,mp3,Remote Sensing
+"The fundamental principle which refers to the fact that locations that are closer together are more likely to have similar values than locations that are far apart, is commonly referred to as",tobler’s first low of geography,kepler’s first law of geography,anthony’s first law of geography,thompson’s first law of geography,tobler’s first low of geography,Spatial Analysis
+"The fundamental problem that we face in many uses of GIS is that of understanding phenomena that have a _____ dimension, as well as a temporal dimension.",temporal,data,spatial or geographic,attribute,spatial or geographic,Spatial Analysis
+The geographer considered as the 'Father of GIS' is:,peter haggett,richard chorley,michal goodchild,roger f. tomlinson,roger f. tomlinson,Geodatabase
+The geostationary satellites are placed at an altitude of _____ .,360 km,36000 km,3600 km,36 km,36000 km,Remote Sensing
+The GIS data are usually in digital form and arranged in:,cells,layers,fields,coharts,layers,Geodatabase
+The height determined with respect to a tide-gauge station is known as _____ height.,ellipsoidal,orthometric,geoid,gps,orthometric,Surveying
+The height of a point with respect to tide gauge is measured using technique known as _____.,graph levelling,geodetic levelling,ellipsodetic levelling,geo levelling point,geodetic levelling,Surveying
+The heterogeneous land surface composed of a cluster of interacting ecosystems is called as _____,structure,patterns,landscape,forests,landscape,Remote Sensing
+"The household income as low, average or high is an example of:",nominal data values,ordinal data values,ratio data values,internal data values,ordinal data values,Spatial Analysis
+The input to geoprocessing is _____.,datasheet,alphanumeric,numeric,alphabets,datasheet,Spatial Analysis
+"The interactively defined selection objects like points, lines, or polygons are used in which type of query?",interactive spatial selection,spatial selection by attribute,combined attribute condition,spatial selection using topological selection,interactive spatial selection,Geodatabase
+The local vertical datum is implemented through a _____.,labelling network,levelling network,labelling connection,levelling connection,levelling network,Surveying
+The main advantage of GIS:,data retrieval service,data sharing,accurate data information,maintaining geo spatial data,maintaining geo spatial data,Spatial Analysis
+"The map that shows temperature, forest and minerals resources is _____.",physical,political,thematic,nan,thematic,Cartography
+The mathematical properties of the geographic space used for spatial data are : _____,euclidean space ramanujan space topological space,euclidean space metric space topological space,interior and boundary metric space hilbert space,interior hilbert space,euclidean space metric space topological space,Spatial Analysis
+"The modification and refinement of DTMs, derivation of intermediate models is called as DTM _____",generation,manipulation,interpretation,visualisation,manipulation,Remote Sensing
+The names of items in a legend replicate the names of,layers.,data frame properties.,the legend attribute fields.,feature classes in the database.,layers.,Cartography
+The NAVSTAR Space Segment consists of _____ satellites operated by the U.S.,24,14,25,20,24,Remote Sensing
+The one of the followings shape will not fit a plane:,rectangles,regular hexagons,triangles,circles,circles,Spatial Analysis
+The open-source GIS platform is:,staad pro,arcgis,arcview,grass,grass,Geodatabase
+The ordinal scale approach using weighting-rating system of terrain parameters is a _____ method,quantitative,qualitative,statistical,spatial,quantitative,Spatial Analysis
+The polygonal data feature uses which of the following data format?,scientific character,math,character,integer,integer,Geodatabase
+The process of joining two or more map sheets after they have separately been digitized is known as :,edge matching,area marking,boundary marking,tabular marking,edge matching,Cartography
+The process of transforming the spatial relationship of features on the Earth's surface to a flat map is?,intersection,projection,rotation,translation,projection,Cartography
+The raster data model uses a _____to cover the space.,regular grid,irregular grid,one directional grid,bi directional grid,regular grid,Spatial Analysis
+The reference plane or surface from which all altitudes on a map are measured is_____ plane,topographic,cartographic,isotropic,datum,datum,Cartography
+"The relation with the attribute which is the primary key is referenced in another relation, in that another relation that attribute is called as _____.",unique key,foreign key,candidate key,super key,foreign key,Geodatabase
+The rendition of the irregular spheroidal shape of the earth is called as _____,ellipsoid,conic,geoid,azimuth,geoid,Cartography
+The roles of a database administrator are expected to fill:,create uptodate database security settings,create queries for reporting purposes,backup and recovery of database,all of the above,all of the above,Geodatabase
+The scale of topographical maps varies in general from_____.,3 inch to the mile to 3/4 inch to the mile,2 inch to the mile to 2/4 inch to the mile,1 inch to the mile to 1/4 inch to the mile,16 inch to the mile to 32 inch to the mile,1 inch to the mile to 1/4 inch to the mile,Cartography
+The scientist Roger Tomlinson created _____ for analyzing and storing a large amount of data.,database,sd card,pen drive,computer,database,Geodatabase
+The scientist Roger Tomlinson firstly implemented GIS work on _____ geographic information system.,canada,usa,india,china,canada,Spatial Analysis
+The set of regularly spaced and contiguous cells with associated field values is called:,vector,raster,segment,polygon,raster,Spatial Analysis
+The set of tuple in a relation at some point in time is called _____.,relation schema,relation attributes,relation instance,relation domain,relation instance,Geodatabase
+The shapefile format is a digital _____ for storing geometric locations and associated attribute information.,point format,polygon format,rastor format,vector format,vector format,Geodatabase
+The simplest form of interpolation is known as,spatial autocorrelation,nearest neighbour interpolation,pattern recognition,contradictions,nearest neighbour interpolation,Spatial Analysis
+The small unwanted polygons created during overlay are called as _____ polygons,sliver,spurious,reduced,relevant,sliver,Cartography
+The spaghet model records the coordinates of all the points as _____,pixels,grids,polygons,codes,polygons,Geodatabase
+The 'Spatial Data' mean data that deals with values:,complex,graphic,positional,decimal,positional,Geodatabase
+The stability of slope tends to increase with _____ .,increase in vegetation,decrease in vegetation,no vegetation,both a and c,increase in vegetation,Spatial Analysis
+The standard overlay operator for two layers of polygons is _____,polygon intersection operator,polygon clipping operator,polygon overwrite operator,all of the above,all of the above,Spatial Analysis
+The term 'Locational Analysis' was coined by:,john snow,richard chorley,peter haggett,roger f. tomlinson,peter haggett,Spatial Analysis
+The term 'Locational Analysis' was coined in:,1965,1966,1967,1968,1965,Spatial Analysis
+The translational and rotational alignment process that coincides two images is called as image _____,registration,enhancement,filtering,processing,registration,Remote Sensing
+The two main reference surfaces to approximate the shape of the Earth are _____.,gid eid,geoid ellipse,gid ellipse,geoid ellipsoid,geoid ellipsoid,Cartography
+The use of backup and recovery in dbms is _____.,to restore a computer to an operational state following a disaster,to reduce redundancy in data,enforcing integrity rules,to allow concurrent use,to restore a computer to an operational state following a disaster,Geodatabase
+The values assigned or sorted according to some set of non-overlapping categories are:,nominal,ordinal,categorical,none of the above,categorical,Geodatabase
+The values that provide a name or identifier so that we can discriminate between them:,nominal data values,ordinal data values,ratio data values,internal data values,nominal data values,Geodatabase
+The values that put in some natural sequence but not allow any other type of counting:,ordinal data values,nominal data values,internal data values,ratio data values,ordinal data values,Geodatabase
+This of the following is not true about ‘Discrete fields’?,discrete fields divide the study space in mutually exclusive bounded parts with all locations in one part having the same field value,land classification is an example of continuous fields,land classification is an example of discrete fields,discrete fields make use of ‘bounded’ features,land classification is an example of continuous fields,Spatial Analysis
+Three files generate when creating a schema; which file contains instructions on importing the schema?,.tbx file.,.sch file.,.xml file.,readme.doc.,readme.doc.,Geodatabase
+TIGER stands for,triangulated integrated geographic encoding and referencing,triple integrated geographic encoding and referencing,topologically integrated geographic encoding and referencing,none of the above,topologically integrated geographic encoding and referencing,Geodatabase
+Tiling of the plane is a collection of plane figures that fills the plane with no overlaps and no gaps are known as_____.,topographic,tessellation,contour,boundary,tessellation,Cartography
+TIN stands for ?,temporal interest network,triangulated irregular network,temperature interface node,traffic internet network,triangulated irregular network,Surveying
+To create relationship between two table what is to be used?,primary and foreign key,join,attribute projection,cartesian cross product,primary and foreign key,Geodatabase
+To determine position precisely GPS need satellites minimum,2,3,4,25,4,Surveying
+"To support an enterprise environment, GIS can be best accomplished using one of the following approaches:",geodatabases stored on a centralized server,write-protected shapefiles located on each employee’s workstation,geospatial data served as map services and web maps,a well-staffed gis department required,geospatial data served as map services and web maps,Geodatabase
+Topographic map is also called _____.,topographic sheet,topographic module,topographic paper,none of the above,topographic sheet,Cartography
+Topography deals with _____ of earth surface.,shape,characteristic,location,both a and b,both a and b,Surveying
+Topological characteristics of spatial data do not include:,adjacency,inclusion,connectivity,elevation,elevation,Spatial Analysis
+Tree representation of GIS data is _____ data structure,hierarchical raster,raster grid,simple raster,hierarchical grid,hierarchical raster,Geodatabase
+Triangulations based on input locations with stretched triangles that are equilateral is known as:,tin,delaunay triangulation,hobson’s triangulation,isosceles triangulation,delaunay triangulation,Surveying
+Tuple selection operation can work on _____ input relation/relations.,three,two,one,four,one,Geodatabase
+Two main techniques of determining class break points in automatic classification are,equal value & equal occurrence,equal interval & equal frequency,equal phase & equal frequency,equal interval & equal phase,equal interval & equal frequency,Cartography
+Two polygon layers A and B produce a new polygon layer that contains all intersections of polygons from A and B,raster overlay,raster intersection,vector overlay,vector division,vector overlay,Spatial Analysis
+Type of classification is,user controlled,automatic,static,both a & b,both a & b,Geodatabase
+Uniform cell size is a description of a:,point data structure,vector data structure,raster data structure,polygon data structure,raster data structure,Geodatabase
+UTM stands for _____,universal transformation mercator,universal transverse mercator,universal transformation meridian,universal transverse meridian,universal transverse mercator,Cartography
+Vector based overlay is _____,quick,straightforward,efficient,time consuming,time consuming,Spatial Analysis
+Vector representations of shapes are?,average,accurate,good,predictable,accurate,Cartography
+"We convert most raster, or image, files by changing the",suffix.,file size.,location.,filename.,suffix.,Remote Sensing
+"We create buffers based on a specified distance, an attribute distance, or as",averages.,multiple buffer rings.,multiples of map units.,a set of rings based upon the map scale.,multiple buffer rings.,Spatial Analysis
+We group grids together by creating “samples” at larger scales by way of,cylinders.,pyramids.,polygons.,diamonds.,pyramids.,Spatial Analysis
+What are mathematical models that translate between coordinate systems?,evolutions.,translations.,declinations.,transformations.,transformations.,Cartography
+What are the primitives of vector data set?,point,polyline,polygon,all of them,all of them,Geodatabase
+What are the three type groups of vector data?,points lines and imagery.,points lines and polygons.,points polygons and imagery.,points lines polygons and imagery.,points lines and polygons.,Geodatabase
+What are the two abstractions of Real Objects in GIS_____?,discrete continuous,integer float,char string,clob blob,discrete continuous,Spatial Analysis
+What are the various reasons for which DBMS is used,a dbms supports the storage and manipulation of very large data sets,a dbms can be instructed to guard over data correctness,a dbms supports the concurrent use of the same data set by many users,all of the above,all of the above,Geodatabase
+What do we call the ratio of the size of an image to the number of grids per unit?,resolution.,image size.,dots per inch. (dpi).,pixels per meter.,resolution.,Remote Sensing
+What does a map legend do?,explain the distance on a map.,explain the value of a map.,explain the symbols on a map.,explain the title of a map.,explain the symbols on a map.,Cartography
+What does GPS do?,determine absolute location,map analyze and process different info,to determine landscapes,to determine colleges,determine absolute location,Surveying
+What does GPS stand for?,going places sometimes,global positioning satellites,government positioning satellites,global positioning system,global positioning system,Surveying
+What does the abbreviation VRML stand for?,visual resource markup language,virtual reality modelling language,visual relationship modelling language,virtual reality markup language,virtual reality modelling language,Cartography
+What is a use of Interpolation in GIS?,to create discreate surface from continuous points,to create continuous surface from discrete points,to calculate area using some random point,to calculate area from boundary points,to create continuous surface from discrete points,Spatial Analysis
+What is chart junk?,unreadable maps and graphs,unnecessary detail around maps and diagrams,awful pop music.,incorrect plots generated by gis.,unnecessary detail around maps and diagrams,Cartography
+What is DEM?,discrete elevation model,data elevation model,digital elevation model,decision enterprise model,digital elevation model,Remote Sensing
+What is DGPS,detectable global positioning system,deliberate global positioning system,discombobulated global positioning system,differential global positioning system,differential global positioning system,Surveying
+What is Glonass?,missile defence system,europe's gps system span,china's gps system,russian’s gps system,russian’s gps system,Remote Sensing
+What is Metadata?,"it is ""data about data""","it is ""meteorological data""","it is "" oceanic data""","it is ""contour data""","it is ""data about data""",Geodatabase
+What is NHD in terms of spatial database_____?,native hydro dataset,national hydrography dataset,natural hydrography dataset,numeric hydrography dataset,national hydrography dataset,Geodatabase
+What is not needed for Successful Spatial analysis?,competent user,soil sample,appropriate software,appropriate hardware,soil sample,Spatial Analysis
+What is point-in polygon overlay?,a method interpolating point data.,an overlay method used to determine which points lie within the boundary of a polygon.,an overlay method used to reclassify polygon data.,an overlay method used to determine the distance between a point and its nearest neighbouring polygon,an overlay method used to determine which points lie within the boundary of a polygon.,Spatial Analysis
+What is reclassification?,an analytical technique based on point data.,the process of simplifying data in a data layer.,the process of combining one or more data ranges into a new data range to create a new data layer.,the process of combing two or more data layers.,the process of combining one or more data ranges into a new data range to create a new data layer.,Spatial Analysis
+What is spatial interpolation?,the process of establishing a statistical relationship between two spatially correlated variables.,the process of establishing values for areas between an existing set of discrete observations.,the process of modelling spatial pattern from a set of one or more data layers.,the process of establishing values for areas outside the boundary of an existing set of data points.,the process of establishing values for areas between an existing set of discrete observations.,Spatial Analysis
+What is the first step of geoprocessing?,processes,management,analyses information,all the above,processes,Spatial Analysis
+What is the full form of DBMS?,database monitoring system,database management system,database manufacturing system,data maintenance system,database management system,Geodatabase
+What is the full form of OGC?,open geospatial connection,open geographic control,open geographic consortium,open geospatial consortium,open geospatial consortium,Geodatabase
+What is the function of airborne imagery?,takes photographs from aircraft,observes aircraft,monitors data,all the above,takes photographs from aircraft,Remote Sensing
+What is the function of geoprocessing?,manipulates global data,manipulates spatial data,manipulates local data,none of the above,manipulates spatial data,Spatial Analysis
+What is the name of the Russian equivalent of GPS?,glonass,gpeski,glasnost,ikonos,glonass,Spatial Analysis
+What is the next step after feeding information to a computer in down digitizing?,it creates data,it creates an identical digital map,it creates report,none of the above,it creates an identical digital map,Remote Sensing
+What three input fields do we specify when using the “Create Feature Class from XY Table” tool?,field1 field2 and field3,x field y field and z field.,northing easting and elevation.,point number point code and point type.,x field y field and z field.,Geodatabase
+"When converting a spreadsheet to a feature class, where must the file output be located?",geodatabase.,attribute table.,compressed folder.,microsoft access database.,geodatabase.,Geodatabase
+"When different objects are shown by various colours, the map is known as_____.",choro-schematic,chorochromatic,chorographic,choropleth,chorochromatic,Cartography
+"When exporting a .dwg to a shapefile, how many shapefile types are output by default?",five.,four.,three.,two.,five.,Geodatabase
+"When performing a statistical analysis, which of these is NOT an output field?",sum.,count.,integral deviation.,frequency distribution.,integral deviation.,Spatial Analysis
+Where do we adjust the size of the layout area and its orientation?,export map.,print preview.,printer properties.,page and print setup.,page and print setup.,Cartography
+Which among the following is a server based hardware platform of GIS?,autodesk revit,staad pro,arcgis,google-maps,google-maps,Geodatabase
+Which analysis do we also refer to as “least cost routing?”,spatial.,integer.,network.,attribute.,network.,Spatial Analysis
+Which are not phases of Spatial database design_____?,requirement analysis,logical design,physical design,manipulation of data,manipulation of data,Geodatabase
+Which are the two approaches to represent GIS_____?,layer-based feature-based,map based boundary based,line based polygon based,vector based raster based,layer-based feature-based,Geodatabase
+Which can be used for GIS output?,dxf,javascript,html,gif,gif,Cartography
+Which data is comprised of lines or arcs_____?,raster data,vector data,raw data,discrete data,vector data,Cartography
+Which data is the change in characteristic of a place over time_____?,discrete data,raw data,vector data,temporal data,temporal data,Remote Sensing
+Which data values are refered as 'qualitative' data value?,interval & ratio,interval & categorical,nominal & ratio,nominal & categorical,nominal & categorical,Geodatabase
+Which Database system offers the underlying database technology for geographic information systems and other applications_____?,relational database system,object oriented database system,spatial database system,object relational database system,spatial database system,Geodatabase
+Which editor function allows us to specify an angle and a length to create a line or side of a polygon?,length.,direction.,deflection.,direction/length.,direction/length.,Cartography
+Which feature of GIS can share the boundary of the polygon?,polygons,polylines,dongle nodes,silver polygons,polygons,Geodatabase
+Which function allow the retrieval of features that fall within a given search window?,classification,overlay,search,buffer zone generation,search,Geodatabase
+Which function evaluates the characteristics of an area surrounding feature’s location?,neighbourhood,overlay,classification,retrieval,neighbourhood,Spatial Analysis
+"Which function works on the basis of networks for example road networks, water courses in coastal zones, and communication lines in mobile telephony?",connectivity,overlay,classification,retrieval,connectivity,Spatial Analysis
+Which interpolation technique is not used for continuous data?,kriging,trend surface fitting,digitization,triangulation,digitization,Spatial Analysis
+Which is a key GIS requirement for data management and integrity?,dbms,rdbms,topology,query management,topology,Geodatabase
+"Which is NOT a key component of ""Spatial Data Quality""",positional accuracy,temporal accuracy,logical consistency,geodatabases,geodatabases,Geodatabase
+Which is the application of GIS?,map generalisation,banking management,hospital management,manufacturing company management,map generalisation,Spatial Analysis
+Which is used to represent area?,arc,line,point,polygon,polygon,Cartography
+Which item does the “Export Data” window not ask us to provide?,format.,output location.,features to export.,coordinate system.,format.,Geodatabase
+Which mission data set (MDS) represents the planning districts of the installation?,land use.,constraints.,future development plan.,common installation picture.,land use.,Geodatabase
+Which neighbourhood function determines a spatial envelope (buffer) around given feature?,buffer zone generation,overlay,classification,retrieval,buffer zone generation,Spatial Analysis
+Which of the following acts as a key to GIS?,topology,platform,software,terrain,topology,Geodatabase
+Which of the following are CAD programs?,auto cad,auto cad lt,both a and b,none of the above,both a and b,Surveying
+Which of the following are common pixel formats in Raster graphics?,grayscale,full colored,palettized,all the above,all the above,Remote Sensing
+Which of the following are considered while developing a digital topographic database for GIS?,aerial photography,satellite imagery,topographical maps,all the above,all the above,Geodatabase
+Which of the following are full-fledged GIS packages,geomedia,arcgis,corp,all of the above,all of the above,Geodatabase
+Which of the following are the applications of stereo-phpotogrammetry?,culture heritage,police investigation,architecture engineering,all the above,all the above,Remote Sensing
+Which of the following are the applications of vertical photography?,photogrammetry,image interpretation,both a and b,none of the above,both a and b,Remote Sensing
+Which of the following are the applications of web mapping?,google maps,bing maps,open street maps,all the above,all the above,Cartography
+Which of the following are the examples of natural satellites?,moon,star,planets,all the above,all the above,Remote Sensing
+Which of the following are the examples of small-scale maps?,wall maps,city plans,atlas maps,both a and c,both a and c,Cartography
+Which of the following are the types of aerial photography?,oblique,vertical,horizontal,both a and b,both a and b,Remote Sensing
+Which of the following are traditional methods to store GIS data?,vector graphics,raster images,both a and b,none of the above,both a and b,Geodatabase
+Which of the following belong to the eight spatial relationships?,disjoint meets equals,inside covered by,contains covers overlaps,all of the above,all of the above,Spatial Analysis
+Which of the following can also be termed as un projected co-ordinate system?,lambert- azimuthal equal area projection,latitude – longitude geographic co-ordinate system,poly conic projection system,cylindrical projection,latitude – longitude geographic co-ordinate system,Cartography
+Which of the following can be represented as an example of format error?,silver polygons,dongle nodes,changing from raster to vector,areal cover,changing from raster to vector,Geodatabase
+Which of the following can be used for representing a real world feature on two dimensional surfaces?,plan,drawing,scale,map,map,Cartography
+Which of the following could you use a buffer operation for?,calculating the area of overlap between two polygon data layers.,calculating the number of observations within a set distance of a point line or area feature.,determining the area within a set distance from a point line or area feature,both b and c,both b and c,Spatial Analysis
+Which of the following device can be using create hard copy of map data?,printer,magnetic tape,internet,cd-rom 0r dvd,printer,Cartography
+Which of the following doesn’t determine the capability of GIS?,generating a map,transferring data,retrieving data,representing cartographic features,transferring data,Geodatabase
+Which of the following group of relationship does not belong to the eight spatial relationships?,disjoint meets equals,disjoint neighbour,inside covered by,contains covers overlaps,disjoint neighbour,Spatial Analysis
+Which of the following indicate topological primitive?,polyline,point,node,polygon,node,Geodatabase
+Which of the following industries knows raster graphic as contones?,prepress,printing,trading,both a and b,both a and b,Remote Sensing
+Which of the following is a branch of the study of GIS concepts?,geographic information science,geographic science,geographic data,none of the above,geographic information science,Spatial Analysis
+Which of the following is a GIS operation?,geodata,geoprocessing,global processing,none of the above,geoprocessing,Spatial Analysis
+Which of the following is an example of spatial analysis?,natural vegetation on hillsides,a checkboard pattern created by farmers,the sizes of major oceans,the flight patterns of birds,a checkboard pattern created by farmers,Spatial Analysis
+Which of the following is not a category of error?,change in format,areal cover,map scale,density of observation,change in format,Surveying
+Which of the following is not a method of representation of the scale of the map?,ratio method,verbal method,geographical method,non-verbal method,non-verbal method,Cartography
+Which of the following is not a property of coordinate in GIS?,line of sight,origin,axis,units of measurement,line of sight,Spatial Analysis
+Which of the following is not a topological property?,boundary,dot,nodes lines polygons,size,size,Spatial Analysis
+Which of the following is not an example of a class interval system used in choropleth mapping?,extremities,equal interval,user-specified,percentiles,extremities,Cartography
+Which of the following is not an example of economic map?,land use map,transport map,agricultural map,vegetation map,vegetation map,Cartography
+Which of the following is not standard comparison operator of raster overlay operation?,< >,> <,=,<,> <,Spatial Analysis
+Which of the following is not the example of geographic fields?,location of any building,air temperature,barometric pressure,rainfall value,location of any building,Spatial Analysis
+Which of the following is not the rule of topological consistency in 2D space?,every 1 - simplex must be bounded by two 0- simplexes,every 1-simplex borders two 2 - simplexes,1- simplexes can intersect anywhere,around every 0 - simplex exists an alternating sequence of 1 and 2 simplexes,1- simplexes can intersect anywhere,Spatial Analysis
+Which of the following is qualitative data?,bankful capacity measurements,a description of flood damage,infiltration rates,% of different land uses,a description of flood damage,Geodatabase
+Which of the following is raster representation technique?,dem,tin,point,line,dem,Remote Sensing
+Which of the following is related to GIS,euclidean space,ramanujan space,pythagorian space,none of the above,euclidean space,Spatial Analysis
+Which of the following is true,tessellations partition the study space into cells & assign a value to each cell,a raster is a regular tessellation with square cells (by far the most commonly used),both ‘1’ & ‘2’,none of the above,both ‘1’ & ‘2’,Geodatabase
+Which of the following is true about ‘Delaunay Triangulation’,the triangles are as equilateral as they can be,for each triangle the circumcircle through its anchor points does not contain any other anchor point,both ‘1’ & ‘2’,none of the above,both ‘1’ & ‘2’,Spatial Analysis
+Which of the following is true about ‘Discrete fields’,discrete fields divide the study space in mutually exclusive bounded parts with all locations in one part having the same field value,‘land classification’ is an example of discrete fields,discrete fields make use of ‘bounded’ features,all of the above,all of the above,Spatial Analysis
+Which of the following is true about ‘Internal Data Values’,they are quantities in that they allow simple forms of computation like addition & subtraction,they do not support multiplication or division,centigrade temperatures are internal data values,all of the above,all of the above,Geodatabase
+Which of the following is true about ‘Nominal Data Values’,they are values that provide a name or identifier so that we can discriminate between different values,true computations cannot be done with these values,when the values assigned are sorted according to some set of non-overlapping categories they are called ‘categorical data’,all of the above,all of the above,Geodatabase
+Which of the following is true about ‘Ordinal Data Values’,they are date values that can be put in some natural sequence but that do not allow any other type of computation,an example of ordinal data value is classifying household income as ‘low’ ‘average’ or ‘high’,none of the above,bothe ‘1’ & ‘2’,bothe ‘1’ & ‘2’,Spatial Analysis
+Which of the following is true about DBMS,a dbms provides a high-level ‘declaration query language’,a dbms supports the use of a ‘data model’,a dbms includes ‘data backup’ and ‘recovery’ functions to ensure data availability at all times,all of the above,all of the above,Geodatabase
+Which of the following is true?,‘fields’ are geographic phenomena that occur everywhere in the study area,‘objects’ are geographic phenomena that occur ‘sparsely’ over the study area,fields can be continuous or discrete,all of the above,all of the above,Geodatabase
+Which of the following is used to retreive the data from database?,relational language,compiler,query language,relational calculus,query language,Geodatabase
+Which of the following justifies the usage of topology?,terrain of the area,geometry of the model,climatic conditions,atmospheric conditions,geometry of the model,Spatial Analysis
+Which of the following maps are especially prepared by the government to realize revenue and tax?,wall maps,topographical maps,cadastral maps,atlas maps,cadastral maps,Cartography
+Which of the following overlay methods would you use to calculate the length of road within a forest polygon?,union,point in polygon,line in polygon,polygon in polygon,line in polygon,Spatial Analysis
+Which of the following parameters using GIS are correlated to represent an earth’s physical location?,location,spatial-temporal,extent references,all the above,all the above,Spatial Analysis
+Which of the following process are included in photogrammetry?,recording,measuring,interpreting,all the above,all the above,Remote Sensing
+which of the following represents the correct set of coordinate classification in GIS?,spherical projected systems,geographic projected systems,geographic spherical systems,geographic geometric systems,geographic projected systems,Spatial Analysis
+Which of the following satellite based augmentation system is not operational?,north america waas,egnos,msas,sdcm,sdcm,Remote Sensing
+Which of the following sets represent the correct set of map classification?,cadastral thematic,thematic geographic,cadastral geographic,geographic topographic,cadastral thematic,Cartography
+Which of the following software can be used in case of property tax assessment?,staad pro,revit,remote sensing,gis,gis,Spatial Analysis
+Which of the following software’s are used for developing vehicle route?,autodesk revit,staad pro,gis,remote sensing,gis,Spatial Analysis
+"Which of the following spatial interpolation techniques is an example of a local, exact, abrupt and deterministic interpolator?",tin,spatial moving average,thiessen polygon,polygons,thiessen polygon,Spatial Analysis
+Which of the following statement is False?,our world is dynamic,positional data of non-geographic nature also exists,hydrological does not require any spatial data,in gis professionals deal with questions related to geographic space,hydrological does not require any spatial data,Geodatabase
+Which of the following statements is true,a table or relation is itself a collection of ‘tuples’ (or records),each table is a collection of tuples that are similarly shaped,an ‘attribute’ is a named field of a tuple with which each tuple associates a value the tuple’s ‘attribute value’,all of the above,all of the above,Geodatabase
+Which of the following statements is true about the capabilities of GIS,data capture and preparation,data management including storage and maintenance,data manipulation and analysis,all of the above,all of the above,Spatial Analysis
+Which of the following surveys provided high accuracy with GPS derived positions?,land,water,farm areas,none of the above,land,Surveying
+Which of the four files that make up a shapefile contains the coordinate system?,.prj.,.shx.,.shp.,.dbf.,.prj.,Geodatabase
+Which of these is not type of spatial analysis?,spatial data analysis,spatial autocorrelation,spatial stratified heterogeneity,geospatial,geospatial,Spatial Analysis
+Which of this is not a class of map projection?,cylindrical,elliptical,conical,azimuthal,elliptical,Cartography
+Which one are digital data creation methods used for GIS?,digitization,demodulation,orthorectified imagery,both a and c,both a and c,Geodatabase
+Which one can be affected by atmospheric path disturbances?,modern gps surveying,conventional gps,absolute positioning,resection method,modern gps surveying,Remote Sensing
+Which one is true for Conic projection ?,less distortion,more distortion,no distortion,variable distortions,less distortion,Cartography
+Which one is true?,internal & ratio data also known as ‘quantitative data’,nominal & categorial data values are qualitative,ordianl data also known as ranking or hierarchical event,all of the above,all of the above,Geodatabase
+Which one of the following are disadvantages of vector representation in GIS?,difficult to represent topology,cell boundaries independent of feature boundaries,complex data structure,less compact data structure,complex data structure,Spatial Analysis
+Which one of the following attribute can be considered as a key attribute?,id,name,city,department,id,Geodatabase
+Which one of the following is correct query?,select * where ares_size>1000 from parcel,from parcel select * where are_size>1000,area_size>1000 select * from parcel,select * from parcel where are_size>1000,select * from parcel where are_size>1000,Geodatabase
+Which one of the following is incorrect?,gis software supports spatial and attribute data,gis offer better table functionality as compared to dbms,gis packages can store tabular data,dbms offer better table functionality as compared to gis,gis offer better table functionality as compared to dbms,Geodatabase
+Which one of the following is not a function of database?,creating a graph,concurrent use,data integrity,query optimization,creating a graph,Geodatabase
+Which one of the following is not a reason for which DBMS is used with GIS?,a dbms supports the storage and manipulation of very large data sets,a dbms can be instructed to guard over data correctness,dbms can also use to represent graphics,a dbms supports the concurrent use of the same data set by many users,dbms can also use to represent graphics,Geodatabase
+Which one of the following is not capability of GIS?,data capture,data management,data presentation,sharing files in the network,sharing files in the network,Spatial Analysis
+Which one of the following is not key component of spatial data quality?,audience,positional accuracy,completeness,logical consistency,audience,Spatial Analysis
+Which one of the following is not related to GIS?,geoinformatics,geometrics,zoology,spatial information science,zoology,Spatial Analysis
+Which one of the following is not required while relation is created?,name,purpose,attributes,domain of each attribute,purpose,Geodatabase
+Which one of the following is not true in terms of data capture process?,data can be collected from various sources,data can contain errors,gross errors need to be removed before using data,data does not contain any variation in the measurement,data does not contain any variation in the measurement,Surveying
+Which one of the following is not true?,geodatabase is not the same thing as a gis,geographic phenomena can have point line and area or image characteristics,geodatabase is the same thing as a gis,gis knows about spatial reference system,geodatabase is the same thing as a gis,Geodatabase
+Which one of the following is not true?,a raster is an irregular tessellation with square cells (by far the most commonly used),a raster is a regular tessellation with square cells (by far the most commonly used),tessellations partition the study space into cells & assign a value to each cell,quad tree is a technique used for irregular tessellation,a raster is an irregular tessellation with square cells (by far the most commonly used),Geodatabase
+Which one of the following is true?,rapid earthquake damage assessment application is an example of short lived gis applications,an automated cadastral system is an example of short lived gis application,gis systems and gis application are same,gis application does not require any database management software,rapid earthquake damage assessment application is an example of short lived gis applications,Spatial Analysis
+Which relationships is correct?,triangle : (2-simplex),line segment : (2-simplex),point : (0-simplex),both a and c,both a and c,Spatial Analysis
+"Which system is designed to capture, store, manipulate, analyse, manage and present spatial or geographic data_____?",satellite,web,database,gis,gis,Geodatabase
+Which tables give data unique characteristics?,data.,excel.,raster.,attribute.,attribute.,Geodatabase
+Which talks about scientific discipline of study in academia_____?,gis science,gps,computer science,data science,gis science,Spatial Analysis
+Which tool allows the most control over the buffer process?,map buffer.,analysis tool.,buffer wizard.,proximity manager.,buffer wizard.,Spatial Analysis
+Which tool do we use to create a new file of a layer’s data in a different format?,draw.,export data.,edit features.,advanced editor.,export data.,Cartography
+Which toolbar has tools for creating graphics as opposed to vector data?,edit.,draw.,georeferencing.,advanced editing.,draw.,Cartography
+Which type of data set is not used in GIS related software’s?,vertex,point,polyline,polygon,vertex,Geodatabase
+Which type of geodatabase can have multiple editors but only if they work on different parts of the data?,file geodatabase.,personal geodatabase.,microsoft database.,enterprise database.,file geodatabase.,Geodatabase
+Which type of head digitizing is most commonly used?,heads up,heads down,head vertical,none of the above,heads up,Surveying
+Which type of head digitizing is rarely used?,heads up,heads down,head vertical,none of the above,heads down,Surveying
+Which type of map can explain a particular feature in detail?,cadastral map,topographic map,thematic map,geographic map,thematic map,Cartography
+Which type of map projection is used in the preparation of atlas?,cylindrical projection,utm projection,poly conic projection system,lambert-azimuthal equal area projection,lambert-azimuthal equal area projection,Cartography
+Which type of query uses containment relationship?,attribute projection query,point in polygon query,tuple selection query,join selection query,point in polygon query,Geodatabase
+"With different file name extensions, three file names are needed to be properly identified as a shapefile:",shp shx dbf,shp sbn prj,shp sbn dbf,shp sbn sbx,shp shx dbf,Geodatabase
+World's first operational GIS was,qgis,cgis,arcgis,grass gis,cgis,Geodatabase
+You should always include as much information as possible in a map?,1,0,nan,nan,FALSE,Cartography

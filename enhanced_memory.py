@@ -167,7 +167,9 @@ class LearningPatternAnalyzer:
         hour_averages = {}
         for hour, scores in time_performance.items():
             if scores:
-                hour_averages[hour] = statistics.mean(scores)
+                # Convert hour to int if it's a string (from JSON)
+                hour_int = int(hour) if isinstance(hour, str) else hour
+                hour_averages[hour_int] = statistics.mean(scores)
         
         if hour_averages:
             best_hour = max(hour_averages, key=hour_averages.get)
@@ -274,46 +276,77 @@ class LearningPatternAnalyzer:
     
     def _generate_repetition_schedule(self) -> List[Dict]:
         """Generate a spaced repetition schedule for weak areas."""
-        schedule = []
-        today = datetime.now()
+        from flashcards import get_spaced_repetition_schedule_for_user
         
-        # Spaced repetition intervals (in days)
+        # Get flashcard-based schedule first (higher priority)
+        flashcard_schedule = get_spaced_repetition_schedule_for_user(self.username, days_ahead=7)
+        
+        # Convert flashcard schedule to our format and filter for due/upcoming items
+        schedule = []
+        for item in flashcard_schedule:
+            if item['days_until_review'] <= 3:  # Only include items due within 3 days
+                schedule.append({
+                    'topic': item['topic'],
+                    'subtopic': item['subtopic'],
+                    'review_date': item['review_date'],
+                    'days_until_review': item['days_until_review'],
+                    'priority': item['priority'],
+                    'source': 'flashcard',
+                    'ease_factor': item.get('ease_factor', 2.5),
+                    'repetitions': item.get('repetitions', 0)
+                })
+        
+        # Add weakness-based schedule for topics without flashcards
+        today = datetime.now()
         intervals = [1, 3, 7, 14, 30]
         
         for topic_subtopic, data in self.patterns['detailed_weaknesses'].items():
             if data['required_repetitions'] > 0:
                 topic, subtopic = topic_subtopic.split('::', 1)
                 
+                # Skip if already covered by flashcards
+                if any(s['topic'] == topic and s['subtopic'] == subtopic for s in schedule):
+                    continue
+                
                 # Calculate next review date based on last review
                 if data['last_reviewed']:
                     last_review = datetime.fromisoformat(data['last_reviewed'])
                     days_since_review = (today - last_review).days
                     
-                    # Find appropriate interval
-                    next_interval = 1
-                    for interval in intervals:
-                        if days_since_review < interval:
-                            next_interval = interval
-                            break
+                    # Find appropriate interval based on performance
+                    repetitions = data['required_repetitions']
+                    if repetitions <= 1:
+                        next_interval = intervals[0]  # 1 day
+                    elif repetitions <= 3:
+                        next_interval = intervals[1]  # 3 days
+                    elif repetitions <= 5:
+                        next_interval = intervals[2]  # 7 days
+                    else:
+                        next_interval = intervals[3]  # 14 days
                     
                     next_review_date = last_review + timedelta(days=next_interval)
                 else:
                     next_review_date = today + timedelta(days=1)
                 
                 # Only include if review is due soon
-                if (next_review_date - today).days <= 7:
+                days_until = (next_review_date - today).days
+                if days_until <= 7:
+                    priority = 'high' if days_until <= 0 else 'medium' if days_until <= 2 else 'low'
                     schedule.append({
                         'topic': topic,
                         'subtopic': subtopic,
                         'review_date': next_review_date.strftime('%Y-%m-%d'),
-                        'days_until_review': (next_review_date - today).days,
-                        'priority': 'high' if (next_review_date - today).days <= 1 else 'medium'
+                        'days_until_review': max(0, days_until),
+                        'priority': priority,
+                        'source': 'weakness_analysis',
+                        'required_repetitions': repetitions
                     })
         
-        # Sort by review date
-        schedule.sort(key=lambda x: x['days_until_review'])
+        # Sort by priority and days until review
+        priority_order = {'high': 0, 'medium': 1, 'low': 2}
+        schedule.sort(key=lambda x: (priority_order.get(x['priority'], 3), x['days_until_review']))
         
-        return schedule[:7]  # Next 7 reviews
+        return schedule[:10]  # Top 10 items
 
 
 class EnhancedMemorySystem:

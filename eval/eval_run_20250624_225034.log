@@ -1,0 +1,19 @@
+2025-06-24 22:50:34,160 INFO Loaded 600 questions from eval/Objective Questions.csv
+2025-06-24 22:50:34,176 INFO llama3.1:8b already available
+2025-06-24 22:50:34,192 INFO mixtral:8x7b already available
+2025-06-24 22:50:34,210 INFO phi4:14b already available
+2025-06-24 22:50:34,226 INFO gemma:7b already available
+2025-06-24 22:50:34,241 INFO mistral:7b already available
+2025-06-24 22:50:34,255 INFO qwen3:8b already available
+2025-06-24 22:50:34,270 INFO qwen3:14b already available
+2025-06-24 22:50:34,286 INFO deepseek-r1:14b already available
+2025-06-24 22:50:34,299 INFO deepseek-r1:8b already available
+2025-06-24 22:50:34,301 INFO Starting Ollama model: llama3.1:8b
+2025-06-24 22:50:34,302 INFO Starting Ollama model: mixtral:8x7b
+2025-06-24 22:50:34,302 INFO Starting Ollama model: phi4:14b
+2025-06-24 22:50:34,303 INFO Starting Ollama model: gemma:7b
+2025-06-24 22:50:34,306 INFO Starting Ollama model: mistral:7b
+2025-06-24 22:50:34,308 INFO Starting Ollama model: qwen3:8b
+2025-06-24 22:50:34,312 INFO Starting Ollama model: qwen3:14b
+2025-06-24 22:50:34,313 INFO Starting Ollama model: deepseek-r1:14b
+2025-06-24 22:50:34,315 INFO Starting Ollama model: deepseek-r1:8b

@@ -249,7 +249,12 @@ const Learn = () => {
     // Load question
     setLoadingContent(prev => ({ ...prev, question: true }));
     try {
-      const questionData = await contentAPI.generateQuestion(subtopic.name, [], 'medium', 'analytical');
+      const questionData = await contentAPI.generateQuestion(
+        subtopic.name, 
+        [], 
+        'medium', 
+        'objective'  // Always use objective questions during learning
+      );
       setQuestion(questionData.question);
     } catch (error) {
       console.error('Failed to load question:', error);

@@ -126,7 +126,7 @@ class DeepSeekProvider(LLMProvider):
 class OllamaProvider(LLMProvider):
     """Ollama provider for local models."""
     
-    def __init__(self, model: str = "llama2", base_url: str = None):
+    def __init__(self, model: str = "llama3.2", base_url: str = None):
         self.model = model
         self.base_url = base_url or "http://localhost:11434"
         
