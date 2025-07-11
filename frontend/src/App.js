@@ -14,8 +14,8 @@ import Learn from "./pages/Learn";
 import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
 import Sources from "./pages/Sources";
-// import Review from './pages/Review';
-// import Test from './pages/Test';
+import Review from './pages/Review';
+import Test from './pages/Test';
 // import Insights from './pages/Insights';
 
 // Placeholder components for pages not yet created
@@ -28,8 +28,8 @@ const PlaceholderPage = ({ title }) => (
   </div>
 );
 
-const Review = () => <PlaceholderPage title="Review Mode" />;
-const Test = () => <PlaceholderPage title="Test Mode" />;
+// const Review = () => <PlaceholderPage title="Review Mode" />;
+// const Test = () => <PlaceholderPage title="Test Mode" />;
 const Insights = () => <PlaceholderPage title="Learning Insights" />;
 
 const MainApp = () => {
