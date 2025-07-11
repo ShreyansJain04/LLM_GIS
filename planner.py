@@ -178,15 +178,10 @@ class PlannerAgent:
                 subtopic['name'], 
                 previous_questions=[],
                 difficulty="medium",
-                question_type="objective"  # Always use objective questions during learning
+                question_type="analytical"
             )
             
-            print(f"\n❓ Question: {question['text']}")
-            print("\nOptions:")
-            for i, option in enumerate(question["options"]):
-                print(f"{i}. {option}")
-            
-            user_answer = input("Enter option number (0-3): ")
+            user_answer = input(question + "\nYour answer: ")
             correct, feedback = check_answer(question, user_answer)
             print(feedback)
             
@@ -198,12 +193,7 @@ class PlannerAgent:
                 'user_answer': user_answer,
                 'correct': correct,
                 'score': subtopic_score,
-                'feedback': feedback,
-                'question_type': 'objective',
-                'options': question["options"],
-                'correct_option': question["correct_option"],
-                'selected_option': int(user_answer) if user_answer.isdigit() else None,
-                'explanation': question.get("explanation", "")
+                'feedback': feedback
             })
             
             if correct:
@@ -220,23 +210,34 @@ class PlannerAgent:
         
         # Final comprehensive assessment
         print(f"\n=== Final Assessment for {topic} ===")
+        # Generate a synthesis question using domain expert
+        final_question = generate_question(
+            topic,
+            previous_questions=[p['question'] for p in subtopics_performance],
+            difficulty="hard",
+            question_type="synthesis"
+        )
         
-        # Optional reflective question
-        print("\nWould you like to answer a reflective question about what you've learned? (This won't affect your grade)")
-        if input("Type 'y' for yes, any other key to skip: ").lower().strip() == 'y':
-            reflection_q = generate_question(
-                topic,
-                previous_questions=[p['question'] for p in subtopics_performance],
-                difficulty="medium",
-                question_type="subjective"
-            )
-            print(f"\n💭 Reflection Question: {reflection_q['text']}")
-            reflection_ans = input("Your thoughts: ")
-            _, feedback = check_answer(reflection_q, reflection_ans)
-            print(f"\nThank you for sharing! {feedback}")
-            # Note: We don't add this to subtopics_performance as it doesn't affect grading
+        user_answer = input(final_question + "\nYour comprehensive answer: ")
+        correct, feedback = check_answer(final_question, user_answer)
+        print(feedback)
         
-        # Calculate mastery based on performance (excluding the optional reflection question)
+        # Record final assessment performance
+        final_score = 1 if correct else 0
+        subtopics_performance.append({
+            'subtopic': 'Final Assessment',
+            'question': final_question,
+            'user_answer': user_answer,
+            'correct': correct,
+            'score': final_score,
+            'feedback': feedback
+        })
+        
+        if correct:
+            total_correct += 1
+        total_questions += 1
+        
+        # Calculate mastery based on performance
         mastery_percentage = total_correct / total_questions if total_questions > 0 else 0
         if mastery_percentage >= 0.8:
             mastery_level = 'mastered'
@@ -253,7 +254,7 @@ class PlannerAgent:
         record_learning_session(
             username=self.username,
             topic=topic,
-            subtopics_performance=subtopics_performance,  # Reflection question not included
+            subtopics_performance=subtopics_performance,
             final_score=mastery_percentage,
             mastery_level=mastery_level
         )

@@ -2,6 +2,9 @@
 .env
 .env.*
 
+# API Keys and sensitive files
+set_api_key.py
+
 # Python
 __pycache__/
 *.py[cod]
@@ -24,6 +27,12 @@ wheels/
 .installed.cfg
 *.egg
 
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 # Virtual Environment
 venv/
 ENV/
@@ -37,26 +46,4 @@ env/
 
 # OS
 .DS_Store
-Thumbs.db
-
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.npm
-.yarn-integrity
-
-# Build outputs
-*.zip
-*.tar.gz
-*.rar
-
-# Logs
-*.log
-
-# Cache directories
-.cache/
-.next/
-.nuxt/
-dist/ 
+Thumbs.db 

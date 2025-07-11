@@ -17,7 +17,6 @@ from domain_expert import (
 from interactive_session import InteractiveSession, Command
 from enhanced_memory import EnhancedMemorySystem
 from llm_providers import llm_manager
-from flashcards import FlashcardDeck, create_flashcards_from_qa
 
 app = FastAPI(title="AI Tutoring System API", version="1.0.0")
 
@@ -87,22 +86,6 @@ class CommandRequest(BaseModel):
     args: Optional[str] = ""
     username: str
     topic: Optional[str] = None
-
-# Flashcard models
-class FlashcardCreate(BaseModel):
-    front: str
-    back: str
-    subtopic: Optional[str] = None
-
-class FlashcardReview(BaseModel):
-    card_id: int
-    quality: int  # 0-5 rating
-
-class FlashcardBulkCreate(BaseModel):
-    qa_pairs: List[Dict[str, str]]  # List of {"question": str, "answer": str, "subtopic": str}
-
-class FlashcardSessionStart(BaseModel):
-    limit: Optional[int] = 10
 
 # Global storage for active sessions (in production, use Redis or similar)
 active_sessions = {}
@@ -526,157 +509,6 @@ async def get_chat_suggestions(username: str):
             "Give me a practice question"
         ]}
 
-# Flashcard API endpoints
-@app.post("/api/flashcards/{username}/decks/{topic}/cards")
-async def create_flashcard(username: str, topic: str, card_data: FlashcardCreate):
-    """Create a new flashcard in a deck."""
-    try:
-        deck = FlashcardDeck(username, topic)
-        card = deck.add_card(card_data.front, card_data.back, card_data.subtopic)
-        return {
-            "success": True,
-            "card": card,
-            "deck_stats": deck.get_stats()
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/flashcards/{username}/decks/{topic}/cards/bulk")
-async def create_flashcards_bulk(username: str, topic: str, bulk_data: FlashcardBulkCreate):
-    """Create multiple flashcards from Q&A pairs."""
-    try:
-        deck = create_flashcards_from_qa(username, topic, bulk_data.qa_pairs)
-        return {
-            "success": True,
-            "cards_created": len(bulk_data.qa_pairs),
-            "deck_stats": deck.get_stats()
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/flashcards/{username}/decks/{topic}")
-async def get_flashcard_deck(username: str, topic: str):
-    """Get flashcard deck information and stats."""
-    try:
-        deck = FlashcardDeck(username, topic)
-        stats = deck.get_stats()
-        return {
-            "topic": topic,
-            "username": username,
-            "stats": stats
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/flashcards/{username}/decks/{topic}/due")
-async def get_due_flashcards(username: str, topic: str, limit: Optional[int] = None):
-    """Get flashcards due for review."""
-    try:
-        deck = FlashcardDeck(username, topic)
-        due_cards = deck.get_due_cards(limit)
-        return {
-            "due_cards": due_cards,
-            "count": len(due_cards),
-            "total_cards": deck.get_stats()['total_cards']
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/flashcards/{username}/decks/{topic}/review")
-async def review_flashcard(username: str, topic: str, review_data: FlashcardReview):
-    """Submit a flashcard review and update scheduling."""
-    try:
-        deck = FlashcardDeck(username, topic)
-        
-        # Find the card by index (card_id is the index in the list)
-        if topic not in deck.deck['decks'] or review_data.card_id >= len(deck.deck['decks'][topic]):
-            raise HTTPException(status_code=404, detail="Card not found")
-        
-        card = deck.deck['decks'][topic][review_data.card_id]
-        
-        # Update card schedule based on quality rating
-        deck.update_card_schedule(card, review_data.quality)
-        
-        # Update deck statistics
-        correct = review_data.quality >= 3
-        deck.update_stats(correct)
-        
-        return {
-            "success": True,
-            "card_updated": {
-                "next_review": card['next_review'],
-                "interval": card['interval'],
-                "repetitions": card['repetitions']
-            },
-            "deck_stats": deck.get_stats()
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/flashcards/{username}/decks/{topic}/stats")
-async def get_flashcard_stats(username: str, topic: str):
-    """Get detailed flashcard statistics."""
-    try:
-        deck = FlashcardDeck(username, topic)
-        stats = deck.get_stats()
-        return stats
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/flashcards/{username}/decks")
-async def list_flashcard_decks(username: str):
-    """List all flashcard decks for a user."""
-    try:
-        from pathlib import Path
-        import json
-        
-        deck_file = Path(f'flashcards_{username}.json')
-        if not deck_file.exists():
-            return {"decks": []}
-        
-        with deck_file.open('r') as f:
-            data = json.load(f)
-        
-        deck_list = []
-        for topic, cards in data.get('decks', {}).items():
-            deck = FlashcardDeck(username, topic)
-            stats = deck.get_stats()
-            deck_list.append({
-                "topic": topic,
-                "stats": stats
-            })
-        
-        return {"decks": deck_list}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/flashcards/{username}/decks/{topic}/session/start")
-async def start_flashcard_session(username: str, topic: str, session_data: FlashcardSessionStart):
-    """Start a flashcard review session."""
-    try:
-        deck = FlashcardDeck(username, topic)
-        due_cards = deck.get_due_cards(session_data.limit)
-        
-        if not due_cards:
-            return {
-                "session_started": False,
-                "message": "No cards due for review",
-                "stats": deck.get_stats()
-            }
-        
-        # Create session data
-        session_id = f"flashcard_{username}_{topic}_{datetime.now().timestamp()}"
-        
-        return {
-            "session_started": True,
-            "session_id": session_id,
-            "cards_to_review": len(due_cards),
-            "first_card": due_cards[0] if due_cards else None,
-            "stats": deck.get_stats()
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run(app, host="0.0.0.0", port=8000) 
