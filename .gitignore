@@ -49,3 +49,4 @@ env/
 Thumbs.db 
 
 memory.py
+llm_providers.py
