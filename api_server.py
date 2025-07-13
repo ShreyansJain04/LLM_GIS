@@ -40,12 +40,12 @@ class UserCreate(BaseModel):
 
 class QuestionRequest(BaseModel):
     topic: str
-    previous_questions: Optional[List[str]] = []
+    previous_questions: List[str] = []
     difficulty: str = "medium"
     question_type: str = "conceptual"
 
 class AnswerRequest(BaseModel):
-    question: str
+    question: Any  # Can be string or dict
     answer: str
 
 class LearningSessionRequest(BaseModel):
@@ -87,9 +87,16 @@ class CommandRequest(BaseModel):
     username: str
     topic: Optional[str] = None
 
+class ReviewSessionRequest(BaseModel):
+    mode: str
+
+class ReviewAnswerRequest(BaseModel):
+    answer: str
+
 # Global storage for active sessions (in production, use Redis or similar)
 active_sessions = {}
 chat_histories = {}  # Store chat histories per user
+review_sessions = {}  # Store review sessions
 
 @app.get("/")
 async def root():
@@ -508,6 +515,189 @@ async def get_chat_suggestions(username: str):
             "Show me my progress",
             "Give me a practice question"
         ]}
+
+# Review Session endpoints
+@app.get("/api/review/{username}/insights")
+async def get_review_insights(username: str):
+    """Get review insights and recommendations for a user."""
+    try:
+        enhanced_memory = EnhancedMemorySystem(username)
+        insights = enhanced_memory.get_insights()
+        
+        # Get weak areas and due items
+        weak_areas = insights.get('personalized_recommendations', {}).get('focus_areas', [])
+        spaced_schedule = insights.get('personalized_recommendations', {}).get('spaced_repetition_schedule', [])
+        due_items = [item for item in spaced_schedule if item.get('days_until_review', 0) <= 0]
+        
+        return {
+            "weak_areas_count": len(weak_areas),
+            "due_items_count": len(due_items),
+            "recommended_focus": weak_areas[0]['topic'] if weak_areas else "No weak areas",
+            "insights": insights
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/review/{username}/start")
+async def start_review_session(username: str, request: ReviewSessionRequest):
+    """Start a review session with the specified mode."""
+    try:
+        session_id = f"review_{username}_{datetime.now().timestamp()}"
+        
+        # Get user insights for personalized review
+        enhanced_memory = EnhancedMemorySystem(username)
+        insights = enhanced_memory.get_insights()
+        
+        # Get focus areas based on mode
+        focus_areas = insights.get('personalized_recommendations', {}).get('focus_areas', [])
+        
+        if not focus_areas:
+            raise HTTPException(status_code=400, detail="No weak areas found for review")
+        
+        # Generate first question
+        topic = focus_areas[0]['topic']
+        question = generate_question(topic, previous_questions=[], difficulty="medium")
+        
+        # Create session data
+        session_data = {
+            "session_id": session_id,
+            "username": username,
+            "mode": request.mode,
+            "topic": topic,
+            "current_question": question,
+            "current_question_index": 0,
+            "total_questions": 0,
+            "correct_answers": 0,
+            "focus_areas": focus_areas,
+            "started_at": datetime.now().isoformat()
+        }
+        
+        review_sessions[session_id] = session_data
+        
+        return session_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/review/{session_id}/answer")
+async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
+    """Submit an answer for a review session question."""
+    try:
+        if session_id not in review_sessions:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        session = review_sessions[session_id]
+        
+        # Use the current question from session instead of the request
+        question = session["current_question"]
+        
+        # Check answer
+        correct, feedback = check_answer(question, request.answer)
+        
+        # Update session stats
+        session["total_questions"] += 1
+        if correct:
+            session["correct_answers"] += 1
+        
+        return {
+            "correct": correct,
+            "feedback": feedback,
+            "session_stats": {
+                "correct_answers": session["correct_answers"],
+                "total_questions": session["total_questions"]
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/review/{session_id}/next-question")
+async def get_next_review_question(session_id: str):
+    """Get the next question for a review session."""
+    try:
+        if session_id not in review_sessions:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        session = review_sessions[session_id]
+        
+        # Generate next question based on mode and performance
+        topic = session["topic"]
+        asked_questions = [session["current_question"]]  # Track asked questions
+        
+        # Adjust difficulty based on performance
+        accuracy = session["correct_answers"] / session["total_questions"] if session["total_questions"] > 0 else 0.5
+        difficulty = "hard" if accuracy > 0.8 else "medium" if accuracy > 0.6 else "easy"
+        
+        question = generate_question(topic, asked_questions, difficulty=difficulty)
+        
+        # Update session
+        session["current_question"] = question
+        session["current_question_index"] += 1
+        
+        return {
+            "question": question,
+            "session_stats": {
+                "correct_answers": session["correct_answers"],
+                "total_questions": session["total_questions"],
+                "current_question_index": session["current_question_index"]
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/review/{session_id}/end")
+async def end_review_session(session_id: str):
+    """End a review session and record results."""
+    try:
+        if session_id not in review_sessions:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        session = review_sessions[session_id]
+        
+        # Calculate final stats
+        accuracy = session["correct_answers"] / session["total_questions"] if session["total_questions"] > 0 else 0
+        
+        # Record the session
+        record_learning_session(
+            username=session["username"],
+            topic=f"{session['mode']} Review Session",
+            subtopics_performance=[],  # Could be enhanced to track individual questions
+            final_score=accuracy,
+            mastery_level="mastered" if accuracy >= 0.8 else "intermediate" if accuracy >= 0.6 else "beginner"
+        )
+        
+        # Clean up session
+        del review_sessions[session_id]
+        
+        return {
+            "success": True,
+            "final_stats": {
+                "correct_answers": session["correct_answers"],
+                "total_questions": session["total_questions"],
+                "accuracy": accuracy
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/review/{session_id}/progress")
+async def get_review_session_progress(session_id: str):
+    """Get the current progress of a review session."""
+    try:
+        if session_id not in review_sessions:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        session = review_sessions[session_id]
+        
+        return {
+            "session_id": session_id,
+            "mode": session["mode"],
+            "topic": session["topic"],
+            "current_question_index": session["current_question_index"],
+            "correct_answers": session["correct_answers"],
+            "total_questions": session["total_questions"],
+            "accuracy": session["correct_answers"] / session["total_questions"] if session["total_questions"] > 0 else 0
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

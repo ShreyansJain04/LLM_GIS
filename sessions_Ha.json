@@ -1,0 +1,156 @@
+{
+  "active_sessions": [
+    {
+      "session_id": "2025-07-13T15:35:57.965212",
+      "topic": "gis coordinates",
+      "status": "completed",
+      "started_at": "2025-07-13T15:35:57.965212",
+      "current_subtopic_index": 3,
+      "subtopics_completed": [
+        "Introduction to GIS Coordinates",
+        "Types of GIS Coordinates",
+        "Reading and Interpreting GIS Coordinates",
+        "Practical Application of GIS Coordinates"
+      ],
+      "questions_asked": [
+        {
+          "text": "What is the fundamental idea behind transforming a geographic coordinate from its original Terrestrial Reference Frame (TRF) to a target TRF?",
+          "options": [
+            "It involves changing the latitude and longitude directly without considering surrounding points.",
+            "It's achieved by completely removing all distortions in the original TRF.",
+            "It's based on converting all angles to distances or vice versa.",
+            "It's based on the idea of finding the necessary shift in a coordinate by interpolation from known shifts for control points in the same area."
+          ],
+          "correct_option": 3,
+          "explanation": "In the context, it is explained that the transformation from one TRF to another involves finding the required shift in the coordinate. This shift is determined by interpolating from known shifts for a number of control points in the same area, rather than altering the latitude and longitude directly or completely eliminating all distortions.",
+          "type": "objective",
+          "difficulty": "medium"
+        },
+        {
+          "text": "What are the different types of GIS coordinates mentioned in the provided context?",
+          "options": [
+            "Latitude and Longitude, Polar coordinates, and Cartesian coordinates",
+            "Mercator and Polar coordinates",
+            "Latitude and Cylindrical coordinates",
+            "Polar and Equirectangular coordinates"
+          ],
+          "correct_option": 0,
+          "explanation": "The context mentions three types of GIS coordinates: Latitude and Longitude, which are all angles; Polar coordinates, which are an angle and a distance; and Cartesian coordinates, which are all distances.",
+          "type": "objective",
+          "difficulty": "medium"
+        },
+        {
+          "text": "How are the datum and the checkerboard similar in the context of GIS coordinates?",
+          "options": [
+            "Both are physical objects used in cartography.",
+            "Both are used to calculate angles in coordinates.",
+            "Both provide a framework to understand and arrange coordinates.",
+            "Both are types of coordinate systems."
+          ],
+          "correct_option": 2,
+          "explanation": "The context compares a datum to a checkerboard to illustrate the function of a datum as a foundational framework that gives meaning to coordinates, much like how a checkerboard gives meaning to the positions of checkers. Without a datum (or a checkerboard), coordinates (or checkers) can be moved around, but their positions don't have any defined meaning.",
+          "type": "objective",
+          "difficulty": "medium"
+        },
+        {
+          "text": "How is the necessary shift in a geographic coordinate from its original TRF to a target TRF determined in GIS?",
+          "options": [
+            "By applying a gnomonic projection.",
+            "By choosing the Lambert Conformal Conic Projection.",
+            "By using only Cartesian coordinates.",
+            "By interpolation from known shifts for a number of control points in the same area."
+          ],
+          "correct_option": 3,
+          "explanation": "The context explains that the shift in a geographic coordinate is determined by interpolation from known shifts for a number of control points in the same area. This is achieved by locating the coordinate within a grid cell and applying a bilinear interpolation algorithm. Other options, such as using a gnomonic projection, using only Cartesian coordinates, or choosing a specific projection, are not mentioned in the context as methods of determining this shift.",
+          "type": "objective",
+          "difficulty": "medium"
+        }
+      ],
+      "performance": [
+        {
+          "subtopic": "Introduction to GIS Coordinates",
+          "question": "What is the fundamental idea behind transforming a geographic coordinate from its original Terrestrial Reference Frame (TRF) to a target TRF?",
+          "answer": "0",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-13T15:36:33.040804",
+          "options": [
+            "It involves changing the latitude and longitude directly without considering surrounding points.",
+            "It's achieved by completely removing all distortions in the original TRF.",
+            "It's based on converting all angles to distances or vice versa.",
+            "It's based on the idea of finding the necessary shift in a coordinate by interpolation from known shifts for control points in the same area."
+          ],
+          "correct_option": 3,
+          "selected_option": 0,
+          "explanation": "In the context, it is explained that the transformation from one TRF to another involves finding the required shift in the coordinate. This shift is determined by interpolating from known shifts for a number of control points in the same area, rather than altering the latitude and longitude directly or completely eliminating all distortions."
+        },
+        {
+          "subtopic": "Types of GIS Coordinates",
+          "question": "What are the different types of GIS coordinates mentioned in the provided context?",
+          "answer": "0",
+          "correct": true,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-13T15:37:39.376432",
+          "options": [
+            "Latitude and Longitude, Polar coordinates, and Cartesian coordinates",
+            "Mercator and Polar coordinates",
+            "Latitude and Cylindrical coordinates",
+            "Polar and Equirectangular coordinates"
+          ],
+          "correct_option": 0,
+          "selected_option": 0,
+          "explanation": "The context mentions three types of GIS coordinates: Latitude and Longitude, which are all angles; Polar coordinates, which are an angle and a distance; and Cartesian coordinates, which are all distances."
+        },
+        {
+          "subtopic": "Reading and Interpreting GIS Coordinates",
+          "question": "How are the datum and the checkerboard similar in the context of GIS coordinates?",
+          "answer": "0",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-13T15:38:12.182385",
+          "options": [
+            "Both are physical objects used in cartography.",
+            "Both are used to calculate angles in coordinates.",
+            "Both provide a framework to understand and arrange coordinates.",
+            "Both are types of coordinate systems."
+          ],
+          "correct_option": 2,
+          "selected_option": 0,
+          "explanation": "The context compares a datum to a checkerboard to illustrate the function of a datum as a foundational framework that gives meaning to coordinates, much like how a checkerboard gives meaning to the positions of checkers. Without a datum (or a checkerboard), coordinates (or checkers) can be moved around, but their positions don't have any defined meaning."
+        },
+        {
+          "subtopic": "Practical Application of GIS Coordinates",
+          "question": "How is the necessary shift in a geographic coordinate from its original TRF to a target TRF determined in GIS?",
+          "answer": "0",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-13T15:38:43.964467",
+          "options": [
+            "By applying a gnomonic projection.",
+            "By choosing the Lambert Conformal Conic Projection.",
+            "By using only Cartesian coordinates.",
+            "By interpolation from known shifts for a number of control points in the same area."
+          ],
+          "correct_option": 3,
+          "selected_option": 0,
+          "explanation": "The context explains that the shift in a geographic coordinate is determined by interpolation from known shifts for a number of control points in the same area. This is achieved by locating the coordinate within a grid cell and applying a bilinear interpolation algorithm. Other options, such as using a gnomonic projection, using only Cartesian coordinates, or choosing a specific projection, are not mentioned in the context as methods of determining this shift."
+        }
+      ],
+      "total_score": 1,
+      "total_questions": 4,
+      "user_questions": [],
+      "difficulty_adjustments": [],
+      "difficulty": "medium",
+      "question_types": [
+        "objective",
+        "subjective"
+      ],
+      "final_score": 0.25,
+      "completed_at": "2025-07-13T15:38:46.876105"
+    }
+  ]
+}

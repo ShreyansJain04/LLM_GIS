@@ -1,0 +1,45 @@
+{
+  "learning_patterns": {
+    "time_of_day_performance": {
+      "15": [
+        0.25
+      ]
+    },
+    "session_duration_patterns": [],
+    "mistake_patterns": {},
+    "improvement_velocity": {},
+    "concept_relationships": {}
+  },
+  "personalization": {
+    "preferred_learning_style": "unknown",
+    "optimal_session_length": 20,
+    "best_time_of_day": "unknown",
+    "difficulty_preference": "medium"
+  },
+  "detailed_weaknesses": {
+    "gis coordinates::Introduction to GIS Coordinates": {
+      "error_types": {
+        "incomplete_answer": 1
+      },
+      "confusion_indicators": [],
+      "required_repetitions": 1,
+      "last_reviewed": "2025-07-13T15:38:46.848643"
+    },
+    "gis coordinates::Reading and Interpreting GIS Coordinates": {
+      "error_types": {
+        "incomplete_answer": 1
+      },
+      "confusion_indicators": [],
+      "required_repetitions": 1,
+      "last_reviewed": "2025-07-13T15:38:46.848643"
+    },
+    "gis coordinates::Practical Application of GIS Coordinates": {
+      "error_types": {
+        "incomplete_answer": 1
+      },
+      "confusion_indicators": [],
+      "required_repetitions": 1,
+      "last_reviewed": "2025-07-13T15:38:46.848643"
+    }
+  }
+}

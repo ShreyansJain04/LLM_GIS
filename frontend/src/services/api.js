@@ -179,6 +179,43 @@ export const healthAPI = {
   },
 };
 
+// Review Session API
+export const reviewAPI = {
+  getReviewInsights: async (username) => {
+    const response = await api.get(`/api/review/${username}/insights`);
+    return response.data;
+  },
+
+  startReviewSession: async (username, mode) => {
+    const response = await api.post(`/api/review/${username}/start`, {
+      mode,
+    });
+    return response.data;
+  },
+
+  submitAnswer: async (sessionId, answer) => {
+    const response = await api.post(`/api/review/${sessionId}/answer`, {
+      answer,
+    });
+    return response.data;
+  },
+
+  getNextQuestion: async (sessionId) => {
+    const response = await api.get(`/api/review/${sessionId}/next-question`);
+    return response.data;
+  },
+
+  endReviewSession: async (sessionId) => {
+    const response = await api.post(`/api/review/${sessionId}/end`);
+    return response.data;
+  },
+
+  getSessionProgress: async (sessionId) => {
+    const response = await api.get(`/api/review/${sessionId}/progress`);
+    return response.data;
+  },
+};
+
 // Chat API
 export const chatAPI = {
   sendMessage: async (username, message, context = null) => {
