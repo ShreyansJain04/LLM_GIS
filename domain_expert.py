@@ -271,6 +271,11 @@ def check_answer(question: Dict, answer: str) -> Tuple[bool, str]:
     Returns:
         Tuple of (is_correct, feedback)
     """
+    
+    print(f"check_answer received question: {question}")
+    print(f"check_answer received answer: {answer}")
+    print(f"Question type: {question.get('type')}")
+    
     if question.get("type") == "objective":
         try:
             selected_option = int(answer)

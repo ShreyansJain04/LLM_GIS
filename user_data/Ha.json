@@ -1,8 +1,128 @@
 {
-  "weak_areas": [],
-  "topic_mastery": {},
-  "history": [],
+  "weak_areas": [
+    "gis coordinates - Introduction to GIS Coordinates",
+    "gis coordinates - Reading and Interpreting GIS Coordinates",
+    "gis coordinates - Practical Application of GIS Coordinates",
+    "gis coordinates"
+  ],
+  "topic_mastery": {
+    "gis coordinates": "beginner"
+  },
+  "history": [
+    {
+      "date": "2025-07-13T15:38:46.849621",
+      "topic": "gis coordinates",
+      "subtopics_performance": [
+        {
+          "subtopic": "Introduction to GIS Coordinates",
+          "question": "What is the fundamental idea behind transforming a geographic coordinate from its original Terrestrial Reference Frame (TRF) to a target TRF?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Types of GIS Coordinates",
+          "question": "What are the different types of GIS coordinates mentioned in the provided context?",
+          "user_answer": "0",
+          "correct": true,
+          "score": 1,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Reading and Interpreting GIS Coordinates",
+          "question": "How are the datum and the checkerboard similar in the context of GIS coordinates?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Practical Application of GIS Coordinates",
+          "question": "How is the necessary shift in a geographic coordinate from its original TRF to a target TRF determined in GIS?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        }
+      ],
+      "final_score": 0.25,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 4,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.25,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 4,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    }
+  ],
   "learning_plan": {},
-  "performance_data": {},
-  "last_active": "2025-07-10T18:21:41.652037"
+  "performance_data": {
+    "gis coordinates": {
+      "attempts": 1,
+      "average_score": 0.25,
+      "subtopic_scores": {
+        "Introduction to GIS Coordinates": [
+          0
+        ],
+        "Types of GIS Coordinates": [
+          1
+        ],
+        "Reading and Interpreting GIS Coordinates": [
+          0
+        ],
+        "Practical Application of GIS Coordinates": [
+          0
+        ]
+      },
+      "question_type_performance": {
+        "objective": {
+          "total": 0,
+          "correct": 0,
+          "trend": []
+        },
+        "subjective": {
+          "total": 4,
+          "correct": 1,
+          "trend": [
+            0.25
+          ]
+        }
+      },
+      "difficulty_performance": {
+        "easy": {
+          "total": 0,
+          "correct": 0
+        },
+        "medium": {
+          "total": 4,
+          "correct": 1
+        },
+        "hard": {
+          "total": 0,
+          "correct": 0
+        }
+      },
+      "common_mistakes": [],
+      "last_attempt": "2025-07-13T15:38:46.849621",
+      "improvement_rate": 0
+    }
+  },
+  "last_active": "2025-07-13T16:03:25.816884"
 }

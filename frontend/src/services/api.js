@@ -67,7 +67,7 @@ export const contentAPI = {
     topic,
     previousQuestions = [],
     difficulty = "medium",
-    questionType = "conceptual"
+    questionType = "objective"
   ) => {
     const response = await api.post("/api/content/question", {
       topic,
@@ -180,41 +180,6 @@ export const healthAPI = {
 };
 
 // Review Session API
-export const reviewAPI = {
-  getReviewInsights: async (username) => {
-    const response = await api.get(`/api/review/${username}/insights`);
-    return response.data;
-  },
-
-  startReviewSession: async (username, mode) => {
-    const response = await api.post(`/api/review/${username}/start`, {
-      mode,
-    });
-    return response.data;
-  },
-
-  submitAnswer: async (sessionId, answer) => {
-    const response = await api.post(`/api/review/${sessionId}/answer`, {
-      answer,
-    });
-    return response.data;
-  },
-
-  getNextQuestion: async (sessionId) => {
-    const response = await api.get(`/api/review/${sessionId}/next-question`);
-    return response.data;
-  },
-
-  endReviewSession: async (sessionId) => {
-    const response = await api.post(`/api/review/${sessionId}/end`);
-    return response.data;
-  },
-
-  getSessionProgress: async (sessionId) => {
-    const response = await api.get(`/api/review/${sessionId}/progress`);
-    return response.data;
-  },
-};
 
 // Chat API
 export const chatAPI = {
@@ -257,8 +222,66 @@ export const chatAPI = {
     return response.data;
   },
 
-  getChatSuggestions: async (username) => {
+  getSuggestions: async (username) => {
     const response = await api.get(`/api/chat/suggestions/${username}`);
+    return response.data;
+  },
+};
+
+// Review Session API
+export const reviewAPI = {
+  startSession: async (username, mode, topics = [], adaptive = false) => {
+    const response = await api.post("/api/review/session/start", {
+      username,
+      mode,
+      topics,
+      adaptive,
+    });
+    return response.data;
+  },
+
+  getSession: async (sessionId) => {
+    const response = await api.get(`/api/review/session/${sessionId}`);
+    return response.data;
+  },
+
+  pauseSession: async (sessionId) => {
+    const response = await api.put(`/api/review/session/${sessionId}/pause`);
+    return response.data;
+  },
+
+  resumeSession: async (sessionId) => {
+    const response = await api.put(`/api/review/session/${sessionId}/resume`);
+    return response.data;
+  },
+
+  endSession: async (sessionId) => {
+    const response = await api.delete(`/api/review/session/${sessionId}`);
+    return response.data;
+  },
+
+  getNextQuestion: async (sessionId, topic = null) => {
+    const response = await api.post(
+      `/api/review/session/${sessionId}/question`,
+      {
+        topic,
+      }
+    );
+    return response.data;
+  },
+
+  submitAnswer: async (sessionId, questionId, answer, timeSpent = null) => {
+    const response = await api.post(`/api/review/session/${sessionId}/answer`, {
+      session_id: sessionId,
+      question_id: questionId,
+      answer,
+      time_spent: timeSpent,
+    });
+    return response.data;
+  },
+
+  getReviewInsights: async (username) => {
+    const response = await api.get(`/api/review/insights/${username}`);
     return response.data;
   },
 };
