@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  AcademicCapIcon,
   ChartBarIcon,
   CheckCircleIcon,
   XCircleIcon,
   LightBulbIcon,
   ArrowPathIcon,
   BookmarkIcon,
+  TrophyIcon,
+  ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import ReactMarkdown from "react-markdown";
 import { useUser } from "../contexts/UserContext";
-import { contentAPI, userAPI } from "../services/api";
+import { contentAPI, userAPI, reviewAPI } from "../services/api";
 import toast from "react-hot-toast";
+import ReviewModeSelector from "../components/ReviewModeSelector";
+import ReviewSession from "../components/ReviewSession";
 
 const ReviewCard = ({ topic, progress, onSelect }) => (
   <motion.div
@@ -64,7 +67,7 @@ const QuestionCard = ({ question, onAnswer, loading, feedback, isCorrect }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (question.type === "objective") {
+    if (question.question?.type === "objective") {
       onAnswer(selectedOption);
     } else {
       onAnswer(answer);
@@ -84,13 +87,15 @@ const QuestionCard = ({ question, onAnswer, loading, feedback, isCorrect }) => {
         </div>
 
         <div className="prose prose-sm max-w-none">
-          <ReactMarkdown>{question.text}</ReactMarkdown>
+          <ReactMarkdown>
+            {question.question?.text || question.text || question}
+          </ReactMarkdown>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {question.type === "objective" ? (
+          {question.question?.type === "objective" ? (
             <div className="space-y-2">
-              {question.options.map((option, index) => (
+              {question.question.options.map((option, index) => (
                 <button
                   key={index}
                   type="button"
@@ -146,7 +151,11 @@ const QuestionCard = ({ question, onAnswer, loading, feedback, isCorrect }) => {
                   <XCircleIcon className="w-5 h-5 text-red-500 flex-shrink-0" />
                 )}
                 <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown>{feedback}</ReactMarkdown>
+                  <ReactMarkdown>
+                    {typeof feedback === "string"
+                      ? feedback
+                      : JSON.stringify(feedback)}
+                  </ReactMarkdown>
                 </div>
               </div>
             </motion.div>
@@ -164,6 +173,14 @@ const Review = () => {
   const [selectedMode, setSelectedMode] = useState(null);
   const [sessionId, setSessionId] = useState(null);
   const [sessionResult, setSessionResult] = useState(null);
+  const [weakTopics, setWeakTopics] = useState([]);
+  const [progress, setProgress] = useState({});
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [feedback, setFeedback] = useState(null);
+  const [isCorrect, setIsCorrect] = useState(null);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [dueItems, setDueItems] = useState([]);
+  const [summary, setSummary] = useState(null);
 
   useEffect(() => {
     if (user?.username) {
@@ -173,19 +190,42 @@ const Review = () => {
 
   const loadReviewInsights = async () => {
     try {
-      const insights = await userAPI.getUserInsights(user.username);
-      const topics = insights.personalized_recommendations?.focus_areas || [];
-      setWeakTopics(topics);
+      // Use existing user insights endpoint
+      const userInsights = await userAPI.getUserInsights(user.username);
 
-      // Initialize progress
+      // Process insights like main.py does
+      const recommendations = userInsights.personalized_recommendations || {};
+
+      // Get focus areas from enhanced memory
+      const focusAreas = recommendations.focus_areas || [];
+
+      // Check for due spaced repetition items
+      const spacedSchedule = recommendations.spaced_repetition_schedule || [];
+      const dueItemsData = spacedSchedule.filter(
+        (item) => item.days_until_review <= 0
+      );
+
+      // Get performance summary
+      const summaryData = userInsights.performance_summary || {
+        total_topics_studied: 0,
+        topics_mastered: 0,
+        weak_areas_count: 0,
+      };
+
+      setWeakTopics(focusAreas);
+      setDueItems(dueItemsData);
+      setSummary(summaryData);
+      setInsights(userInsights);
+
+      // Initialize progress from focus areas
       const progressMap = {};
-      topics.forEach((topic) => {
-        progressMap[topic.topic] = topic.mastery || 0;
+      focusAreas.forEach((area) => {
+        progressMap[area.topic] = area.mastery || 0;
       });
       setProgress(progressMap);
     } catch (error) {
-      console.error("Failed to load weak topics:", error);
-      toast.error("Failed to load review topics");
+      console.error("Failed to load user insights:", error);
+      toast.error("Failed to load user insights");
     } finally {
       setLoading(false);
     }
@@ -194,12 +234,35 @@ const Review = () => {
   const handleSelectMode = async (mode) => {
     setLoading(true);
     try {
-      const response = await contentAPI.generateQuestion(topic);
-      setCurrentQuestion(response.question);
-      setFeedback(null);
+      let sessionResponse;
+
+      // Use specific endpoints for each review mode
+      switch (mode) {
+        case "adaptive":
+          sessionResponse = await reviewAPI.startAdaptiveReview(user.username);
+          break;
+        case "intensive":
+          sessionResponse = await reviewAPI.startIntensiveReview(user.username);
+          break;
+        case "spaced":
+          sessionResponse = await reviewAPI.startSpacedReview(user.username);
+          break;
+        case "quick":
+          sessionResponse = await reviewAPI.startQuickReview(user.username);
+          break;
+        case "flashcards":
+          sessionResponse = await reviewAPI.startFlashcardReview(user.username);
+          break;
+        default:
+          // Fallback to generic endpoint
+          sessionResponse = await reviewAPI.startSession(user.username, mode);
+      }
+
+      setSessionId(sessionResponse.session_id);
+      setSelectedMode(mode);
     } catch (error) {
-      console.error("Failed to load question:", error);
-      toast.error("Failed to load question");
+      console.error("Failed to start review session:", error);
+      toast.error("Failed to start review session");
     } finally {
       setLoading(false);
     }
@@ -209,14 +272,31 @@ const Review = () => {
     try {
       // Create a clean question object with only the fields the backend expects
       const cleanQuestion = {
-        text: currentQuestion.text,
-        type: currentQuestion.type,
-        options: currentQuestion.options || [],
-        correct_option: currentQuestion.correct_option || 0,
-        explanation: currentQuestion.explanation || "",
+        text: currentQuestion.question?.text || currentQuestion.text,
+        type: currentQuestion.question?.type || currentQuestion.type,
+        options:
+          currentQuestion.question?.options || currentQuestion.options || [],
+        correct_option:
+          currentQuestion.question?.correct_option ||
+          currentQuestion.correct_option ||
+          0,
+        explanation:
+          currentQuestion.question?.explanation ||
+          currentQuestion.explanation ||
+          "",
       };
 
-      const result = await contentAPI.checkAnswer(cleanQuestion, answer);
+      // Extract question text for the API
+      const questionId = cleanQuestion.text || JSON.stringify(cleanQuestion);
+
+      console.log("sessionId", sessionId);
+      console.log("questionId", questionId);
+      console.log("answer", answer);
+      const result = await reviewAPI.submitAnswer(
+        sessionId,
+        questionId,
+        answer
+      );
       setFeedback(result.feedback);
       setIsCorrect(result.correct);
 
@@ -235,6 +315,46 @@ const Review = () => {
     } catch (error) {
       console.error("Failed to check answer:", error);
       toast.error("Failed to check answer");
+    }
+  };
+
+  const loadQuestion = async (topic) => {
+    try {
+      const response = await reviewAPI.getNextQuestion(sessionId, topic);
+      setCurrentQuestion(response);
+      setFeedback(null);
+      setIsCorrect(null);
+    } catch (error) {
+      console.error("Failed to load question:", error);
+      toast.error("Failed to load question");
+    }
+  };
+
+  const handleBackToModeSelection = () => {
+    setSessionId(null);
+    setSelectedMode(null);
+    setSessionResult(null);
+  };
+
+  const handleEndSession = (result) => {
+    setSessionResult(result);
+  };
+
+  const handlePauseSession = () => {
+    // Handle session pause
+    toast.success("Session paused");
+  };
+
+  const getMasteryLevelColor = (level) => {
+    switch (level.toLowerCase()) {
+      case "mastered":
+        return "bg-green-100 text-green-800";
+      case "intermediate":
+        return "bg-yellow-100 text-yellow-800";
+      case "beginner":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -333,7 +453,7 @@ const Review = () => {
     );
   }
 
-  // Show mode selection
+  // Show mode selection with enhanced memory insights
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-8">
@@ -350,10 +470,109 @@ const Review = () => {
         </div>
       </div>
 
+      {/* Enhanced Memory Insights */}
+      {summary && (
+        <div className="mb-6 bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <ChartBarIcon className="w-6 h-6 text-primary-600" />
+            <h3 className="text-lg font-medium text-secondary-900">
+              Your Learning Progress
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary-600">
+                {summary.total_topics_studied || 0}
+              </div>
+              <div className="text-sm text-secondary-600">Topics Studied</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {summary.topics_mastered || 0}
+              </div>
+              <div className="text-sm text-secondary-600">Topics Mastered</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-orange-600">
+                {summary.weak_areas_count || 0}
+              </div>
+              <div className="text-sm text-secondary-600">Weak Areas</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Spaced Repetition Due Items */}
+      {dueItems.length > 0 && (
+        <div className="mb-6 bg-orange-50 border border-orange-200 rounded-xl p-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <ExclamationTriangleIcon className="w-6 h-6 text-orange-600" />
+            <h3 className="text-lg font-medium text-orange-900">
+              Spaced Repetition Due
+            </h3>
+          </div>
+          <p className="text-orange-700 mb-4">
+            You have {dueItems.length} items due for spaced repetition review!
+          </p>
+          <div className="space-y-2">
+            {dueItems.slice(0, 3).map((item, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <span className="text-orange-600">
+                  {item.priority === "high" ? "🔴" : "🟡"}
+                </span>
+                <span className="text-orange-800">
+                  {item.topic} - {item.subtopic}
+                </span>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => handleSelectMode("spaced")}
+            className="mt-4 bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700"
+          >
+            Start Spaced Repetition Review
+          </button>
+        </div>
+      )}
+
+      {/* Focus Areas */}
+      {weakTopics.length > 0 && (
+        <div className="mb-6 bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <BookmarkIcon className="w-6 h-6 text-primary-600" />
+            <h3 className="text-lg font-medium text-secondary-900">
+              Priority Focus Areas
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {weakTopics.slice(0, 6).map((area, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-secondary-50 rounded-lg"
+              >
+                <div>
+                  <div className="font-medium text-secondary-900">
+                    {area.topic}
+                  </div>
+                  <div className="text-sm text-secondary-600">
+                    {area.subtopic}
+                  </div>
+                </div>
+                <div className="text-sm text-secondary-500">
+                  Priority: {area.priority_score || "Medium"}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <ReviewModeSelector
         onSelectMode={handleSelectMode}
         insights={insights}
         loading={loading}
+        dueItems={dueItems}
+        focusAreas={weakTopics}
       />
     </div>
   );

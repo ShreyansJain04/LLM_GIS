@@ -275,6 +275,8 @@ def check_answer(question: Dict, answer: str) -> Tuple[bool, str]:
     print(f"check_answer received question: {question}")
     print(f"check_answer received answer: {answer}")
     print(f"Question type: {question.get('type')}")
+    print(f"Question options: {question.get('options', [])}")
+    print(f"Question correct_option: {question.get('correct_option')}")
     
     if question.get("type") == "objective":
         try:

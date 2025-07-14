@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, Union
 import asyncio
 from datetime import datetime
 
@@ -52,11 +52,7 @@ class Question(BaseModel):
     explanation: Optional[str] = ""
 
 class AnswerRequest(BaseModel):
-<<<<<<< Updated upstream
-    question: Any  # Can be string or dict
-=======
     question: Question
->>>>>>> Stashed changes
     answer: str
 
 class LearningSessionRequest(BaseModel):
@@ -106,10 +102,13 @@ class ReviewSessionRequest(BaseModel):
     adaptive: bool = False
 
 class ReviewAnswerRequest(BaseModel):
-    session_id: str
-    question_id: str
+    question_id: Any
     answer: str
     time_spent: Optional[int] = None
+    
+    def __init__(self, **data):
+        print(f"DEBUG: ReviewAnswerRequest.__init__ called with data: {data}")
+        super().__init__(**data)
 
 class FlashcardReviewRequest(BaseModel):
     session_id: str
@@ -143,6 +142,32 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
+
+@app.get("/test-enhanced-memory/{username}")
+async def test_enhanced_memory(username: str):
+    """Test endpoint to check if EnhancedMemorySystem works."""
+    try:
+        print(f"Testing EnhancedMemorySystem for user: {username}")
+        enhanced_memory = EnhancedMemorySystem(username)
+        print("EnhancedMemorySystem created successfully")
+        
+        insights = enhanced_memory.get_insights()
+        print(f"Insights received: {type(insights)}")
+        
+        return {
+            "success": True,
+            "message": "EnhancedMemorySystem works",
+            "insights_type": str(type(insights))
+        }
+    except Exception as e:
+        print(f"Error testing EnhancedMemorySystem: {e}")
+        import traceback
+        traceback.print_exc()
+        return {
+            "success": False,
+            "error": str(e),
+            "message": "EnhancedMemorySystem failed"
+        }
 
 # User management endpoints
 @app.post("/api/users/create")
@@ -188,7 +213,21 @@ async def get_user_insights(username: str):
         insights = enhanced_memory.get_insights()
         return insights
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error getting user insights: {e}")
+        import traceback
+        traceback.print_exc()
+        # Return basic structure if enhanced memory fails
+        return {
+            "personalized_recommendations": {
+                "focus_areas": [],
+                "spaced_repetition_schedule": []
+            },
+            "performance_summary": {
+                "total_topics_studied": 0,
+                "topics_mastered": 0,
+                "weak_areas_count": 0
+            }
+        }
 
 # Learning content endpoints
 @app.post("/api/content/explain")
@@ -562,27 +601,49 @@ async def get_chat_suggestions(username: str):
 # Review session endpoints
 @app.post("/api/review/session/start")
 async def start_review_session(request: ReviewSessionRequest):
-    """Start a new review session."""
+    """Start a new review session with enhanced memory integration."""
     try:
         session_id = f"review_{request.username}_{datetime.now().isoformat()}"
         
-        # Get enhanced memory insights
-        enhanced_memory = EnhancedMemorySystem(request.username)
-        insights = enhanced_memory.get_insights()
-        recommendations = insights['personalized_recommendations']
+        # Try to get enhanced memory insights, fallback to basic data if it fails
+        try:
+            enhanced_memory = EnhancedMemorySystem(request.username)
+            insights = enhanced_memory.get_insights()
+            recommendations = insights.get('personalized_recommendations', {})
+            
+            # Get performance summary
+            summary = get_performance_summary(request.username)
+            
+            # Check for due spaced repetition items
+            spaced_schedule = recommendations.get('spaced_repetition_schedule', [])
+            due_items = [item for item in spaced_schedule if item.get('days_until_review', 0) <= 0]
+            
+            # Get focus areas from enhanced memory
+            focus_areas = recommendations.get('focus_areas', [])
+        except Exception as enhanced_error:
+            print(f"Enhanced memory failed, using fallback: {enhanced_error}")
+            # Fallback to basic data
+            insights = {
+                'personalized_recommendations': {
+                    'focus_areas': [],
+                    'spaced_repetition_schedule': []
+                }
+            }
+            summary = {
+                'total_topics_studied': 0,
+                'topics_mastered': 0,
+                'weak_areas_count': 0
+            }
+            due_items = []
+            focus_areas = []
         
-        # Get focus areas
-        focus_areas = recommendations.get('focus_areas', [])
-        due_items = recommendations.get('spaced_repetition_schedule', [])
-        due_items = [item for item in due_items if item.get('days_until_review', 0) <= 0]
-        
-        # Initialize session state
+        # Create session state with all the data from main.py
         session_state = {
             "session_id": session_id,
             "username": request.username,
             "mode": request.mode,
             "current_topic": None,
-            "difficulty": "medium",
+            "difficulty": "medium",  # Will be adjusted based on past performance
             "consecutive_correct": 0,
             "consecutive_wrong": 0,
             "total_questions": 0,
@@ -592,7 +653,12 @@ async def start_review_session(request: ReviewSessionRequest):
             "focus_areas": focus_areas,
             "due_items": due_items,
             "asked_questions": [],
-            "started_at": datetime.now().isoformat()
+            "started_at": datetime.now().isoformat(),
+            "insights": insights,
+            "summary": summary,
+            "current_round": 0,
+            "max_questions": 7 if request.mode == "adaptive" else 5,
+            "adaptive": request.mode in ["adaptive", "intensive"]
         }
         
         active_sessions[session_id] = session_state
@@ -602,7 +668,289 @@ async def start_review_session(request: ReviewSessionRequest):
             "mode": request.mode,
             "focus_areas": focus_areas,
             "due_items": due_items,
+            "summary": summary,
             "message": f"Started {request.mode} review session"
+        }
+    except Exception as e:
+        print(f"Error starting review session: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/review/adaptive")
+async def start_adaptive_review(request: ReviewSessionRequest):
+    """Start adaptive review session - AI adjusts difficulty based on performance."""
+    try:
+        session_id = f"adaptive_{request.username}_{datetime.now().isoformat()}"
+        
+        # Get enhanced memory insights
+        try:
+            enhanced_memory = EnhancedMemorySystem(request.username)
+            insights = enhanced_memory.get_insights()
+            recommendations = insights.get('personalized_recommendations', {})
+            focus_areas = recommendations.get('focus_areas', [])
+        except Exception as e:
+            print(f"Enhanced memory failed: {e}")
+            focus_areas = []
+        
+        if not focus_areas:
+            # Fallback to default topics
+            focus_areas = [
+                {"topic": "GIS Basics", "subtopic": "Fundamentals", "priority_score": "high"},
+                {"topic": "Coordinate Systems", "subtopic": "Projections", "priority_score": "medium"},
+                {"topic": "Data Types", "subtopic": "Vector vs Raster", "priority_score": "medium"}
+            ]
+        
+        session_state = {
+            "session_id": session_id,
+            "username": request.username,
+            "mode": "adaptive",
+            "current_topic": None,
+            "difficulty": "medium",
+            "consecutive_correct": 0,
+            "consecutive_wrong": 0,
+            "total_questions": 0,
+            "total_correct": 0,
+            "session_state": "active",
+            "performance": [],
+            "focus_areas": focus_areas,
+            "asked_questions": [],
+            "started_at": datetime.now().isoformat(),
+            "current_round": 0,
+            "max_questions": 7,
+            "adaptive": True
+        }
+        
+        active_sessions[session_id] = session_state
+        
+        return {
+            "session_id": session_id,
+            "mode": "adaptive",
+            "focus_areas": focus_areas,
+            "message": "Started adaptive review session"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/review/intensive")
+async def start_intensive_review(request: ReviewSessionRequest):
+    """Start intensive review session - Deep dive into specific weak areas."""
+    try:
+        session_id = f"intensive_{request.username}_{datetime.now().isoformat()}"
+        
+        # Get enhanced memory insights
+        try:
+            enhanced_memory = EnhancedMemorySystem(request.username)
+            insights = enhanced_memory.get_insights()
+            recommendations = insights.get('personalized_recommendations', {})
+            focus_areas = recommendations.get('focus_areas', [])
+        except Exception as e:
+            print(f"Enhanced memory failed: {e}")
+            focus_areas = []
+        
+        # Get highest priority area or use default
+        if focus_areas:
+            highest_priority = focus_areas[0]
+            topic = highest_priority['topic']
+        else:
+            topic = "GIS Basics"
+        
+        # Set initial difficulty based on past performance
+        try:
+            profile = load_user(request.username)
+            topic_mastery = profile.get('performance_data', {}).get(topic, {})
+            avg_score = topic_mastery.get('average_score', 0.5)
+            
+            if avg_score >= 0.8:
+                difficulty = "hard"
+            elif avg_score >= 0.6:
+                difficulty = "medium"
+            else:
+                difficulty = "easy"
+        except:
+            difficulty = "medium"
+        
+        session_state = {
+            "session_id": session_id,
+            "username": request.username,
+            "mode": "intensive",
+            "current_topic": topic,
+            "difficulty": difficulty,
+            "consecutive_correct": 0,
+            "consecutive_wrong": 0,
+            "total_questions": 0,
+            "total_correct": 0,
+            "session_state": "active",
+            "performance": [],
+            "focus_areas": focus_areas,
+            "asked_questions": [],
+            "started_at": datetime.now().isoformat(),
+            "current_round": 0,
+            "max_questions": 5,
+            "adaptive": True
+        }
+        
+        active_sessions[session_id] = session_state
+        
+        return {
+            "session_id": session_id,
+            "mode": "intensive",
+            "topic": topic,
+            "difficulty": difficulty,
+            "focus_areas": focus_areas,
+            "message": f"Started intensive review session on {topic}"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/review/spaced")
+async def start_spaced_review(request: ReviewSessionRequest):
+    """Start spaced repetition review session."""
+    try:
+        session_id = f"spaced_{request.username}_{datetime.now().isoformat()}"
+        
+        # Get enhanced memory insights
+        try:
+            enhanced_memory = EnhancedMemorySystem(request.username)
+            insights = enhanced_memory.get_insights()
+            recommendations = insights.get('personalized_recommendations', {})
+            spaced_schedule = recommendations.get('spaced_repetition_schedule', [])
+            due_items = [item for item in spaced_schedule if item.get('days_until_review', 0) <= 0]
+        except Exception as e:
+            print(f"Enhanced memory failed: {e}")
+            due_items = []
+        
+        if not due_items:
+            # Fallback to default topics
+            due_items = [
+                {"topic": "GIS Basics", "subtopic": "Fundamentals", "days_until_review": 0, "priority": "high"},
+                {"topic": "Coordinate Systems", "subtopic": "Projections", "days_until_review": 0, "priority": "medium"}
+            ]
+        
+        session_state = {
+            "session_id": session_id,
+            "username": request.username,
+            "mode": "spaced",
+            "current_topic": None,
+            "difficulty": "medium",
+            "consecutive_correct": 0,
+            "consecutive_wrong": 0,
+            "total_questions": 0,
+            "total_correct": 0,
+            "session_state": "active",
+            "performance": [],
+            "due_items": due_items,
+            "asked_questions": [],
+            "started_at": datetime.now().isoformat(),
+            "current_round": 0,
+            "max_questions": len(due_items),
+            "adaptive": False
+        }
+        
+        active_sessions[session_id] = session_state
+        
+        return {
+            "session_id": session_id,
+            "mode": "spaced",
+            "due_items": due_items,
+            "message": f"Started spaced repetition review with {len(due_items)} due items"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/review/quick")
+async def start_quick_review(request: ReviewSessionRequest):
+    """Start quick review session - Rapid review of all weak areas."""
+    try:
+        session_id = f"quick_{request.username}_{datetime.now().isoformat()}"
+        
+        # Get enhanced memory insights
+        try:
+            enhanced_memory = EnhancedMemorySystem(request.username)
+            insights = enhanced_memory.get_insights()
+            recommendations = insights.get('personalized_recommendations', {})
+            focus_areas = recommendations.get('focus_areas', [])
+            weak_topics = [area['topic'] for area in focus_areas]
+        except Exception as e:
+            print(f"Enhanced memory failed: {e}")
+            weak_topics = ["GIS Basics", "Coordinate Systems", "Data Types"]
+        
+        session_state = {
+            "session_id": session_id,
+            "username": request.username,
+            "mode": "quick",
+            "current_topic": None,
+            "difficulty": "medium",
+            "consecutive_correct": 0,
+            "consecutive_wrong": 0,
+            "total_questions": 0,
+            "total_correct": 0,
+            "session_state": "active",
+            "performance": [],
+            "focus_areas": focus_areas if 'focus_areas' in locals() else [],
+            "weak_topics": weak_topics,
+            "asked_questions": [],
+            "started_at": datetime.now().isoformat(),
+            "current_round": 0,
+            "max_questions": min(5, len(weak_topics)),
+            "adaptive": False
+        }
+        
+        active_sessions[session_id] = session_state
+        
+        return {
+            "session_id": session_id,
+            "mode": "quick",
+            "weak_topics": weak_topics,
+            "message": f"Started quick review of {len(weak_topics)} weak areas"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/review/flashcards")
+async def start_flashcard_review(request: ReviewSessionRequest):
+    """Start flashcard review session."""
+    try:
+        session_id = f"flashcards_{request.username}_{datetime.now().isoformat()}"
+        
+        # Get enhanced memory insights
+        try:
+            enhanced_memory = EnhancedMemorySystem(request.username)
+            insights = enhanced_memory.get_insights()
+            recommendations = insights.get('personalized_recommendations', {})
+            focus_areas = recommendations.get('focus_areas', [])
+            topics = [area['topic'] for area in focus_areas]
+        except Exception as e:
+            print(f"Enhanced memory failed: {e}")
+            topics = ["GIS Basics", "Coordinate Systems", "Data Types"]
+        
+        session_state = {
+            "session_id": session_id,
+            "username": request.username,
+            "mode": "flashcards",
+            "current_topic": None,
+            "difficulty": "medium",
+            "consecutive_correct": 0,
+            "consecutive_wrong": 0,
+            "total_questions": 0,
+            "total_correct": 0,
+            "session_state": "active",
+            "performance": [],
+            "topics": topics,
+            "asked_questions": [],
+            "started_at": datetime.now().isoformat(),
+            "current_round": 0,
+            "max_questions": 10,
+            "adaptive": False
+        }
+        
+        active_sessions[session_id] = session_state
+        
+        return {
+            "session_id": session_id,
+            "mode": "flashcards",
+            "topics": topics,
+            "message": f"Started flashcard review with {len(topics)} topics"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -664,15 +1012,18 @@ async def end_review_session(session_id: str):
         total_correct = session["total_correct"]
         final_score = total_correct / total_questions if total_questions > 0 else 0
         
-        # Determine mastery level
-        if final_score >= 0.8:
+        # Determine mastery level based on difficulty and consistency
+        high_difficulty_correct = sum(1 for perf in session["performance"] 
+                                     if perf['correct'] and perf['difficulty'] in ['medium', 'hard'])
+        
+        if final_score >= 0.8 and high_difficulty_correct >= 2:
             mastery_level = 'mastered'
         elif final_score >= 0.6:
             mastery_level = 'intermediate'
         else:
             mastery_level = 'beginner'
         
-        # Record the session
+        # Record the session with detailed performance data
         if session["performance"]:
             record_learning_session(
                 username=session["username"],
@@ -690,60 +1041,101 @@ async def end_review_session(session_id: str):
             "final_score": final_score,
             "mastery_level": mastery_level,
             "total_questions": total_questions,
-            "total_correct": total_correct
+            "total_correct": total_correct,
+            "high_difficulty_correct": high_difficulty_correct
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/review/session/{session_id}/question")
 async def get_next_question(session_id: str, topic: Optional[str] = None):
-    """Get the next question for the review session."""
+    """Get the next question for the review session with adaptive difficulty."""
     try:
         if session_id not in active_sessions:
             raise HTTPException(status_code=404, detail="Session not found")
         
         session = active_sessions[session_id]
+        session["current_round"] += 1
         
-        # Determine topic based on mode
+        # Determine topic and difficulty based on mode
         if session["mode"] == "adaptive":
-            # Rotate through focus areas
+            # Select topic based on priority and recent performance
             focus_areas = session["focus_areas"]
             if not focus_areas:
-                raise HTTPException(status_code=400, detail="No focus areas available")
-            
-            current_index = session["total_questions"] % len(focus_areas)
-            topic = focus_areas[current_index]["topic"]
-            session["current_topic"] = topic
+                # Fallback to default topics if no focus areas
+                default_topics = ["GIS Basics", "Coordinate Systems", "Data Types", "Spatial Analysis"]
+                topic = default_topics[session["current_round"] % len(default_topics)]
+                session["current_topic"] = topic
+            else:
+                if session["current_round"] <= 3:
+                    # First 3 questions: highest priority areas
+                    current_area = focus_areas[min(session["current_round"]-1, len(focus_areas)-1)]
+                else:
+                    # Later questions: rotate through areas
+                    current_area = focus_areas[(session["current_round"]-1) % len(focus_areas)]
+                
+                topic = current_area['topic']
+                session["current_topic"] = topic
             
         elif session["mode"] == "intensive":
             if not topic:
-                raise HTTPException(status_code=400, detail="Topic required for intensive mode")
+                # Fallback to default topic for intensive mode
+                topic = "GIS Basics"
             session["current_topic"] = topic
+            
+            # Set initial difficulty based on past performance
+            profile = load_user(session["username"])
+            topic_mastery = profile.get('performance_data', {}).get(topic, {})
+            avg_score = topic_mastery.get('average_score', 0.5)
+            
+            if avg_score >= 0.8:
+                session["difficulty"] = "hard"
+            elif avg_score >= 0.6:
+                session["difficulty"] = "medium"
+            else:
+                session["difficulty"] = "easy"
             
         elif session["mode"] == "spaced":
             # Use due items for spaced repetition
             due_items = session["due_items"]
             if not due_items:
-                raise HTTPException(status_code=400, detail="No due items for spaced repetition")
-            
-            current_item = due_items[session["total_questions"] % len(due_items)]
-            topic = current_item["topic"]
-            session["current_topic"] = topic
+                # Fallback to default topics if no due items
+                default_topics = ["GIS Basics", "Coordinate Systems", "Data Types", "Spatial Analysis"]
+                topic = default_topics[session["current_round"] % len(default_topics)]
+                session["current_topic"] = topic
+            else:
+                current_item = due_items[session["total_questions"] % len(due_items)]
+                topic = current_item["topic"]
+                session["current_topic"] = topic
             
         elif session["mode"] == "quick":
             # Use weak topics for quick review
             weak_topics = [area["topic"] for area in session["focus_areas"]]
             if not weak_topics:
-                raise HTTPException(status_code=400, detail="No weak topics available")
-            
-            current_index = session["total_questions"] % len(weak_topics)
-            topic = weak_topics[current_index]
-            session["current_topic"] = topic
+                # Fallback to default topics if no weak topics
+                default_topics = ["GIS Basics", "Coordinate Systems", "Data Types", "Spatial Analysis"]
+                topic = default_topics[session["current_round"] % len(default_topics)]
+                session["current_topic"] = topic
+            else:
+                current_index = session["total_questions"] % len(weak_topics)
+                topic = weak_topics[current_index]
+                session["current_topic"] = topic
         
-        # Generate question
+        # Generate question with current difficulty
+        if not topic:
+            raise HTTPException(status_code=400, detail="No topic available for question generation")
+        
+        # Extract question texts from asked_questions for generate_question
+        previous_question_texts = []
+        for q in session["asked_questions"]:
+            if isinstance(q, dict) and "text" in q:
+                previous_question_texts.append(q["text"])
+            elif isinstance(q, str):
+                previous_question_texts.append(q)
+        
         question = generate_question(
             topic,
-            session["asked_questions"],
+            previous_question_texts,
             session["difficulty"],
             "objective"
         )
@@ -755,28 +1147,42 @@ async def get_next_question(session_id: str, topic: Optional[str] = None):
             "question": question,
             "topic": topic,
             "difficulty": session["difficulty"],
-            "question_number": session["total_questions"] + 1
+            "question_number": session["current_round"],
+            "max_questions": session["max_questions"],
+            "consecutive_correct": session["consecutive_correct"],
+            "consecutive_wrong": session["consecutive_wrong"]
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/review/session/{session_id}/answer")
 async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
-    """Submit an answer for the current question."""
+    """Submit an answer for the current question with adaptive difficulty adjustment."""
+    
     try:
+        print(f"DEBUG: Received request for session {session_id}")
+        print(f"DEBUG: Request data: {request.dict()}")
+        
         if session_id not in active_sessions:
             raise HTTPException(status_code=404, detail="Session not found")
         
         session = active_sessions[session_id]
         
         # Handle question_id - it could be a string or a question object
-        question_to_check = request.question_id
-        if isinstance(question_to_check, dict):
-            # If it's a question object, use the text field
-            question_to_check = question_to_check.get('text', str(question_to_check))
+        if isinstance(request.question_id, dict):
+            # If it's already a question object, use it directly
+            question_dict = request.question_id
+        else:
+            # If it's a string, create a basic question dict
+            question_dict = {
+                "text": request.question_id,
+                "type": "objective",
+                "options": ["Option A", "Option B", "Option C", "Option D"],
+                "correct_option": 0,
+                "explanation": "Question from review session."
+            }
         
-        # Check answer
-        correct, feedback = check_answer(question_to_check, request.answer)
+        correct, feedback = check_answer(question_dict, request.answer)
         
         # Update session state
         session["total_questions"] += 1
@@ -788,10 +1194,10 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
             session["consecutive_correct"] = 0
             session["consecutive_wrong"] += 1
         
-        # Record performance
+        # Record performance with detailed data
         performance_entry = {
-            'subtopic': session["current_topic"],
-            'question': question_to_check,
+            'subtopic': f"{session['current_topic']} - Round {session['current_round']}",
+            'question': request.question_id,
             'user_answer': request.answer,
             'correct': correct,
             'score': 1 if correct else 0,
@@ -802,8 +1208,23 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
         }
         session["performance"].append(performance_entry)
         
+        # Auto-create flashcard for correct answers at medium+ difficulty
+        if correct and session["difficulty"] in ["medium", "hard"]:
+            try:
+                from flashcards import auto_create_flashcard_from_review
+                auto_create_flashcard_from_review(
+                    session["username"], 
+                    session["current_topic"], 
+                    str(request.question_id),
+                    feedback.split('\n')[0] if '\n' in feedback else feedback,
+                    session["difficulty"]
+                )
+            except ImportError:
+                # Flashcard module not available, skip
+                pass
+        
         # Adaptive difficulty adjustment
-        if session["mode"] in ["adaptive", "intensive"]:
+        if session["adaptive"]:
             if session["consecutive_correct"] >= 2 and session["difficulty"] != "hard":
                 if session["difficulty"] == "easy":
                     session["difficulty"] = "medium"
@@ -824,30 +1245,14 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
             "consecutive_correct": session["consecutive_correct"],
             "consecutive_wrong": session["consecutive_wrong"],
             "total_questions": session["total_questions"],
-            "total_correct": session["total_correct"]
+            "total_correct": session["total_correct"],
+            "question_number": session["current_round"],
+            "max_questions": session["max_questions"]
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/review/insights/{username}")
-async def get_review_insights(username: str):
-    """Get insights for review mode."""
-    try:
-        enhanced_memory = EnhancedMemorySystem(username)
-        insights = enhanced_memory.get_insights()
-        
-        # Get performance summary
-        summary = get_performance_summary(username)
-        
-        return {
-            "insights": insights,
-            "summary": summary,
-            "focus_areas": insights["personalized_recommendations"]["focus_areas"],
-            "due_items": [item for item in insights["personalized_recommendations"]["spaced_repetition_schedule"] 
-                         if item.get('days_until_review', 0) <= 0]
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     import uvicorn

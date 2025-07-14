@@ -66,15 +66,20 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     if (submitting) return;
 
     const userAnswer =
-      currentQuestion.type === "objective" ? selectedOption : answer;
+      currentQuestion.question?.type === "objective" ? selectedOption : answer;
     if (userAnswer === null || userAnswer === "") return;
 
     setSubmitting(true);
     try {
+      // Send the full question object to the API
+      const questionData = currentQuestion.question || currentQuestion;
+      console.log("ReviewSession.js sessionId", sessionId);
+      console.log("ReviewSession.js questionData", questionData);
+      console.log("ReviewSession.js userAnswer", userAnswer);
       const result = await reviewAPI.submitAnswer(
         sessionId,
-        currentQuestion.id || currentQuestion,
-        userAnswer
+        questionData,
+        String(userAnswer)
       );
 
       setFeedback(result.feedback);
@@ -267,15 +272,17 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
 
               <div className="prose prose-sm max-w-none">
                 <ReactMarkdown>
-                  {currentQuestion.text || currentQuestion}
+                  {currentQuestion.question?.text ||
+                    currentQuestion.text ||
+                    currentQuestion}
                 </ReactMarkdown>
               </div>
 
               <form onSubmit={handleSubmitAnswer} className="space-y-4">
-                {currentQuestion.type === "objective" &&
-                currentQuestion.options ? (
+                {currentQuestion.question?.type === "objective" &&
+                currentQuestion.question?.options ? (
                   <div className="space-y-2">
-                    {currentQuestion.options.map((option, index) => (
+                    {currentQuestion.question.options.map((option, index) => (
                       <button
                         key={index}
                         type="button"
@@ -306,7 +313,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
                   disabled={
                     submitting ||
                     feedback ||
-                    (currentQuestion.type === "objective"
+                    (currentQuestion.question?.type === "objective"
                       ? selectedOption === null
                       : !answer)
                   }
@@ -335,7 +342,11 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
                         <XCircleIcon className="w-5 h-5 text-red-500 flex-shrink-0" />
                       )}
                       <div className="prose prose-sm max-w-none">
-                        <ReactMarkdown>{feedback}</ReactMarkdown>
+                        <ReactMarkdown>
+                          {typeof feedback === "string"
+                            ? feedback
+                            : JSON.stringify(feedback)}
+                        </ReactMarkdown>
                       </div>
                     </div>
                   </motion.div>

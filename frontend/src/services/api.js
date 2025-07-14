@@ -35,6 +35,14 @@ export const userAPI = {
     const response = await api.get(`/api/users/${username}/insights`);
     return response.data;
   },
+
+  startReviewSession: async (username, mode) => {
+    const response = await api.post("/api/review/session/start", {
+      username,
+      mode,
+    });
+    return response.data;
+  },
 };
 
 // Learning Content API
@@ -179,8 +187,6 @@ export const healthAPI = {
   },
 };
 
-// Review Session API
-
 // Chat API
 export const chatAPI = {
   sendMessage: async (username, message, context = null) => {
@@ -240,6 +246,46 @@ export const reviewAPI = {
     return response.data;
   },
 
+  startAdaptiveReview: async (username) => {
+    const response = await api.post("/api/review/adaptive", {
+      username,
+      mode: "adaptive",
+    });
+    return response.data;
+  },
+
+  startIntensiveReview: async (username) => {
+    const response = await api.post("/api/review/intensive", {
+      username,
+      mode: "intensive",
+    });
+    return response.data;
+  },
+
+  startSpacedReview: async (username) => {
+    const response = await api.post("/api/review/spaced", {
+      username,
+      mode: "spaced",
+    });
+    return response.data;
+  },
+
+  startQuickReview: async (username) => {
+    const response = await api.post("/api/review/quick", {
+      username,
+      mode: "quick",
+    });
+    return response.data;
+  },
+
+  startFlashcardReview: async (username) => {
+    const response = await api.post("/api/review/flashcards", {
+      username,
+      mode: "flashcards",
+    });
+    return response.data;
+  },
+
   getSession: async (sessionId) => {
     const response = await api.get(`/api/review/session/${sessionId}`);
     return response.data;
@@ -272,16 +318,12 @@ export const reviewAPI = {
 
   submitAnswer: async (sessionId, questionId, answer, timeSpent = null) => {
     const response = await api.post(`/api/review/session/${sessionId}/answer`, {
-      session_id: sessionId,
       question_id: questionId,
       answer,
       time_spent: timeSpent,
     });
-    return response.data;
-  },
-
-  getReviewInsights: async (username) => {
-    const response = await api.get(`/api/review/insights/${username}`);
+    console.log(questionId);
+    console.log(answer);
     return response.data;
   },
 };
