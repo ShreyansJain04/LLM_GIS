@@ -1175,7 +1175,7 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
         else:
             # If it's a string, create a basic question dict
             question_dict = {
-                "text": request.question_id,
+                "text": request.question_id.text,
                 "type": "objective",
                 "options": ["Option A", "Option B", "Option C", "Option D"],
                 "correct_option": 0,
@@ -1197,7 +1197,7 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
         # Record performance with detailed data
         performance_entry = {
             'subtopic': f"{session['current_topic']} - Round {session['current_round']}",
-            'question': request.question_id,
+            'question': question_dict.get('text', str(request.question_id)),
             'user_answer': request.answer,
             'correct': correct,
             'score': 1 if correct else 0,
@@ -1215,7 +1215,7 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
                 auto_create_flashcard_from_review(
                     session["username"], 
                     session["current_topic"], 
-                    str(request.question_id),
+                    str(question_dict.get('text', request.question_id)),
                     feedback.split('\n')[0] if '\n' in feedback else feedback,
                     session["difficulty"]
                 )

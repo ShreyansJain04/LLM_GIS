@@ -322,8 +322,6 @@ export const reviewAPI = {
       answer,
       time_spent: timeSpent,
     });
-    console.log(questionId);
-    console.log(answer);
     return response.data;
   },
 };
