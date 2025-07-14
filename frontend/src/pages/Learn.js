@@ -22,7 +22,6 @@ const Learn = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [sessionState, setSessionState] = useState("input");
   const [messages, setMessages] = useState([]);
-  const [messageQueue, setMessageQueue] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
@@ -83,83 +82,51 @@ const Learn = () => {
     continueAction();
   };
 
-  // Helper to queue messages and process them immediately
-  const queueMessages = (msgs) => {
-    setMessageQueue((prev) => {
-      const newQueue = [...prev, ...msgs];
-      return newQueue;
-    });
-  };
-
-  // Helper to add message directly and process queue
-  const addMessageAndProcess = (msg) => {
-    addMessage(msg);
-    // Process any queued messages after adding this one
-    setTimeout(() => {
-      if (messageQueue.length > 0 && sessionState === "revealing") {
-        processNextMessage();
-      }
-    }, 0);
-  };
-
-  // Process next message in queue
-  const processNextMessage = (currentQueue = messageQueue) => {
-    if (currentQueue.length > 0 && sessionState === "revealing") {
-      const [nextMsg, ...rest] = currentQueue;
-
-      if (nextMsg.pauseAfter === "question") {
-        addMessage(nextMsg);
-        setSessionState("awaitingAnswer");
-        setQuestionState({
-          text: nextMsg.questionText,
-          options: nextMsg.options || [],
-          type: nextMsg.questionType || "objective",
-          correct_option: nextMsg.correct_option || 0,
-          explanation: nextMsg.explanation || "",
-        });
-      } else if (nextMsg.pauseAfter === "name") {
-        // Subtopic title - no continue button, just show and auto-proceed
-        addMessage(nextMsg);
-        setTimeout(
-          () => setSessionState("waitingForUserAfterName"),
-          Math.floor(500 + Math.random() * 500)
-        );
+  // Simple function to add messages sequentially with delays
+  const addMessagesSequentially = async (messages) => {
+    for (const msg of messages) {
+      if (msg.pauseAfter === "name") {
+        addMessage(msg);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       } else if (
-        nextMsg.pauseAfter === "explanation" ||
-        nextMsg.pauseAfter === "example"
+        msg.pauseAfter === "explanation" ||
+        msg.pauseAfter === "example"
       ) {
-        // Add message with continue button
-        addMessageWithContinue(nextMsg, () => {
-          setSessionState("revealing");
-          // Process next message after continue
+        // Set appropriate session state and turn off loading
+        if (msg.pauseAfter === "explanation") {
+          setSessionState("waitingForUserAfterExplanation");
+          setIsLoading(false);
+        } else if (msg.pauseAfter === "example") {
+          setSessionState("waitingForUserAfterExample");
+        }
+
+        addMessageWithContinue(msg, () => {
+          // Continue to next message after user clicks continue
           setTimeout(() => {
-            if (rest.length > 0) {
-              setMessageQueue(rest);
+            const nextIndex = messages.indexOf(msg) + 1;
+            if (nextIndex < messages.length) {
+              addMessagesSequentially(messages.slice(nextIndex));
             }
           }, 100);
         });
-
-        // Set appropriate session state
-        if (nextMsg.pauseAfter === "explanation") {
-          setSessionState("waitingForUserAfterExplanation");
-          setIsLoading(false);
-        } else if (nextMsg.pauseAfter === "example") {
-          setSessionState("waitingForUserAfterExample");
-        }
-      } else if (nextMsg.pauseAfter) {
-        addMessageWithContinue(nextMsg, () => setSessionState("revealing"));
+        break; // Stop here and wait for user to continue
+      } else if (msg.pauseAfter === "question") {
+        addMessage(msg);
+        setSessionState("awaitingAnswer");
+        setQuestionState({
+          text: msg.questionText,
+          options: msg.options || [],
+          type: msg.questionType || "objective",
+          correct_option: msg.correct_option || 0,
+          explanation: msg.explanation || "",
+        });
+        break; // Stop here and wait for user to answer
       } else {
-        addMessage(nextMsg);
+        addMessage(msg);
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
     }
   };
-
-  // Process queue when it changes
-  useEffect(() => {
-    if (messageQueue.length > 0 && sessionState === "revealing") {
-      processNextMessage();
-    }
-  }, [messageQueue, sessionState]);
 
   // Start learning session
   const startLearningSession = async (topicText) => {
@@ -192,7 +159,7 @@ const Learn = () => {
       });
 
       if (learningPlan.subtopics?.length > 0) {
-        await buildSubtopicQueue(learningPlan.subtopics[0], 0, true);
+        await buildSubtopicMessages(learningPlan.subtopics[0], 0, true);
       }
     } catch (error) {
       addMessage({
@@ -205,13 +172,13 @@ const Learn = () => {
     }
   };
 
-  // Build subtopic queue
-  const buildSubtopicQueue = async (
+  // Build subtopic messages
+  const buildSubtopicMessages = async (
     subtopic,
     stepIdx,
     autoRevealFirst = false
   ) => {
-    const queue = [
+    const messages = [
       {
         type: "assistant",
         message: `**Subtopic ${stepIdx + 1}: ${subtopic.name}**`,
@@ -226,20 +193,18 @@ const Learn = () => {
         subtopic.name,
         "standard"
       );
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `**Explanation:**\n${explainData.explanation}`,
         pauseAfter: "explanation",
         showContinueButton: true,
-        onContinue: () => setSessionState("revealing"),
       });
     } catch {
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `Failed to load explanation for ${subtopic.name}.`,
         pauseAfter: "explanation",
         showContinueButton: true,
-        onContinue: () => setSessionState("revealing"),
       });
     }
 
@@ -249,20 +214,18 @@ const Learn = () => {
         subtopic.name,
         "medium"
       );
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `**Example:**\n${exampleData.example}`,
         pauseAfter: "example",
         showContinueButton: true,
-        onContinue: () => setSessionState("revealing"),
       });
     } catch {
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `Failed to load example for ${subtopic.name}.`,
         pauseAfter: "example",
         showContinueButton: true,
-        onContinue: () => setSessionState("revealing"),
       });
     }
 
@@ -274,7 +237,7 @@ const Learn = () => {
         "medium",
         "objective"
       );
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `**Question:**\n${questionData.question.text}`,
         pauseAfter: "question",
@@ -287,7 +250,7 @@ const Learn = () => {
         explanation: questionData.question.explanation || "",
       });
     } catch {
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `Failed to load question for ${subtopic.name}.`,
         pauseAfter: "question",
@@ -297,8 +260,8 @@ const Learn = () => {
       });
     }
 
-    setMessageQueue(queue);
-    setSessionState("revealing");
+    // Start processing messages sequentially
+    addMessagesSequentially(messages);
   };
 
   // Handle user input
@@ -336,10 +299,11 @@ const Learn = () => {
       return;
     }
 
-    // Handle continue button clicks for explanation/example messages
+    // Handle continue button clicks for explanation/example/feedback messages
     if (
       sessionState === "waitingForUserAfterExplanation" ||
-      sessionState === "waitingForUserAfterExample"
+      sessionState === "waitingForUserAfterExample" ||
+      sessionState === "waitingForUserAfterFeedback"
     ) {
       // User pressed enter to continue - this should trigger the continue button
       if (messageText.trim() === "") {
@@ -503,7 +467,7 @@ const Learn = () => {
             });
             setSessionState("preparingSubtopic");
             setIsLoading(true);
-            buildSubtopicQueue(plan.subtopics[nextStep], nextStep, false);
+            buildSubtopicMessages(plan.subtopics[nextStep], nextStep, false);
             setCurrentStep(nextStep);
             setQuestionState({
               text: "",
@@ -512,12 +476,10 @@ const Learn = () => {
             });
             setSelectedOption("");
           } else {
-            queueMessages([
-              {
-                type: "assistant",
-                message: `🎉 **Learning session completed!** You can now ask more questions or use ! commands.`,
-              },
-            ]);
+            addMessage({
+              type: "assistant",
+              message: `🎉 **Learning session completed!** You can now ask more questions or use ! commands.`,
+            });
             setSessionState("completed");
             setQuestionState({
               text: "",
@@ -547,7 +509,8 @@ const Learn = () => {
     // Allow empty input for continue actions
     if (
       sessionState === "waitingForUserAfterExplanation" ||
-      sessionState === "waitingForUserAfterExample"
+      sessionState === "waitingForUserAfterExample" ||
+      sessionState === "waitingForUserAfterFeedback"
     ) {
       return false; // Allow empty input to trigger continue
     }
@@ -576,7 +539,8 @@ const Learn = () => {
     }
     if (
       sessionState === "waitingForUserAfterExplanation" ||
-      sessionState === "waitingForUserAfterExample"
+      sessionState === "waitingForUserAfterExample" ||
+      sessionState === "waitingForUserAfterFeedback"
     ) {
       return "Press Enter to continue, or use commands (type ! for help)...";
     }
