@@ -1,21 +1,29 @@
 {
   "weak_areas": [
-    "Spaced Review Session - gis coordinates - Round 4",
+    "Adaptive Review Session - gis coordinates - Round 2",
+    "Adaptive Review Session - gis coordinates - Round 6",
+    "Spaced Review Session - 2 - Round 7",
+    "Intensive Review Session - GIS Basics - Round 5",
+    "Spaced Review Session - gis coordinates - Round 3",
     "Adaptive Review Session - gis coordinates - Round 7",
-    "Adaptive Review Session",
-    "Intensive Review Session - GIS Basics - Round 2",
     "Adaptive Review Session - gis coordinates - Round 3",
     "Intensive Review Session - GIS Basics - Round 6",
-    "Adaptive Review Session - gis coordinates - Round 2",
+    "Spaced Review Session",
+    "Adaptive Review Session",
+    "Spaced Review Session - gis coordinates - Round 5",
+    "Spaced Review Session - 2 - Round 6",
+    "Intensive Review Session - GIS Basics - Round 2",
+    "Intensive Review Session - GIS Basics - Round 4",
+    "Spaced Review Session - gis coordinates - Round 4",
     "Intensive Review Session",
-    "Intensive Review Session - GIS Basics - Round 5",
-    "Adaptive Review Session - gis coordinates - Round 6",
-    "Intensive Review Session - GIS Basics - Round 4"
+    "Spaced Review Session - 2 - Round 5",
+    "Spaced Review Session - gis coordinates - Round 2"
   ],
   "topic_mastery": {
     "gis coordinates": "beginner",
     "Intensive Review Session": "beginner",
-    "Adaptive Review Session": "beginner"
+    "Adaptive Review Session": "beginner",
+    "Spaced Review Session": "beginner"
   },
   "history": [
     {
@@ -1984,6 +1992,563 @@
           }
         }
       }
+    },
+    {
+      "date": "2025-07-15T16:03:29.409301",
+      "topic": "Spaced Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": "In a polar coordinate system used in GIS, how is the direction of rotation represented? ",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: Clockwise rotation is positive and counterclockwise rotation is negative.\n\nExplanation: In the mapping and surveying convention of a polar coordinate system used in GIS, a clockwise rotation is considered positive, while a counterclockwise rotation is considered negative. This is important for accurately representing and interpreting geographic information.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T15:57:42.062002",
+          "time_spent": null
+        }
+      ],
+      "final_score": 0.0,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 1,
+        "subjective_correct": 0,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.0,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 1,
+            "correct": 0
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-15T16:14:38.553664",
+      "topic": "Spaced Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": "In the context of GIS coordinates, what is the role of a 'datum'?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It provides a clearly defined surface or framework for the coordinates. \n\nExplanation: The datum provides the foundation or framework for the coordinates, similar to a checkerboard for checkers. Without this framework, the positioning and analysis of coordinates would be meaningless.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:03:50.984572",
+          "time_spent": null
+        }
+      ],
+      "final_score": 0.0,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 1,
+        "subjective_correct": 0,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.0,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 1,
+            "correct": 0
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-15T16:23:31.891650",
+      "topic": "Spaced Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": "In the context of GIS Coordinates, how is the x-coordinate determined in the CTRS system?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: The x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude.\n\nExplanation: In the CTRS system, the x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude. This is not determined by the rotational axis of the earth, nor is it always positive. Additionally, it is not positive in the eastern hemisphere and negative in the western.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:22:12.488260",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 3",
+          "question": "In the context of Basic GIS Coordinates, how is the rotation of vectors interpreted in a polar coordinate system?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: Clockwise rotation is positive and counterclockwise rotation is negative.\n\nExplanation: According to the provided context, in the mapping and surveying convention of a polar coordinate system, a clockwise rotation is interpreted as positive, while a counterclockwise rotation is interpreted as negative.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:22:24.383812",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 4",
+          "question": "In the context of GIS coordinates, what is the role of a radius vector in a polar coordinate system?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It points out from the origin and is always positive.\n\nExplanation: The radius vector in a polar coordinate system always points out from the origin and maintains a positive value. It does not define the angle of rotation or the zero meridian, nor does it point towards the origin.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:22:42.326928",
+          "time_spent": null
+        },
+        {
+          "subtopic": "2 - Round 5",
+          "question": "What does the number '2' represent in the context of the provided information?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It refers to the page number for the topic \"Cartesian Coordinates\" in a book.\n\nExplanation: The '2' in the context refers to the page number where the topic \"Cartesian Coordinates\" is discussed in the book. Other options are not supported by the given context.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:22:59.191246",
+          "time_spent": null
+        },
+        {
+          "subtopic": "2 - Round 6",
+          "question": "What does the number '2' refer to in the context of the provided information?",
+          "user_answer": "2",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! In the context, '2' appears just before the section title 'Cartesian Coordinates', suggesting it refers to the section number in the book. None of the other options are supported by the provided context.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:23:18.624390",
+          "time_spent": null
+        }
+      ],
+      "final_score": 0.2,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 5,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.2,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 5,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-15T16:36:56.798239",
+      "topic": "Spaced Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "2 - Round 2",
+          "question": "What is the significance of '2' in the context provided?",
+          "user_answer": "0",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! In the given context, '2' appears immediately before the topic 'Cartesian Coordinates', and after the heading 'No claim to original U.S. Government works', which suggests it is the number of a chapter or section in a book. Other options are incorrect because '2' does not correspond to any such details in the provided context.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:35:48.300003",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 3",
+          "question": "In the context of GIS coordinates, what does the radius vector always do?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It always points out from the origin and is always positive.\n\nExplanation: According to the given context, the radius vector in the polar coordinates arrangement always points out from the origin and is always positive.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:36:03.663545",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 4",
+          "question": "In a polar coordinate system used in mapping and surveying, which of the following statements is true regarding GIS coordinates?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: The radius vector always points out from the origin and is always positive.\n\nExplanation: As per the context, in the arrangement of polar coordinates used in GIS, the radius vector always points out from the origin, indicating the distance from the origin, and is always positive. This does not change based on other factors like the direction or the longitude.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:36:15.607221",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 5",
+          "question": "In the context of GIS coordinates, how are angles of longitude measured?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: They are measured where the two planes meet, at the line known as the polar axis.\n\nExplanation: The text explains that the measurement of angles of longitude is imagined to take place where the two planes meet, and that place is the line referred to as the polar axis.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:36:28.788083",
+          "time_spent": null
+        },
+        {
+          "subtopic": "2 - Round 6",
+          "question": "What is the significance of '2' in the context of Cartesian Coordinates as mentioned in the context?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It signifies the page number of the book where Cartesian Coordinates are discussed.\n\nExplanation: In the context, '2' is mentioned right after 'Cartesian Coordinates', indicating it is the page number where this topic is discussed in the book. There's no information suggesting that it refers to the edition, chapter, or number of authors.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:36:40.983282",
+          "time_spent": null
+        },
+        {
+          "subtopic": "2 - Round 7",
+          "question": "Based on the context provided, what could '2' be referring to?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: The Cartesian Coordinates\n\nExplanation: The context includes the phrase \"Cartesian Coordinates\" immediately following the '2', suggesting that '2' could be a reference to this topic. The other options do not align with the information provided in the context.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:36:55.052381",
+          "time_spent": null
+        }
+      ],
+      "final_score": 0.16666666666666666,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 6,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.16666666666666666,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 6,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-15T16:50:40.524765",
+      "topic": "Adaptive Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": "In the three-dimensional coordinate system known as CTRS, how is the x-coordinate defined in relation to the zero meridian and longitudinal degrees? ",
+          "user_answer": "1",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! According to the CTRS (Conventional Terrestrial Reference System), the x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude. This means for the first 90 degrees to the west and east of the zero meridian, the x-coordinate is positive.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:50:18.667246",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": "In the three-dimensional coordinate system known as CTRS, how is the x-coordinate defined in relation to the zero meridian and longitudinal degrees? ",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: The x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude.\n\nExplanation: According to the CTRS (Conventional Terrestrial Reference System), the x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude. This means for the first 90 degrees to the west and east of the zero meridian, the x-coordinate is positive.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:50:22.032254",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 3",
+          "question": "In the context of GIS coordinates, how is the coordinate transformation from its original Terrestrial Reference Frame to a target one achieved?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: By interpolation from known shifts for a number of control points in the same area.\n\nExplanation: The correct answer is achieved by interpolating known shifts for a number of control points in the area. This method allows for the transformation of a coordinate from its original Terrestrial Reference Frame (TRF) to a target TRF. The other options, while involve concepts relevant to GIS coordinates, do not correctly describe this specific transformation process.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T16:50:37.658398",
+          "time_spent": null
+        }
+      ],
+      "final_score": 0.3333333333333333,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 3,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.3333333333333333,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 3,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-15T17:05:40.479651",
+      "topic": "Adaptive Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": "In a polar coordinate system, what does the radius vector always do?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: Points out from the origin and is always positive\n\nExplanation: According to the context, in the arrangement of polar coordinates, the radius vector always points outwards from the origin and is always positive.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T17:05:06.313121",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "gis coordinates - Round 3",
+          "question": "In the context of GIS coordinates, how is the x-coordinate represented in the CTRS three-dimensional coordinate system?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: The x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude.\n\nExplanation: According to the context, in the CTRS three-dimensional coordinate system, the x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude. This is a unique characteristic of the CTRS system.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T17:05:37.521491",
+          "time_spent": null,
+          "type": "question"
+        }
+      ],
+      "final_score": 0.0,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 2,
+        "subjective_correct": 0,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.0,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 2,
+            "correct": 0
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-15T17:06:08.053341",
+      "topic": "Adaptive Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": "What does the radius vector represent in the context of polar coordinates in GIS?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It points out from the origin and is always positive\n\nExplanation: In the polar coordinates system used in GIS, the radius vector always points out from the origin and is always positive. It does not indicate rotation, longitude, or coordinate shift.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T17:06:01.828759",
+          "time_spent": null,
+          "type": "question"
+        }
+      ],
+      "final_score": 0.0,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 1,
+        "subjective_correct": 0,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.0,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 1,
+            "correct": 0
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-15T17:10:48.953358",
+      "topic": "Adaptive Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": "According to the provided context, which statement about GIS coordinates is correct?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: In a polar coordinate system used in mapping and surveying, the radius vector always points out from the origin and is always positive.\n\nExplanation: The correct answer is based on the first context, which explains that in a polar coordinate system, the radius vector is always positive and points away from the origin, following mapping and surveying conventions. The other options contradict the provided contexts.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T17:10:40.961651",
+          "time_spent": null,
+          "type": "question"
+        }
+      ],
+      "final_score": 0.0,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 1,
+        "subjective_correct": 0,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.0,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 1,
+            "correct": 0
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-15T17:31:35.384869",
+      "topic": "Adaptive Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "gis coordinates - Round 1",
+          "question": {
+            "text": "In the context of Basic GIS Coordinates, which statement is correct regarding the polar coordinate and cartesian system?",
+            "options": [
+              "The polar coordinate system uses a radius vector that always points inward towards the origin.",
+              "The cartesian system does not require a clearly defined surface or datum.",
+              "The polar coordinate system uses a radius vector that always points out from the origin and is always positive, while the cartesian system requires a clearly defined surface or datum.",
+              "In the polar coordinate system, clockwise rotation is negative, and counterclockwise rotation is positive."
+            ],
+            "correct_option": 2,
+            "explanation": "The context mentions that in the polar coordinate system, the radius vector always points out from the origin and is always positive. For the cartesian system, coordinates must be on a clearly defined surface, called the datum.",
+            "type": "objective",
+            "difficulty": "medium"
+          },
+          "user_answer": "2",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! The context mentions that in the polar coordinate system, the radius vector always points out from the origin and is always positive. For the cartesian system, coordinates must be on a clearly defined surface, called the datum.",
+          "difficulty": "medium"
+        },
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": {
+            "text": "In the context of Basic GIS Coordinates, how is the x-coordinate defined in the right-handed three-dimensional coordinate system known as CTRS?",
+            "options": [
+              "The x-coordinate is always positive in both the western and eastern hemispheres.",
+              "The x-coordinate is positive in the eastern hemisphere and negative in the western.",
+              "The x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude.",
+              "The x-coordinate is positive from the zero meridian to 180\u00b0 W longitude and from the zero meridian to 180\u00b0 E longitude."
+            ],
+            "correct_option": 2,
+            "explanation": "According to the provided context, in the right-handed three-dimensional coordinate system known as CTRS, the x-coordinate is defined as positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude. The remaining 180\u00b0 makes the x-coordinate negative. This means that the x-coordinate is not always positive in both hemispheres, nor does it remain positive up to 180\u00b0.",
+            "type": "objective",
+            "difficulty": "medium"
+          },
+          "user_answer": "3",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: The x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude.\n\nExplanation: According to the provided context, in the right-handed three-dimensional coordinate system known as CTRS, the x-coordinate is defined as positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude. The remaining 180\u00b0 makes the x-coordinate negative. This means that the x-coordinate is not always positive in both hemispheres, nor does it remain positive up to 180\u00b0.",
+          "difficulty": "medium"
+        },
+        {
+          "subtopic": "gis coordinates - Round 3",
+          "question": {
+            "text": "In the context of Basic GIS Coordinates, what is the significance of the datum in coordinate systems?",
+            "options": [
+              "It represents the point of zero longitude, such as Greenwich, England.",
+              "It defines the zero meridian for the x-coordinate in the CTRS system.",
+              "It determines the positive and negative rotation of the coordinates.",
+              "It provides a clearly defined surface and framework for the coordinates."
+            ],
+            "correct_option": 3,
+            "explanation": "The datum provides a clearly defined surface, or 'checkerboard', for coordinates. Without this framework, one cannot truly understand or analyze the arrangement of the coordinates.",
+            "type": "objective",
+            "difficulty": "medium"
+          },
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It provides a clearly defined surface and framework for the coordinates.\n\nExplanation: The datum provides a clearly defined surface, or 'checkerboard', for coordinates. Without this framework, one cannot truly understand or analyze the arrangement of the coordinates.",
+          "difficulty": "medium"
+        }
+      ],
+      "final_score": 0.3333333333333333,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 3,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.3333333333333333,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 3,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
     }
   ],
   "learning_plan": {},
@@ -2042,8 +2607,8 @@
       "improvement_rate": -0.25
     },
     "Adaptive Review Session": {
-      "attempts": 18,
-      "average_score": 0.12367012531812868,
+      "attempts": 23,
+      "average_score": 0.14479523796221788,
       "subtopic_scores": {
         "gis coordinates - Round 2": [
           0,
@@ -2075,6 +2640,12 @@
           0,
           0,
           0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
           0
         ],
         "gis coordinates - Round 3": [
@@ -2089,6 +2660,9 @@
           0,
           0,
           1,
+          0,
+          0,
+          0,
           0,
           0,
           0,
@@ -2134,7 +2708,8 @@
           0
         ],
         "gis coordinates - Round 1": [
-          0
+          0,
+          1
         ],
         "2 - Round 4": [
           0,
@@ -2158,19 +2733,19 @@
           "trend": []
         },
         "subjective": {
-          "total": 83,
-          "correct": 28,
+          "total": 93,
+          "correct": 30,
           "trend": [
-            0.0,
-            0.0,
-            0.5,
-            0.9,
-            0.0,
             0.3333333333333333,
             0.0,
             0.3333333333333333,
             0.0,
-            0.0
+            0.0,
+            0.3333333333333333,
+            0.0,
+            0.0,
+            0.0,
+            0.3333333333333333
           ]
         }
       },
@@ -2180,8 +2755,8 @@
           "correct": 12
         },
         "medium": {
-          "total": 54,
-          "correct": 16
+          "total": 64,
+          "correct": 18
         },
         "hard": {
           "total": 0,
@@ -2189,8 +2764,8 @@
         }
       },
       "common_mistakes": [],
-      "last_attempt": "2025-07-15T15:50:24.580893",
-      "improvement_rate": -0.1766716075973267
+      "last_attempt": "2025-07-15T17:31:35.384869",
+      "improvement_rate": 0.26934013624445063
     },
     "Quick Review Session": {
       "attempts": 1,
@@ -2283,28 +2858,47 @@
       "improvement_rate": 0
     },
     "Spaced Review Session": {
-      "attempts": 1,
-      "average_score": 0.0,
+      "attempts": 5,
+      "average_score": 0.092,
       "subtopic_scores": {
         "gis coordinates - Round 2": [
+          0,
+          0,
+          0,
           0
         ],
         "gis coordinates - Round 3": [
+          0,
+          0,
           0
         ],
         "gis coordinates - Round 4": [
+          0,
+          0,
           0
         ],
         "2 - Round 5": [
+          0,
           0
         ],
         "2 - Round 6": [
+          0,
+          1,
           0
         ],
         "gis coordinates - Round 7": [
           0
         ],
         "gis coordinates - Round 8": [
+          0
+        ],
+        "2 - Round 2": [
+          1
+        ],
+        "gis coordinates - Round 5": [
+          0
+        ],
+        "2 - Round 7": [
           0
         ]
       },
@@ -2315,10 +2909,14 @@
           "trend": []
         },
         "subjective": {
-          "total": 7,
-          "correct": 0,
+          "total": 20,
+          "correct": 2,
           "trend": [
-            0.0
+            0.0,
+            0.0,
+            0.0,
+            0.2,
+            0.16666666666666666
           ]
         }
       },
@@ -2328,8 +2926,8 @@
           "correct": 0
         },
         "medium": {
-          "total": 7,
-          "correct": 0
+          "total": 20,
+          "correct": 2
         },
         "hard": {
           "total": 0,
@@ -2337,8 +2935,8 @@
         }
       },
       "common_mistakes": [],
-      "last_attempt": "2025-07-15T12:36:41.110846",
-      "improvement_rate": 0
+      "last_attempt": "2025-07-15T16:36:56.798239",
+      "improvement_rate": 0.10666666666666666
     },
     "Intensive Review Session": {
       "attempts": 1,
@@ -2399,5 +2997,5 @@
       "improvement_rate": 0
     }
   },
-  "last_active": "2025-07-15T15:50:24.580893"
+  "last_active": "2025-07-15T17:32:18.700116"
 }

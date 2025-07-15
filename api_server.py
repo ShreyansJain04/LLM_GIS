@@ -805,28 +805,56 @@ async def start_intensive_review(request: ReviewSessionRequest):
 
 @app.post("/api/review/spaced")
 async def start_spaced_review(request: ReviewSessionRequest):
-    """Start spaced repetition review session."""
+    """Start spaced repetition review session with mixed flashcard and question items."""
     try:
         session_id = f"spaced_{request.username}_{datetime.now().isoformat()}"
-        
+        from flashcards import FlashcardDeck
         # Get enhanced memory insights
         try:
             enhanced_memory = EnhancedMemorySystem(request.username)
             insights = enhanced_memory.get_insights()
             recommendations = insights.get('personalized_recommendations', {})
             spaced_schedule = recommendations.get('spaced_repetition_schedule', [])
-            due_items = [item for item in spaced_schedule if item.get('days_until_review', 0) <= 0]
+            due_items_raw = [item for item in spaced_schedule if item.get('days_until_review', 0) <= 0]
         except Exception as e:
             print(f"Enhanced memory failed: {e}")
-            due_items = []
-        
-        if not due_items:
+            due_items_raw = []
+        if not due_items_raw:
             # Fallback to default topics
-            due_items = [
+            due_items_raw = [
                 {"topic": "GIS Basics", "subtopic": "Fundamentals", "days_until_review": 0, "priority": "high"},
                 {"topic": "Coordinate Systems", "subtopic": "Projections", "days_until_review": 0, "priority": "medium"}
             ]
-        
+        # Build mixed due_items list
+        mixed_due_items = []
+        for item in due_items_raw:
+            topic = item["topic"]
+            subtopic = item.get("subtopic", topic)
+            deck = FlashcardDeck(request.username, topic)
+            due_cards = deck.get_due_cards(limit=2)  # Limit to 2 per topic for session
+            if due_cards:
+                for card in due_cards:
+                    mixed_due_items.append({
+                        "type": "flashcard",
+                        "topic": topic,
+                        "subtopic": subtopic,
+                        "card": {
+                            "id": f"{topic}_{card.get('created_at', 'unknown')}",
+                            "front": card['front'],
+                            "back": card['back'],
+                            "topic": topic,
+                            "subtopic": card.get('subtopic', topic),
+                            "difficulty_level": card.get('difficulty_level', 'medium'),
+                            "repetitions": card.get('repetitions', 0),
+                            "ease_factor": card.get('ease_factor', 2.5)
+                        }
+                    })
+            else:
+                mixed_due_items.append({
+                    "type": "question",
+                    "topic": topic,
+                    "subtopic": subtopic
+                })
         session_state = {
             "session_id": session_id,
             "username": request.username,
@@ -839,21 +867,19 @@ async def start_spaced_review(request: ReviewSessionRequest):
             "total_correct": 0,
             "session_state": "active",
             "performance": [],
-            "due_items": due_items,
+            "due_items": mixed_due_items,
             "asked_questions": [],
             "started_at": datetime.now().isoformat(),
             "current_round": 0,
-            "max_questions": len(due_items),
+            "max_questions": len(mixed_due_items),
             "adaptive": False
         }
-        
         active_sessions[session_id] = session_state
-        
         return {
             "session_id": session_id,
             "mode": "spaced",
-            "due_items": due_items,
-            "message": f"Started spaced repetition review with {len(due_items)} due items"
+            "due_items": mixed_due_items,
+            "message": f"Started spaced repetition review with {len(mixed_due_items)} due items"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -917,6 +943,7 @@ async def start_flashcard_review(request: ReviewSessionRequest):
         from flashcards import get_all_due_cards_for_user
         all_due_cards = get_all_due_cards_for_user(request.username)
         
+        
         # Group by topic
         topics_with_due = {}
         for card in all_due_cards:
@@ -966,9 +993,11 @@ async def get_flashcard_topics(username: str):
         from flashcards import get_all_due_cards_for_user
         all_due_cards = get_all_due_cards_for_user(username)
         
+        
         # Group by topic and count due cards
         topics_with_due = {}
         for card in all_due_cards:
+            # type of card is dict
             topic = card['topic']
             if topic not in topics_with_due:
                 topics_with_due[topic] = {
@@ -981,16 +1010,18 @@ async def get_flashcard_topics(username: str):
         
         # Get total cards and next review for each topic
         from flashcards import FlashcardDeck
+        # Topics with due cards is a dict and has 2 entries for now
         for topic in topics_with_due:
             deck = FlashcardDeck(username, topic)
             stats = deck.get_stats()
             topics_with_due[topic]['total_cards'] = stats['total_cards']
             
-            # Get next review date (if any cards exist)
-            if stats['total_cards'] > 0:
-                upcoming_cards = deck.get_cards_due_within_days(30)  # Next 30 days
-                if upcoming_cards:
-                    topics_with_due[topic]['next_review'] = upcoming_cards[0]['review_date']
+            # Get next review date (if any cards exist) -- Error here for now
+            # if stats['total_cards'] > 0:
+            #     upcoming_cards = deck.get_cards_due_within_days(30)  # Next 30 days
+            #     if upcoming_cards:
+            #         topics_with_due[topic]['next_review'] = upcoming_cards[0]['review_date']
+            
         
         return {
             "topics": list(topics_with_due.values()),
@@ -1220,14 +1251,55 @@ async def end_review_session(session_id: str):
 
 @app.post("/api/review/session/{session_id}/question")
 async def get_next_question(session_id: str, topic: Optional[str] = None):
-    """Get the next question for the review session with adaptive difficulty."""
+    """Get the next question or flashcard for the review session with adaptive difficulty."""
     try:
         if session_id not in active_sessions:
             raise HTTPException(status_code=404, detail="Session not found")
-        
         session = active_sessions[session_id]
         session["current_round"] += 1
-        
+        # For spaced mode, serve from mixed due_items
+        if session["mode"] == "spaced":
+            due_items = session["due_items"]
+            idx = session["total_questions"]
+            if idx >= len(due_items):
+                raise HTTPException(status_code=400, detail="No more due items for review")
+            item = due_items[idx]
+            session["current_topic"] = item["topic"]
+            if item["type"] == "flashcard":
+                return {
+                    "type": "flashcard",
+                    "card": item["card"],
+                    "topic": item["topic"],
+                    "subtopic": item["subtopic"],
+                    "question_number": session["current_round"],
+                    "max_questions": session["max_questions"]
+                }
+            else:  # question
+                # Generate question with current difficulty
+                previous_question_texts = []
+                for q in session["asked_questions"]:
+                    if isinstance(q, dict) and "text" in q:
+                        previous_question_texts.append(q["text"])
+                    elif isinstance(q, str):
+                        previous_question_texts.append(q)
+                question = generate_question(
+                    item["topic"],
+                    previous_question_texts,
+                    session["difficulty"],
+                    "objective"
+                )
+                session["asked_questions"].append(question)
+                return {
+                    "type": "question",
+                    "question": question,
+                    "topic": item["topic"],
+                    "subtopic": item["subtopic"],
+                    "difficulty": session["difficulty"],
+                    "question_number": session["current_round"],
+                    "max_questions": session["max_questions"],
+                    "consecutive_correct": session["consecutive_correct"],
+                    "consecutive_wrong": session["consecutive_wrong"]
+                }
         # Determine topic and difficulty based on mode
         if session["mode"] == "adaptive":
             # Select topic based on priority and recent performance
@@ -1265,19 +1337,6 @@ async def get_next_question(session_id: str, topic: Optional[str] = None):
                 session["difficulty"] = "medium"
             else:
                 session["difficulty"] = "easy"
-            
-        elif session["mode"] == "spaced":
-            # Use due items for spaced repetition
-            due_items = session["due_items"]
-            if not due_items:
-                # Fallback to default topics if no due items
-                default_topics = ["GIS Basics", "Coordinate Systems", "Data Types", "Spatial Analysis"]
-                topic = default_topics[session["current_round"] % len(default_topics)]
-                session["current_topic"] = topic
-            else:
-                current_item = due_items[session["total_questions"] % len(due_items)]
-                topic = current_item["topic"]
-                session["current_topic"] = topic
             
         elif session["mode"] == "quick":
             # Use weak topics for quick review
@@ -1328,100 +1387,417 @@ async def get_next_question(session_id: str, topic: Optional[str] = None):
 
 @app.post("/api/review/session/{session_id}/answer")
 async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
-    """Submit an answer for the current question with adaptive difficulty adjustment."""
-    
-    try:
-        print(f"DEBUG: Received request for session {session_id}")
-        print(f"DEBUG: Request data: {request.dict()}")
-        
+    """Submit an answer for the current question or flashcard with adaptive difficulty adjustment."""
+    try:      
         if session_id not in active_sessions:
             raise HTTPException(status_code=404, detail="Session not found")
-        
         session = active_sessions[session_id]
-        
-        # Handle question_id - it could be a string or a question object
-        if isinstance(request.question_id, dict):
-            # If it's already a question object, use it directly
-            question_dict = request.question_id
-        else:
-            # If it's a string, create a basic question dict
-            question_dict = {
-                "text": str(request.question_id),
-                "type": "objective",
-                "options": ["Option A", "Option B", "Option C", "Option D"],
-                "correct_option": 0,
-                "explanation": "Question from review session."
-            }
-        
-        correct, feedback = check_answer(question_dict, request.answer)
-        
-        # Update session state
-        session["total_questions"] += 1
-        if correct:
-            session["total_correct"] += 1
-            session["consecutive_correct"] += 1
-            session["consecutive_wrong"] = 0
-        else:
-            session["consecutive_correct"] = 0
-            session["consecutive_wrong"] += 1
-        
-        # Record performance with detailed data
-        performance_entry = {
-            'subtopic': f"{session.get('current_topic', 'Unknown')} - Round {session.get('current_round', 1)}",
-            'question': question_dict.get('text', str(request.question_id)),
-            'user_answer': request.answer,
-            'correct': correct,
-            'score': 1 if correct else 0,
-            'feedback': feedback,
-            'difficulty': session.get("difficulty", "medium"),
-            'timestamp': datetime.now().isoformat(),
-            'time_spent': request.time_spent
-        }
-        if "performance" not in session:
-            session["performance"] = []
-        session["performance"].append(performance_entry)
-        
-        # Auto-create flashcard for correct answers at medium+ difficulty
-        if correct and session.get("difficulty", "medium") in ["medium", "hard"]:
-            try:
-                from flashcards import auto_create_flashcard_from_review
-                auto_create_flashcard_from_review(
-                    session["username"], 
-                    session.get("current_topic", "Unknown"), 
-                    str(question_dict.get('text', request.question_id)),
-                    feedback.split('\n')[0] if '\n' in feedback else feedback,
-                    session.get("difficulty", "medium")
-                )
-            except ImportError:
-                # Flashcard module not available, skip
-                pass
-        
-        # Adaptive difficulty adjustment
-        if session.get("adaptive", False):
-            if session["consecutive_correct"] >= 2 and session.get("difficulty", "medium") != "hard":
-                if session.get("difficulty", "medium") == "easy":
-                    session["difficulty"] = "medium"
-                elif session.get("difficulty", "medium") == "medium":
-                    session["difficulty"] = "hard"
-                session["consecutive_correct"] = 0
-            elif session["consecutive_wrong"] >= 2 and session.get("difficulty", "medium") != "easy":
-                if session.get("difficulty", "medium") == "hard":
-                    session["difficulty"] = "medium"
-                elif session.get("difficulty", "medium") == "medium":
-                    session["difficulty"] = "easy"
+        # For spaced mode, handle flashcard or question
+        if session["mode"] == "spaced":
+            idx = session["total_questions"]
+            due_items = session["due_items"]
+            if idx >= len(due_items):
+                raise HTTPException(status_code=400, detail="No more due items for review")
+            item = due_items[idx]
+            session["total_questions"] += 1
+            if item["type"] == "flashcard":
+                # Self-assessment answer is expected as an integer (0-5)
+                quality = None
+                try:
+                    quality = int(request.answer)
+                except Exception:
+                    pass
+                if quality is None or quality < 0 or quality > 5:
+                    raise HTTPException(status_code=400, detail="Invalid quality rating (0-5) for flashcard")
+                from flashcards import FlashcardDeck
+                deck = FlashcardDeck(session["username"], item["topic"])
+                # Find the card by id (created_at)
+                card_id = item["card"]["id"].split("_", 1)[-1]
+                card = None
+                for c in deck.get_due_cards():
+                    if c.get("created_at", "unknown") == card_id:
+                        card = c
+                        break
+                if not card:
+                    # fallback: match by front text
+                    for c in deck.get_due_cards():
+                        if c["front"] == item["card"]["front"]:
+                            card = c
+                            break
+                if not card:
+                    raise HTTPException(status_code=404, detail="Flashcard not found for update")
+                deck.update_card_schedule(card, quality)
+                deck.update_stats(quality >= 3)
+                if quality >= 3:
+                    session["total_correct"] += 1
+                performance_entry = {
+                    'topic': item["topic"],
+                    'card_front': card['front'],
+                    'quality': quality,
+                    'correct': quality >= 3,
+                    'timestamp': datetime.now().isoformat(),
+                    'ease_factor': card.get('ease_factor', 2.5),
+                    'repetitions': card.get('repetitions', 0),
+                    'type': 'flashcard'
+                }
+                session["performance"].append(performance_entry)
+                return {
+                    "type": "flashcard",
+                    "quality": quality,
+                    "correct": quality >= 3,
+                    "cards_reviewed": session["total_questions"],
+                    "total_correct": session["total_correct"],
+                    "session_complete": session["total_questions"] >= session["max_questions"],
+                    "accuracy": session["total_correct"] / session["total_questions"] if session["total_questions"] > 0 else 0
+                }
+            else:  # question
+                # Handle question_id - it could be a string or a question object
+                if isinstance(request.question_id, dict):
+                    question_dict = request.question_id
+                else:
+                    question_dict = {
+                        "text": str(request.question_id),
+                        "type": "objective",
+                        "options": ["Option A", "Option B", "Option C", "Option D"],
+                        "correct_option": 0,
+                        "explanation": "Question from review session."
+                    }
+                correct, feedback = check_answer(question_dict, request.answer)
+                if correct:
+                    session["total_correct"] += 1
+                    session["consecutive_correct"] += 1
+                    session["consecutive_wrong"] = 0
+                else:
+                    session["consecutive_correct"] = 0
+                    session["consecutive_wrong"] += 1
+                performance_entry = {
+                    'subtopic': f"{session.get('current_topic', 'Unknown')} - Round {session.get('current_round', 1)}",
+                    'question': question_dict.get('text', str(request.question_id)),
+                    'user_answer': request.answer,
+                    'correct': correct,
+                    'score': 1 if correct else 0,
+                    'feedback': feedback,
+                    'difficulty': session.get("difficulty", "medium"),
+                    'timestamp': datetime.now().isoformat(),
+                    'time_spent': request.time_spent,
+                    'type': 'question'
+                }
+                if "performance" not in session:
+                    session["performance"] = []
+                session["performance"].append(performance_entry)
+                # Auto-create flashcard for correct answers at medium+ difficulty
+                if correct and session.get("difficulty", "medium") in ["medium", "hard"]:
+                    try:
+                        from flashcards import auto_create_flashcard_from_review
+                        auto_create_flashcard_from_review(
+                            session["username"],
+                            session.get("current_topic", "Unknown"),
+                            str(question_dict.get('text', request.question_id)),
+                            feedback.split('\n')[0] if '\n' in feedback else feedback,
+                            session.get("difficulty", "medium")
+                        )
+                    except ImportError:
+                        pass
+                return {
+                    "type": "question",
+                    "correct": correct,
+                    "feedback": feedback,
+                    "new_difficulty": session.get("difficulty", "medium"),
+                    "consecutive_correct": session.get("consecutive_correct", 0),
+                    "consecutive_wrong": session.get("consecutive_wrong", 0),
+                    "total_questions": session.get("total_questions", 0),
+                    "total_correct": session.get("total_correct", 0),
+                    "question_number": session.get("current_round", 1),
+                    "max_questions": session.get("max_questions", 7)
+                }
+        # For adaptive mode, handle question
+        elif session["mode"] == "adaptive":
+            # For adaptive mode, the current_topic is set in get_next_question
+            # We need to get the current question from asked_questions
+            current_question_text = None
+            for q in session["asked_questions"]:
+                if isinstance(q, dict) and "text" in q:
+                    current_question_text = q["text"]
+                    break
+            
+            if not current_question_text:
+                raise HTTPException(status_code=400, detail="No question to answer in adaptive mode")
+            
+            # Handle question_id - it could be a string or a question object
+            if isinstance(request.question_id, dict):
+                question_dict = request.question_id
+            else:
+                question_dict = {
+                    "text": str(request.question_id),
+                    "type": "objective",
+                    "options": ["Option A", "Option B", "Option C", "Option D"],
+                    "correct_option": 0,
+                    "explanation": "Question from review session."
+                }
+            
+            correct, feedback = check_answer(question_dict, request.answer)
+            
+            # Update session state
+            session["total_questions"] += 1
+            if correct:
+                session["total_correct"] += 1
+                session["consecutive_correct"] += 1
                 session["consecutive_wrong"] = 0
-        
-        return {
-            "correct": correct,
-            "feedback": feedback,
-            "new_difficulty": session.get("difficulty", "medium"),
-            "consecutive_correct": session.get("consecutive_correct", 0),
-            "consecutive_wrong": session.get("consecutive_wrong", 0),
-            "total_questions": session.get("total_questions", 0),
-            "total_correct": session.get("total_correct", 0),
-            "question_number": session.get("current_round", 1),
-            "max_questions": session.get("max_questions", 7)
-        }
+            else:
+                session["consecutive_correct"] = 0
+                session["consecutive_wrong"] += 1
+            
+            # Record performance with detailed data
+            performance_entry = {
+                'subtopic': f"{session.get('current_topic', 'Unknown')} - Round {session.get('current_round', 1)}",
+                'question': question_dict.get('text', str(request.question_id)),
+                'user_answer': request.answer,
+                'correct': correct,
+                'score': 1 if correct else 0,
+                'feedback': feedback,
+                'difficulty': session.get("difficulty", "medium"),
+                'timestamp': datetime.now().isoformat(),
+                'time_spent': request.time_spent,
+                'type': 'question'
+            }
+            if "performance" not in session:
+                session["performance"] = []
+            session["performance"].append(performance_entry)
+            
+            # Auto-create flashcard for correct answers at medium+ difficulty
+            if correct and session.get("difficulty", "medium") in ["medium", "hard"]:
+                print("DEBUG: Auto-creating flashcard", session["username"], type(session["username"]), "\n", session.get("current_topic", "Unknown"), type(session.get("current_topic", "Unknown")), "\n", question_dict['text'] if isinstance(question_dict, dict) and 'text' in question_dict else str(request.question_id), type(question_dict['text'] if isinstance(question_dict, dict) and 'text' in question_dict else str(request.question_id)), "\n", feedback.split('\n')[0] if '\n' in feedback else feedback, type(feedback.split('\n')[0] if '\n' in feedback else feedback), "\n", session.get("difficulty", "medium"), type(session.get("difficulty", "medium")))
+                try:
+                    from flashcards import auto_create_flashcard_from_review
+                    auto_create_flashcard_from_review(
+                        session["username"],
+                        session.get("current_topic", "Unknown"),
+                        question_dict['text'] if isinstance(question_dict, dict) and 'text' in question_dict else str(request.question_id),
+                        feedback.split('\n')[0] if '\n' in feedback else feedback,
+                        session.get("difficulty", "medium")
+                    )
+                except Exception as e:
+                    print("ERROR: Failed to auto-create flashcard:", e)
+                    import traceback
+                    traceback.print_exc()
+            
+            # Adaptive difficulty adjustment
+            if session.get("adaptive", False):
+                if session["consecutive_correct"] >= 2 and session.get("difficulty", "medium") != "hard":
+                    if session.get("difficulty", "medium") == "easy":
+                        session["difficulty"] = "medium"
+                    elif session.get("difficulty", "medium") == "medium":
+                        session["difficulty"] = "hard"
+                    session["consecutive_correct"] = 0
+                elif session["consecutive_wrong"] >= 2 and session.get("difficulty", "medium") != "easy":
+                    if session.get("difficulty", "medium") == "hard":
+                        session["difficulty"] = "medium"
+                    elif session.get("difficulty", "medium") == "medium":
+                        session["difficulty"] = "easy"
+                    session["consecutive_wrong"] = 0
+            
+            return {
+                "type": "question",
+                "correct": correct,
+                "feedback": feedback,
+                "new_difficulty": session.get("difficulty", "medium"),
+                "consecutive_correct": session.get("consecutive_correct", 0),
+                "consecutive_wrong": session.get("consecutive_wrong", 0),
+                "total_questions": session.get("total_questions", 0),
+                "total_correct": session.get("total_correct", 0),
+                "question_number": session.get("current_round", 1),
+                "max_questions": session.get("max_questions", 7)
+            }
+        # For intensive mode, handle question
+        elif session["mode"] == "intensive":
+            # For intensive mode, the current_topic is set in get_next_question
+            # We need to get the current question from asked_questions
+            current_question_text = None
+            for q in session["asked_questions"]:
+                if isinstance(q, dict) and "text" in q:
+                    current_question_text = q["text"]
+                    break
+            
+            if not current_question_text:
+                raise HTTPException(status_code=400, detail="No question to answer in intensive mode")
+            
+            # Handle question_id - it could be a string or a question object
+            if isinstance(request.question_id, dict):
+                question_dict = request.question_id
+            else:
+                question_dict = {
+                    "text": str(request.question_id),
+                    "type": "objective",
+                    "options": ["Option A", "Option B", "Option C", "Option D"],
+                    "correct_option": 0,
+                    "explanation": "Question from review session."
+                }
+            
+            correct, feedback = check_answer(question_dict, request.answer)
+            
+            # Update session state
+            session["total_questions"] += 1
+            if correct:
+                session["total_correct"] += 1
+                session["consecutive_correct"] += 1
+                session["consecutive_wrong"] = 0
+            else:
+                session["consecutive_correct"] = 0
+                session["consecutive_wrong"] += 1
+            
+            # Record performance with detailed data
+            performance_entry = {
+                'subtopic': f"{session.get('current_topic', 'Unknown')} - Round {session.get('current_round', 1)}",
+                'question': question_dict.get('text', str(request.question_id)),
+                'user_answer': request.answer,
+                'correct': correct,
+                'score': 1 if correct else 0,
+                'feedback': feedback,
+                'difficulty': session.get("difficulty", "medium"),
+                'timestamp': datetime.now().isoformat(),
+                'time_spent': request.time_spent,
+                'type': 'question'
+            }
+            if "performance" not in session:
+                session["performance"] = []
+            session["performance"].append(performance_entry)
+            
+            # Auto-create flashcard for correct answers at medium+ difficulty
+            if correct and session.get("difficulty", "medium") in ["medium", "hard"]:
+                try:
+                    from flashcards import auto_create_flashcard_from_review
+                    auto_create_flashcard_from_review(
+                        session["username"],
+                        session.get("current_topic", "Unknown"),
+                        str(question_dict.get('text', request.question_id)),
+                        feedback.split('\n')[0] if '\n' in feedback else feedback,
+                        session.get("difficulty", "medium")
+                    )
+                except ImportError:
+                    pass
+            
+            # Adaptive difficulty adjustment
+            if session.get("adaptive", False):
+                if session["consecutive_correct"] >= 2 and session.get("difficulty", "medium") != "hard":
+                    if session.get("difficulty", "medium") == "easy":
+                        session["difficulty"] = "medium"
+                    elif session.get("difficulty", "medium") == "medium":
+                        session["difficulty"] = "hard"
+                    session["consecutive_correct"] = 0
+                elif session["consecutive_wrong"] >= 2 and session.get("difficulty", "medium") != "easy":
+                    if session.get("difficulty", "medium") == "hard":
+                        session["difficulty"] = "medium"
+                    elif session.get("difficulty", "medium") == "medium":
+                        session["difficulty"] = "easy"
+                    session["consecutive_wrong"] = 0
+            
+            return {
+                "type": "question",
+                "correct": correct,
+                "feedback": feedback,
+                "new_difficulty": session.get("difficulty", "medium"),
+                "consecutive_correct": session.get("consecutive_correct", 0),
+                "consecutive_wrong": session.get("consecutive_wrong", 0),
+                "total_questions": session.get("total_questions", 0),
+                "total_correct": session.get("total_correct", 0),
+                "question_number": session.get("current_round", 1),
+                "max_questions": session.get("max_questions", 7)
+            }
+        # For quick mode, handle question
+        elif session["mode"] == "quick":
+            # For quick mode, the current_topic is set in get_next_question
+            # We need to get the current question from asked_questions
+            current_question_text = None
+            for q in session["asked_questions"]:
+                if isinstance(q, dict) and "text" in q:
+                    current_question_text = q["text"]
+                    break
+            
+            if not current_question_text:
+                raise HTTPException(status_code=400, detail="No question to answer in quick mode")
+            
+            # Handle question_id - it could be a string or a question object
+            if isinstance(request.question_id, dict):
+                question_dict = request.question_id
+            else:
+                question_dict = {
+                    "text": str(request.question_id),
+                    "type": "objective",
+                    "options": ["Option A", "Option B", "Option C", "Option D"],
+                    "correct_option": 0,
+                    "explanation": "Question from review session."
+                }
+            
+            correct, feedback = check_answer(question_dict, request.answer)
+            
+            # Update session state
+            session["total_questions"] += 1
+            if correct:
+                session["total_correct"] += 1
+                session["consecutive_correct"] += 1
+                session["consecutive_wrong"] = 0
+            else:
+                session["consecutive_correct"] = 0
+                session["consecutive_wrong"] += 1
+            
+            # Record performance with detailed data
+            performance_entry = {
+                'subtopic': f"{session.get('current_topic', 'Unknown')} - Round {session.get('current_round', 1)}",
+                'question': question_dict.get('text', str(request.question_id)),
+                'user_answer': request.answer,
+                'correct': correct,
+                'score': 1 if correct else 0,
+                'feedback': feedback,
+                'difficulty': session.get("difficulty", "medium"),
+                'timestamp': datetime.now().isoformat(),
+                'time_spent': request.time_spent,
+                'type': 'question'
+            }
+            if "performance" not in session:
+                session["performance"] = []
+            session["performance"].append(performance_entry)
+            
+            # Auto-create flashcard for correct answers at medium+ difficulty
+            if correct and session.get("difficulty", "medium") in ["medium", "hard"]:
+                try:
+                    from flashcards import auto_create_flashcard_from_review
+                    auto_create_flashcard_from_review(
+                        session["username"],
+                        session.get("current_topic", "Unknown"),
+                        str(question_dict.get('text', request.question_id)),
+                        feedback.split('\n')[0] if '\n' in feedback else feedback,
+                        session.get("difficulty", "medium")
+                    )
+                except ImportError:
+                    pass
+            
+            # Adaptive difficulty adjustment
+            if session.get("adaptive", False):
+                if session["consecutive_correct"] >= 2 and session.get("difficulty", "medium") != "hard":
+                    if session.get("difficulty", "medium") == "easy":
+                        session["difficulty"] = "medium"
+                    elif session.get("difficulty", "medium") == "medium":
+                        session["difficulty"] = "hard"
+                    session["consecutive_correct"] = 0
+                elif session["consecutive_wrong"] >= 2 and session.get("difficulty", "medium") != "easy":
+                    if session.get("difficulty", "medium") == "hard":
+                        session["difficulty"] = "medium"
+                    elif session.get("difficulty", "medium") == "medium":
+                        session["difficulty"] = "easy"
+                    session["consecutive_wrong"] = 0
+            
+            return {
+                "type": "question",
+                "correct": correct,
+                "feedback": feedback,
+                "new_difficulty": session.get("difficulty", "medium"),
+                "consecutive_correct": session.get("consecutive_correct", 0),
+                "consecutive_wrong": session.get("consecutive_wrong", 0),
+                "total_questions": session.get("total_questions", 0),
+                "total_correct": session.get("total_correct", 0),
+                "question_number": session.get("current_round", 1),
+                "max_questions": session.get("max_questions", 7)
+            }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -1429,4 +1805,4 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True) 

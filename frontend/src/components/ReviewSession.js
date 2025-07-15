@@ -12,10 +12,11 @@ import {
 import ReactMarkdown from "react-markdown";
 import { reviewAPI } from "../services/api";
 import toast from "react-hot-toast";
+import FlashcardCard from "./FlashcardCard";
 
 const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
   const [session, setSession] = useState(null);
-  const [currentQuestion, setCurrentQuestion] = useState(null);
+  const [currentItem, setCurrentItem] = useState(null); // holds either question or flashcard
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
@@ -25,9 +26,12 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
   const [sessionState, setSessionState] = useState("active");
   const [readyForNext, setReadyForNext] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(1); // Start at 1 for first question
+  const [showFlashcardAnswer, setShowFlashcardAnswer] = useState(false);
+  const [flashcardSubmitting, setFlashcardSubmitting] = useState(false);
 
-  // Add this line to define reviewMode
   const reviewMode = mode || session?.mode || "Review";
+  const isSpaced = reviewMode.toLowerCase() === "spaced";
+  const maxQuestions = session?.max_questions || 7;
 
   useEffect(() => {
     loadSession();
@@ -38,9 +42,8 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
       const sessionData = await reviewAPI.getSession(sessionId);
       setSession(sessionData);
       setSessionState(sessionData.session_state);
-
       if (sessionData.session_state === "active") {
-        await loadNextQuestion();
+        await loadNextItem();
       }
     } catch (error) {
       console.error("Failed to load session:", error);
@@ -50,17 +53,18 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     }
   };
 
-  const loadNextQuestion = async () => {
+  const loadNextItem = async () => {
     setLoading(true);
     try {
-      const questionData = await reviewAPI.getNextQuestion(sessionId);
-      setCurrentQuestion(questionData);
+      const itemData = await reviewAPI.getNextQuestion(sessionId);
+      setCurrentItem(itemData);
       setFeedback(null);
       setAnswer("");
       setSelectedOption(null);
+      setShowFlashcardAnswer(false);
     } catch (error) {
-      console.error("Failed to load question:", error);
-      toast.error("Failed to load question");
+      console.error("Failed to load item:", error);
+      toast.error("Failed to load review item");
     } finally {
       setLoading(false);
     }
@@ -69,22 +73,19 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
   const handleSubmitAnswer = async (e) => {
     e.preventDefault();
     if (submitting) return;
-
+    if (!currentItem) return;
+    if (currentItem.type === "flashcard") return; // handled separately
     const userAnswer =
-      currentQuestion.question?.type === "objective" ? selectedOption : answer;
+      currentItem.question?.type === "objective" ? selectedOption : answer;
     if (userAnswer === null || userAnswer === "") return;
-
     setSubmitting(true);
     try {
-      // Send the full question object to the API
-      const questionData = currentQuestion.question || currentQuestion;
-
+      const questionData = currentItem.question || currentItem;
       const response = await reviewAPI.submitAnswer(
         sessionId,
         questionData,
         String(userAnswer)
       );
-      // If backend returns error, do not advance
       if (response && response.feedback !== undefined) {
         setFeedback(response.feedback);
         setIsCorrect(response.correct);
@@ -123,7 +124,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     try {
       await reviewAPI.resumeSession(sessionId);
       setSessionState("active");
-      await loadNextQuestion();
+      await loadNextItem();
     } catch (error) {
       console.error("Failed to resume session:", error);
       toast.error("Failed to resume session");
@@ -145,7 +146,6 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     if (!session) return 0;
     // Calculate progress based on questions answered (not just correct answers)
     const questionsAnswered = session.total_questions || 0;
-    const maxQuestions = 7; // Maximum questions for adaptive review
     return (questionsAnswered / maxQuestions) * 100;
   };
 
@@ -165,6 +165,42 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
       default:
         return "text-gray-600 bg-gray-100";
     }
+  };
+
+  // Handler for flashcard recall rating
+  const handleFlashcardSelfAssessment = async (quality) => {
+    if (!currentItem || !currentItem.card) return;
+    setFlashcardSubmitting(true);
+    try {
+      // Call backend to update flashcard schedule
+      const response = await reviewAPI.submitAnswer(
+        sessionId,
+        currentItem.card, // pass card as question_id for backend
+        String(quality)
+      );
+      setShowFlashcardAnswer(false);
+      setFeedback(null);
+      setIsCorrect(null);
+      setReadyForNext(true);
+      setSession((prev) => ({
+        ...prev,
+        total_questions: response.cards_reviewed,
+        total_correct: response.total_correct,
+      }));
+    } catch (error) {
+      console.error("Failed to submit flashcard assessment:", error);
+      toast.error("Failed to submit assessment");
+    } finally {
+      setFlashcardSubmitting(false);
+    }
+  };
+
+  const handleShowFlashcardAnswer = () => setShowFlashcardAnswer(true);
+
+  const handleNext = async () => {
+    setReadyForNext(false);
+    setQuestionIndex((prev) => prev + 1);
+    await loadNextItem();
   };
 
   if (loading && !session) {
@@ -194,8 +230,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     );
   }
 
-  // Check if session is complete (7 questions answered)
-  const isSessionComplete = session && session.total_questions >= 7;
+  const isSessionComplete = session && session.total_questions >= maxQuestions;
 
   return (
     <div className="space-y-6">
@@ -239,7 +274,9 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
         <div className="mt-4">
           <div className="flex justify-between text-sm text-secondary-600 mb-1">
             <span>Progress</span>
-            <span>{questionIndex}/7 questions</span>
+            <span>
+              {questionIndex}/{maxQuestions} questions
+            </span>
           </div>
           <div className="w-full bg-secondary-200 rounded-full h-2">
             <div
@@ -266,7 +303,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
         </div>
       </div>
 
-      {/* Question Interface */}
+      {/* Question or Flashcard Interface */}
       <AnimatePresence mode="wait">
         {isSessionComplete ? (
           <motion.div
@@ -279,7 +316,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
               Review Session Complete!
             </h3>
             <p className="text-secondary-600 mb-6">
-              You've completed all 7 questions. Great job!
+              You've completed all {maxQuestions} questions. Great job!
             </p>
             <button
               onClick={handleEndSession}
@@ -288,142 +325,135 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
               View Results
             </button>
           </motion.div>
+        ) : currentItem && currentItem.type === "flashcard" ? (
+          <FlashcardCard
+            card={currentItem.card}
+            loading={loading}
+            submitting={flashcardSubmitting}
+            showAnswer={showFlashcardAnswer}
+            onShowAnswer={handleShowFlashcardAnswer}
+            onSelfAssessment={handleFlashcardSelfAssessment}
+            progress={{ current: questionIndex, total: maxQuestions }}
+          />
         ) : (
-          currentQuestion && (
-            <>
-              {loading && !isSessionComplete ? (
-                <div className="flex justify-center items-center h-32">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-                  <span className="ml-3 text-primary-600">
-                    Loading next question...
-                  </span>
-                </div>
-              ) : (
-                <motion.div
-                  key={questionIndex}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6"
-                >
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <ChartBarIcon className="w-5 h-5 text-primary-600" />
-                        <span className="text-sm text-secondary-600">
-                          Question {questionIndex}/7
-                        </span>
-                      </div>
-                      {session?.current_topic && (
-                        <span className="text-sm text-secondary-500">
-                          Topic: {session.current_topic}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="prose prose-sm max-w-none">
-                      <ReactMarkdown>
-                        {currentQuestion.question?.text ||
-                          currentQuestion.text ||
-                          currentQuestion}
-                      </ReactMarkdown>
-                    </div>
-
-                    <form onSubmit={handleSubmitAnswer} className="space-y-4">
-                      {currentQuestion.question?.type === "objective" &&
-                      currentQuestion.question?.options ? (
-                        <div className="space-y-2">
-                          {currentQuestion.question.options.map(
-                            (option, index) => (
-                              <button
-                                key={index}
-                                type="button"
-                                onClick={() => setSelectedOption(index)}
-                                className={`w-full text-left p-3 rounded-lg border transition-all ${
-                                  selectedOption === index
-                                    ? "border-primary-500 bg-primary-50 text-primary-700"
-                                    : "border-secondary-200 hover:bg-secondary-50"
-                                }`}
-                                disabled={submitting || feedback}
-                              >
-                                {option}
-                              </button>
-                            )
-                          )}
-                        </div>
-                      ) : (
-                        <textarea
-                          value={answer}
-                          onChange={(e) => setAnswer(e.target.value)}
-                          placeholder="Type your answer here..."
-                          className="w-full h-32 p-3 rounded-lg border border-secondary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                          disabled={submitting || feedback}
-                        />
-                      )}
-
-                      <button
-                        type="submit"
-                        disabled={
-                          submitting ||
-                          feedback ||
-                          (currentQuestion.question?.type === "objective"
-                            ? selectedOption === null
-                            : !answer)
-                        }
-                        className="w-full py-2 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
-                      >
-                        {submitting ? "Checking..." : "Submit Answer"}
-                      </button>
-                    </form>
-
-                    <AnimatePresence>
-                      {feedback && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className={`p-4 rounded-lg ${
-                            isCorrect
-                              ? "bg-green-50 border border-green-200"
-                              : "bg-red-50 border border-red-200"
-                          }`}
-                        >
-                          <div className="flex items-start space-x-2">
-                            {isCorrect ? (
-                              <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0" />
-                            ) : (
-                              <XCircleIcon className="w-5 h-5 text-red-500 flex-shrink-0" />
-                            )}
-                            <div className="prose prose-sm max-w-none">
-                              <ReactMarkdown>
-                                {typeof feedback === "string"
-                                  ? feedback
-                                  : JSON.stringify(feedback)}
-                              </ReactMarkdown>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* Next Question button appears only after feedback is shown and not at session end */}
-                    {feedback && readyForNext && !isSessionComplete && (
-                      <button
-                        onClick={() => {
-                          setReadyForNext(false);
-                          setQuestionIndex((prev) => prev + 1);
-                          loadNextQuestion();
-                        }}
-                        className="mt-4 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
-                        disabled={loading}
-                      >
-                        Next Question
-                      </button>
-                    )}
+          currentItem && (
+            <motion.div
+              key={questionIndex}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <ChartBarIcon className="w-5 h-5 text-primary-600" />
+                    <span className="text-sm text-secondary-600">
+                      Question {questionIndex}/{maxQuestions}
+                    </span>
                   </div>
-                </motion.div>
-              )}
-            </>
+                  {session?.current_topic && (
+                    <span className="text-sm text-secondary-500">
+                      Topic: {session.current_topic}
+                    </span>
+                  )}
+                </div>
+
+                <div className="prose prose-sm max-w-none">
+                  <ReactMarkdown>
+                    {currentItem.question?.text ||
+                      currentItem.text ||
+                      currentItem}
+                  </ReactMarkdown>
+                </div>
+
+                <form onSubmit={handleSubmitAnswer} className="space-y-4">
+                  {currentItem.question?.type === "objective" &&
+                  currentItem.question?.options ? (
+                    <div className="space-y-2">
+                      {currentItem.question.options.map((option, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => setSelectedOption(index)}
+                          className={`w-full text-left p-3 rounded-lg border transition-all ${
+                            selectedOption === index
+                              ? "border-primary-500 bg-primary-50 text-primary-700"
+                              : "border-secondary-200 hover:bg-secondary-50"
+                          }`}
+                          disabled={submitting || feedback}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <textarea
+                      value={answer}
+                      onChange={(e) => setAnswer(e.target.value)}
+                      placeholder="Type your answer here..."
+                      className="w-full h-32 p-3 rounded-lg border border-secondary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      disabled={submitting || feedback}
+                    />
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={
+                      submitting ||
+                      feedback ||
+                      (currentItem.question?.type === "objective"
+                        ? selectedOption === null
+                        : !answer)
+                    }
+                    className="w-full py-2 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                  >
+                    {submitting ? "Checking..." : "Submit Answer"}
+                  </button>
+                </form>
+
+                <AnimatePresence>
+                  {feedback && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className={`p-4 rounded-lg ${
+                        isCorrect
+                          ? "bg-green-50 border border-green-200"
+                          : "bg-red-50 border border-red-200"
+                      }`}
+                    >
+                      <div className="flex items-start space-x-2">
+                        {isCorrect ? (
+                          <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        ) : (
+                          <XCircleIcon className="w-5 h-5 text-red-500 flex-shrink-0" />
+                        )}
+                        <div className="prose prose-sm max-w-none">
+                          <ReactMarkdown>
+                            {typeof feedback === "string"
+                              ? feedback
+                              : JSON.stringify(feedback)}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Next Question button appears only after feedback is shown and not at session end */}
+                {readyForNext && !isSessionComplete && (
+                  <button
+                    onClick={handleNext}
+                    className="mt-4 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
+                    disabled={loading}
+                  >
+                    Next Question
+                  </button>
+                )}
+              </div>
+            </motion.div>
           )
         )}
       </AnimatePresence>

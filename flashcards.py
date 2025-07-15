@@ -38,8 +38,10 @@ class FlashcardDeck:
             self.deck['decks'][self.topic] = []
             
         # Check for duplicates
+        print("DEBUG: Adding card", front, type(front), "\n", back, type(back), "\n", subtopic, type(subtopic))
         for existing_card in self.deck['decks'][self.topic]:
-            if existing_card['front'].lower().strip() == front.lower().strip():
+            print("DEBUG: Existing card", existing_card['front'], type(existing_card['front']), "\n", existing_card['back'], type(existing_card['back']), "\n", existing_card['subtopic'], type(existing_card['subtopic']))
+            if existing_card['front']['text'].lower().strip() == front.lower().strip():
                 return existing_card  # Don't add duplicate
             
         card = {

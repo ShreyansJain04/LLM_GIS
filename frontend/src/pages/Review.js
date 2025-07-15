@@ -200,6 +200,7 @@ const Review = () => {
 
       // Process insights like main.py does
       const recommendations = userInsights.personalized_recommendations || {};
+      console.log("recommendations", recommendations);
 
       // Get focus areas from enhanced memory
       const focusAreas = recommendations.focus_areas || [];
@@ -495,6 +496,7 @@ const Review = () => {
             mode={selectedMode}
             onEndSession={handleEndSession}
             onPauseSession={handlePauseSession}
+            dueItems={dueItems}
           />
         )}
       </div>

@@ -12,6 +12,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import { reviewAPI } from "../services/api";
 import toast from "react-hot-toast";
+import FlashcardCard from "./FlashcardCard";
 
 const FlashcardReview = ({ sessionId, onEndSession, onPauseSession }) => {
   const [session, setSession] = useState(null);
@@ -247,87 +248,18 @@ const FlashcardReview = ({ sessionId, onEndSession, onPauseSession }) => {
       {/* Flashcard Interface */}
       <AnimatePresence mode="wait">
         {currentCard && (
-          <motion.div
-            key={currentCard.card.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6"
-          >
-            <div className="space-y-6">
-              {/* Card Progress */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <ChartBarIcon className="w-5 h-5 text-primary-600" />
-                  <span className="text-sm text-secondary-600">
-                    Card {session?.cards_reviewed + 1 || 1} of{" "}
-                    {session?.total_cards || 0}
-                  </span>
-                </div>
-                {currentCard.card.topic && (
-                  <span className="text-sm text-secondary-500">
-                    Topic: {currentCard.card.topic}
-                  </span>
-                )}
-              </div>
-
-              {/* Card Front */}
-              <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg p-6 border border-primary-200">
-                <div className="text-center">
-                  <h3 className="text-lg font-medium text-primary-900 mb-4">
-                    {showAnswer ? "Answer" : "Question"}
-                  </h3>
-                  <div className="prose prose-sm max-w-none text-primary-800">
-                    <ReactMarkdown>
-                      {showAnswer
-                        ? currentCard.card.back
-                        : currentCard.card.front}
-                    </ReactMarkdown>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              {!showAnswer ? (
-                <button
-                  onClick={handleShowAnswer}
-                  disabled={submitting}
-                  className="w-full py-3 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center space-x-2"
-                >
-                  <EyeIcon className="w-5 h-5" />
-                  <span>Show Answer</span>
-                </button>
-              ) : (
-                <div className="space-y-4">
-                  {/* Self Assessment */}
-                  <div className="text-center">
-                    <h4 className="text-lg font-medium text-secondary-900 mb-4">
-                      How well did you know this?
-                    </h4>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[0, 1, 2, 3, 4, 5].map((quality) => (
-                        <button
-                          key={quality}
-                          onClick={() => handleSelfAssessment(quality)}
-                          disabled={submitting}
-                          className={`p-3 rounded-lg border transition-all ${
-                            quality >= 3
-                              ? "border-green-200 hover:bg-green-50 text-green-700"
-                              : "border-red-200 hover:bg-red-50 text-red-700"
-                          } disabled:opacity-50`}
-                        >
-                          <div className="text-lg font-bold">{quality}</div>
-                          <div className="text-xs">
-                            {getQualityDescription(quality)}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </motion.div>
+          <FlashcardCard
+            card={currentCard.card}
+            loading={loading}
+            submitting={submitting}
+            showAnswer={showAnswer}
+            onShowAnswer={handleShowAnswer}
+            onSelfAssessment={handleSelfAssessment}
+            progress={{
+              current: (session?.cards_reviewed || 0) + 1,
+              total: session?.total_cards || 0,
+            }}
+          />
         )}
       </AnimatePresence>
     </div>
