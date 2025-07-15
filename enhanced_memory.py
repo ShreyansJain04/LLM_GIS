@@ -22,11 +22,36 @@ class LearningPatternAnalyzer:
         """Load existing analytics or create new ones."""
         if self.analytics_file.exists():
             with self.analytics_file.open('r') as f:
-                return json.load(f)
+                data = json.load(f)
+                tod_perf = data['learning_patterns']['time_of_day_performance']
+                # Convert keys to int if they are strings
+                data['learning_patterns']['time_of_day_performance'] = {int(k): v for k, v in tod_perf.items()}
+                # Ensure all 24 hours are present
+                for h in range(24):
+                    if h not in data['learning_patterns']['time_of_day_performance']:
+                        data['learning_patterns']['time_of_day_performance'][h] = []
+                # Rebuild detailed_weaknesses as defaultdict with correct nested structure
+                from collections import defaultdict
+                def _default_weakness():
+                    return {
+                        'error_types': defaultdict(int),
+                        'confusion_indicators': [],
+                        'required_repetitions': 0,
+                        'last_reviewed': None
+                    }
+                dw = data['detailed_weaknesses']
+                new_dw = defaultdict(_default_weakness)
+                for k, v in dw.items():
+                    v['error_types'] = defaultdict(int, v.get('error_types', {}))
+                    new_dw[k] = v
+                data['detailed_weaknesses'] = new_dw
+                return data
         
+        # Initialize time_of_day_performance with all 24 hours
+        time_of_day_performance = {h: [] for h in range(24)}
         return {
             'learning_patterns': {
-                'time_of_day_performance': defaultdict(list),
+                'time_of_day_performance': time_of_day_performance,
                 'session_duration_patterns': [],
                 'mistake_patterns': defaultdict(list),
                 'improvement_velocity': defaultdict(list),
@@ -68,7 +93,9 @@ class LearningPatternAnalyzer:
         """Analyze a learning session for patterns."""
         start_time = datetime.fromisoformat(session_data['started_at'])
         hour_of_day = start_time.hour
-        
+        # Debugging prints
+        print('DEBUG: hour_of_day:', hour_of_day)
+        print('DEBUG: time_of_day_performance keys:', list(self.patterns['learning_patterns']['time_of_day_performance'].keys()))
         # Track time of day performance
         if 'final_score' in session_data:
             self.patterns['learning_patterns']['time_of_day_performance'][hour_of_day].append(
@@ -172,7 +199,7 @@ class LearningPatternAnalyzer:
                 hour_averages[hour_int] = statistics.mean(scores)
         
         if hour_averages:
-            best_hour = max(hour_averages, key=hour_averages.get)
+            best_hour = max(hour_averages, key=lambda k: hour_averages[k])
             
             # Convert to time range
             if best_hour < 12:
@@ -230,7 +257,7 @@ class LearningPatternAnalyzer:
                     'topic': topic,
                     'subtopic': subtopic,
                     'priority_score': priority_score,
-                    'main_error_type': max(data['error_types'], key=data['error_types'].get) if data['error_types'] else 'unknown',
+                    'main_error_type': max(data['error_types'], key=lambda k: data['error_types'][k]) if data['error_types'] else 'unknown',
                     'repetitions_needed': data['required_repetitions'],
                     'last_reviewed': data['last_reviewed']
                 })
@@ -251,7 +278,7 @@ class LearningPatternAnalyzer:
                 all_errors[error_type] += count
         
         if all_errors:
-            most_common_error = max(all_errors, key=all_errors.get)
+            most_common_error = max(all_errors, key=lambda k: all_errors[k]) if all_errors else 'unknown'
             
             if most_common_error == 'incomplete_answer':
                 suggestions.append("Try to provide more detailed answers - break down your thoughts step by step")

@@ -151,6 +151,126 @@
       ],
       "final_score": 0.25,
       "completed_at": "2025-07-13T15:38:46.876105"
+    },
+    {
+      "session_id": "2025-07-15T12:30:35.277141",
+      "topic": "2",
+      "status": "completed",
+      "started_at": "2025-07-15T12:30:35.277141",
+      "current_subtopic_index": 2,
+      "subtopics_completed": [
+        "Introduction to 2",
+        "2 in Mathematics",
+        "2 in the World"
+      ],
+      "questions_asked": [
+        {
+          "text": "What is the primary objective of the section titled 'Maps and Map Types'?",
+          "options": [
+            "To define what a map is and to describe reference, thematic, and dynamic maps.",
+            "To illustrate the various uses of maps in geographic information systems.",
+            "To discuss the history and evolution of maps.",
+            "To explain how to create a map."
+          ],
+          "correct_option": 0,
+          "explanation": "The context specifies that the objective of the 'Maps and Map Types' section is to define what a map is and to describe reference, thematic, and dynamic maps.",
+          "type": "objective",
+          "difficulty": "medium"
+        },
+        {
+          "text": "In the context of Cartesian Coordinates, what does '2' refer to?",
+          "options": [
+            "The number of dimensions in the coordinate system",
+            "The number of relational operators used in the system",
+            "The number of axes defined on a flat plane",
+            "The number of mathematical functions used to plot graphs"
+          ],
+          "correct_option": 0,
+          "explanation": "Cartesian Coordinates in this context refers to a two-dimensional system, which means it has two dimensions \u2013 length and width. The number '2' does not refer to the number of functions, operators or axes.",
+          "type": "objective",
+          "difficulty": "medium"
+        },
+        {
+          "text": "How do lines of latitude and longitude relate to the concept of Cartesian coordinates?",
+          "options": [
+            "They form a two-dimensional plane similar to a Cartesian grid.",
+            "They intersect at right angles, similar to the lines in a Cartesian grid.",
+            "They are represented by the 'x' and 'y' coordinates in a Cartesian grid.",
+            "They are direct transformations of Cartesian coordinates."
+          ],
+          "correct_option": 1,
+          "explanation": "The context mentions that lines of latitude and longitude intersect at right angles, just like the lines in a Cartesian grid. However, unlike a Cartesian grid which is flat, these lines exist on a curved surface \u2013 the Earth.",
+          "type": "objective",
+          "difficulty": "medium"
+        }
+      ],
+      "performance": [
+        {
+          "subtopic": "Introduction to 2",
+          "question": "What is the primary objective of the section titled 'Maps and Map Types'?",
+          "answer": "0",
+          "correct": true,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T12:31:22.669901",
+          "options": [
+            "To define what a map is and to describe reference, thematic, and dynamic maps.",
+            "To illustrate the various uses of maps in geographic information systems.",
+            "To discuss the history and evolution of maps.",
+            "To explain how to create a map."
+          ],
+          "correct_option": 0,
+          "selected_option": 0,
+          "explanation": "The context specifies that the objective of the 'Maps and Map Types' section is to define what a map is and to describe reference, thematic, and dynamic maps."
+        },
+        {
+          "subtopic": "2 in Mathematics",
+          "question": "In the context of Cartesian Coordinates, what does '2' refer to?",
+          "answer": "",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T12:31:52.631767",
+          "options": [
+            "The number of dimensions in the coordinate system",
+            "The number of relational operators used in the system",
+            "The number of axes defined on a flat plane",
+            "The number of mathematical functions used to plot graphs"
+          ],
+          "correct_option": 0,
+          "selected_option": null,
+          "explanation": "Cartesian Coordinates in this context refers to a two-dimensional system, which means it has two dimensions \u2013 length and width. The number '2' does not refer to the number of functions, operators or axes."
+        },
+        {
+          "subtopic": "2 in the World",
+          "question": "How do lines of latitude and longitude relate to the concept of Cartesian coordinates?",
+          "answer": "0",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T12:32:27.539806",
+          "options": [
+            "They form a two-dimensional plane similar to a Cartesian grid.",
+            "They intersect at right angles, similar to the lines in a Cartesian grid.",
+            "They are represented by the 'x' and 'y' coordinates in a Cartesian grid.",
+            "They are direct transformations of Cartesian coordinates."
+          ],
+          "correct_option": 1,
+          "selected_option": 0,
+          "explanation": "The context mentions that lines of latitude and longitude intersect at right angles, just like the lines in a Cartesian grid. However, unlike a Cartesian grid which is flat, these lines exist on a curved surface \u2013 the Earth."
+        }
+      ],
+      "total_score": 1,
+      "total_questions": 3,
+      "user_questions": [],
+      "difficulty_adjustments": [],
+      "difficulty": "medium",
+      "question_types": [
+        "objective",
+        "subjective"
+      ],
+      "final_score": 0.3333333333333333,
+      "completed_at": "2025-07-15T12:32:27.614961"
     }
   ]
 }

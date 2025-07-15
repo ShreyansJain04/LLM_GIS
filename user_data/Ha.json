@@ -1,26 +1,39 @@
 {
   "weak_areas": [
-    "Adaptive Review Session - gis coordinates - Round 7",
-    "Adaptive Review Session - gis coordinates - Round 2",
-    "Adaptive Review Session - gis coordinates - Round 9",
+    "Spaced Review Session - gis coordinates - Round 4",
+    "gis coordinates - Introduction to GIS Coordinates",
+    "Spaced Review Session - 2 - Round 5",
     "Adaptive Review Session - gis coordinates - Round 1",
+    "2 - 2 in Mathematics",
+    "Adaptive Review Session",
+    "Adaptive Review Session - gis coordinates - Round 9",
+    "Adaptive Review Session - gis coordinates - Round 2",
+    "Adaptive Review Session - gis coordinates - Round 6",
+    "Spaced Review Session",
+    "gis coordinates - Reading and Interpreting GIS Coordinates",
+    "gis coordinates - Practical Application of GIS Coordinates",
+    "Spaced Review Session - gis coordinates - Round 8",
+    "Quick Review Session - gis coordinates - Round 3",
+    "Spaced Review Session - gis coordinates - Round 7",
+    "Spaced Review Session - gis coordinates - Round 2",
+    "Adaptive Review Session - gis coordinates - Round 3",
     "gis coordinates",
     "Quick Review Session - gis coordinates - Round 2",
-    "Adaptive Review Session - gis coordinates - Round 6",
-    "Quick Review Session - gis coordinates - Round 3",
-    "gis coordinates - Introduction to GIS Coordinates",
     "gis coordinates - gis coordinates - Question 1",
-    "Quick Review Session",
     "Adaptive Review Session - gis coordinates - Round 8",
-    "gis coordinates - Practical Application of GIS Coordinates",
-    "Adaptive Review Session",
-    "Adaptive Review Session - gis coordinates - Round 3",
-    "gis coordinates - Reading and Interpreting GIS Coordinates"
+    "Adaptive Review Session - gis coordinates - Round 7",
+    "2 - 2 in the World",
+    "2",
+    "Spaced Review Session - 2 - Round 6",
+    "Quick Review Session",
+    "Spaced Review Session - gis coordinates - Round 3"
   ],
   "topic_mastery": {
     "gis coordinates": "beginner",
     "Adaptive Review Session": "beginner",
-    "Quick Review Session": "beginner"
+    "Quick Review Session": "beginner",
+    "2": "beginner",
+    "Spaced Review Session": "beginner"
   },
   "history": [
     {
@@ -600,6 +613,167 @@
           }
         }
       }
+    },
+    {
+      "date": "2025-07-15T12:32:27.572186",
+      "topic": "2",
+      "subtopics_performance": [
+        {
+          "subtopic": "Introduction to 2",
+          "question": "What is the primary objective of the section titled 'Maps and Map Types'?",
+          "user_answer": "0",
+          "correct": true,
+          "score": 1,
+          "feedback": ""
+        },
+        {
+          "subtopic": "2 in Mathematics",
+          "question": "In the context of Cartesian Coordinates, what does '2' refer to?",
+          "user_answer": "",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        },
+        {
+          "subtopic": "2 in the World",
+          "question": "How do lines of latitude and longitude relate to the concept of Cartesian coordinates?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        }
+      ],
+      "final_score": 0.3333333333333333,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 3,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.3333333333333333,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 3,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-15T12:36:41.110846",
+      "topic": "Spaced Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": "In a polar coordinate system used in GIS, what does the radius vector always do?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It always points out from the origin and is always positive.\n\nExplanation: In the context of GIS and cartography, the radius vector in a polar coordinate system always points out from the origin and is always positive. This helps in accurately mapping and plotting data.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T12:34:57.938567",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 3",
+          "question": "In a GIS coordinate system, how is the x-coordinate determined?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: The x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude.\n\nExplanation: According to the provided context, in the CTRS three-dimensional coordinate system, the x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude. For the remaining 180\u00b0, the x-coordinate is negative.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T12:35:19.659086",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 4",
+          "question": "What is the function of a datum in GIS coordinates?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It provides a clearly defined surface or framework for coordinates.\n\nExplanation: A datum in GIS coordinates serves as the foundation or surface on which coordinates are placed and defined. Without a datum, coordinates lack a framework for analysis and interpretation.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T12:35:32.917512",
+          "time_spent": null
+        },
+        {
+          "subtopic": "2 - Round 5",
+          "question": "What is the significance of '2' in the context of this text related to GIS and mapping?",
+          "user_answer": "3",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It is a reference to the Cartesian Coordinates section in the book.\n\nExplanation: In the provided context, '2' appears to be a page number or a section number referring to the part of the book that discusses Cartesian coordinates. Other options are not supported by the context.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T12:35:51.056350",
+          "time_spent": null
+        },
+        {
+          "subtopic": "2 - Round 6",
+          "question": "What does '2' denote in the context of the given information related to GIS and mapping?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It indicates the page number in the book where information on Cartesian Coordinates is provided.\n\nExplanation: In the context of the provided information, '2' is used to denote the page number in the book where information about Cartesian Coordinates is mentioned. The other options are incorrect as they don't match the context provided.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T12:36:02.821681",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 7",
+          "question": "In a GIS system, how does the transformation from the original Terrestrial Reference Frame (TRF) to a target TRF take place?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: By interpolation from known shifts for a number of control points in the same area.\n\nExplanation: The context mentions that the required shift in a coordinate to transform it from its original TRF to a target TRF is found by interpolation from known shifts for a number of control points in the same area. This process allows for the transformation of a specific geographic coordinate that falls within a grid cell with points of known shifts at each of its four corners.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T12:36:17.138505",
+          "time_spent": null
+        },
+        {
+          "subtopic": "gis coordinates - Round 8",
+          "question": "In the context of GIS coordinates, what is the significance of the zero meridian?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: The x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude.\n\nExplanation: In the context of GIS, the zero meridian is significant because it is the point from which the x-coordinate is positive to 90\u00b0 W longitude and to 90\u00b0 E longitude. It helps establish the positive and negative values of the x-coordinate.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-15T12:36:30.550056",
+          "time_spent": null
+        }
+      ],
+      "final_score": 0.0,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 7,
+        "subjective_correct": 0,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.0,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 7,
+            "correct": 0
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
     }
   ],
   "learning_plan": {},
@@ -779,7 +953,111 @@
       "common_mistakes": [],
       "last_attempt": "2025-07-14T02:44:28.227986",
       "improvement_rate": 0
+    },
+    "2": {
+      "attempts": 1,
+      "average_score": 0.3333333333333333,
+      "subtopic_scores": {
+        "Introduction to 2": [
+          1
+        ],
+        "2 in Mathematics": [
+          0
+        ],
+        "2 in the World": [
+          0
+        ]
+      },
+      "question_type_performance": {
+        "objective": {
+          "total": 0,
+          "correct": 0,
+          "trend": []
+        },
+        "subjective": {
+          "total": 3,
+          "correct": 1,
+          "trend": [
+            0.3333333333333333
+          ]
+        }
+      },
+      "difficulty_performance": {
+        "easy": {
+          "total": 0,
+          "correct": 0
+        },
+        "medium": {
+          "total": 3,
+          "correct": 1
+        },
+        "hard": {
+          "total": 0,
+          "correct": 0
+        }
+      },
+      "common_mistakes": [],
+      "last_attempt": "2025-07-15T12:32:27.572186",
+      "improvement_rate": 0
+    },
+    "Spaced Review Session": {
+      "attempts": 1,
+      "average_score": 0.0,
+      "subtopic_scores": {
+        "gis coordinates - Round 2": [
+          0
+        ],
+        "gis coordinates - Round 3": [
+          0
+        ],
+        "gis coordinates - Round 4": [
+          0
+        ],
+        "2 - Round 5": [
+          0
+        ],
+        "2 - Round 6": [
+          0
+        ],
+        "gis coordinates - Round 7": [
+          0
+        ],
+        "gis coordinates - Round 8": [
+          0
+        ]
+      },
+      "question_type_performance": {
+        "objective": {
+          "total": 0,
+          "correct": 0,
+          "trend": []
+        },
+        "subjective": {
+          "total": 7,
+          "correct": 0,
+          "trend": [
+            0.0
+          ]
+        }
+      },
+      "difficulty_performance": {
+        "easy": {
+          "total": 0,
+          "correct": 0
+        },
+        "medium": {
+          "total": 7,
+          "correct": 0
+        },
+        "hard": {
+          "total": 0,
+          "correct": 0
+        }
+      },
+      "common_mistakes": [],
+      "last_attempt": "2025-07-15T12:36:41.110846",
+      "improvement_rate": 0
     }
   },
-  "last_active": "2025-07-15T01:28:39.978947"
+  "last_active": "2025-07-15T12:37:58.415663"
 }
