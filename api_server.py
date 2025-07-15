@@ -909,48 +909,219 @@ async def start_quick_review(request: ReviewSessionRequest):
 
 @app.post("/api/review/flashcards")
 async def start_flashcard_review(request: ReviewSessionRequest):
-    """Start flashcard review session."""
+    """Start a flashcard review session."""
     try:
-        session_id = f"flashcards_{request.username}_{datetime.now().isoformat()}"
+        session_id = f"flashcard_{request.username}_{datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f')}"
         
-        # Get enhanced memory insights
-        try:
-            enhanced_memory = EnhancedMemorySystem(request.username)
-            insights = enhanced_memory.get_insights()
-            recommendations = insights.get('personalized_recommendations', {})
-            focus_areas = recommendations.get('focus_areas', [])
-            topics = [area['topic'] for area in focus_areas]
-        except Exception as e:
-            print(f"Enhanced memory failed: {e}")
-            topics = ["GIS Basics", "Coordinate Systems", "Data Types"]
+        # Get all topics with due cards
+        from flashcards import get_all_due_cards_for_user
+        all_due_cards = get_all_due_cards_for_user(request.username)
         
-        session_state = {
+        # Group by topic
+        topics_with_due = {}
+        for card in all_due_cards:
+            topic = card['topic']
+            if topic not in topics_with_due:
+                topics_with_due[topic] = []
+            topics_with_due[topic].append(card)
+        
+        if not topics_with_due:
+            raise HTTPException(
+                status_code=400, 
+                detail="No flashcards are due for review. Check back later!"
+            )
+        
+        # Create session
+        session = {
             "session_id": session_id,
             "username": request.username,
             "mode": "flashcards",
-            "current_topic": None,
-            "difficulty": "medium",
-            "consecutive_correct": 0,
-            "consecutive_wrong": 0,
-            "total_questions": 0,
-            "total_correct": 0,
             "session_state": "active",
+            "current_topic": None,
+            "current_card_index": 0,
+            "topics_with_due": topics_with_due,
+            "total_cards": sum(len(cards) for cards in topics_with_due.values()),
+            "cards_reviewed": 0,
+            "correct_answers": 0,
             "performance": [],
-            "topics": topics,
-            "asked_questions": [],
-            "started_at": datetime.now().isoformat(),
-            "current_round": 0,
-            "max_questions": 10,
-            "adaptive": False
+            "adaptive": False,
+            "max_questions": 50  # Allow more cards than regular review
         }
         
-        active_sessions[session_id] = session_state
+        active_sessions[session_id] = session
         
         return {
             "session_id": session_id,
-            "mode": "flashcards",
-            "topics": topics,
-            "message": f"Started flashcard review with {len(topics)} topics"
+            "topics_with_due": topics_with_due,
+            "total_due_cards": session["total_cards"],
+            "message": f"Flashcard review session started with {session['total_cards']} cards due"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/review/flashcards/topics/{username}")
+async def get_flashcard_topics(username: str):
+    """Get all topics with due flashcards for a user."""
+    try:
+        from flashcards import get_all_due_cards_for_user
+        all_due_cards = get_all_due_cards_for_user(username)
+        
+        # Group by topic and count due cards
+        topics_with_due = {}
+        for card in all_due_cards:
+            topic = card['topic']
+            if topic not in topics_with_due:
+                topics_with_due[topic] = {
+                    'topic': topic,
+                    'due_count': 0,
+                    'total_cards': 0,
+                    'next_review': None
+                }
+            topics_with_due[topic]['due_count'] += 1
+        
+        # Get total cards and next review for each topic
+        from flashcards import FlashcardDeck
+        for topic in topics_with_due:
+            deck = FlashcardDeck(username, topic)
+            stats = deck.get_stats()
+            topics_with_due[topic]['total_cards'] = stats['total_cards']
+            
+            # Get next review date (if any cards exist)
+            if stats['total_cards'] > 0:
+                upcoming_cards = deck.get_cards_due_within_days(30)  # Next 30 days
+                if upcoming_cards:
+                    topics_with_due[topic]['next_review'] = upcoming_cards[0]['review_date']
+        
+        return {
+            "topics": list(topics_with_due.values()),
+            "total_due_cards": sum(topic['due_count'] for topic in topics_with_due.values()),
+            "has_due_cards": len(topics_with_due) > 0
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/review/session/{session_id}/flashcard")
+async def get_next_flashcard(session_id: str, topic: Optional[str] = None):
+    """Get the next flashcard for review."""
+    try:
+        if session_id not in active_sessions:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        session = active_sessions[session_id]
+        
+        if session["mode"] != "flashcards":
+            raise HTTPException(status_code=400, detail="Not a flashcard session")
+        
+        # If no topic specified, get the first topic with due cards
+        if not topic:
+            available_topics = list(session["topics_with_due"].keys())
+            if not available_topics:
+                raise HTTPException(status_code=400, detail="No more cards due for review")
+            topic = available_topics[0]
+        
+        if topic not in session["topics_with_due"]:
+            raise HTTPException(status_code=400, detail=f"No due cards for topic: {topic}")
+        
+        due_cards = session["topics_with_due"][topic]
+        if not due_cards:
+            raise HTTPException(status_code=400, detail=f"No more due cards for topic: {topic}")
+        
+        # Get the next card
+        current_card = due_cards[0]
+        
+        return {
+            "card": {
+                "id": f"{topic}_{current_card.get('created_at', 'unknown')}",
+                "front": current_card['front'],
+                "back": current_card['back'],
+                "topic": topic,
+                "subtopic": current_card.get('subtopic', topic),
+                "difficulty_level": current_card.get('difficulty_level', 'medium'),
+                "repetitions": current_card.get('repetitions', 0),
+                "ease_factor": current_card.get('ease_factor', 2.5)
+            },
+            "progress": {
+                "current_card": session["cards_reviewed"] + 1,
+                "total_cards": session["total_cards"],
+                "topic": topic,
+                "cards_remaining_in_topic": len(due_cards)
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/review/session/{session_id}/flashcard/answer")
+async def submit_flashcard_answer(session_id: str, request: dict):
+    """Submit flashcard self-assessment and get next card."""
+    try:
+        if session_id not in active_sessions:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        session = active_sessions[session_id]
+        
+        if session["mode"] != "flashcards":
+            raise HTTPException(status_code=400, detail="Not a flashcard session")
+        
+        quality = request.get("quality")  # 0-5 rating
+        topic = request.get("topic")
+        card_id = request.get("card_id")
+        
+        if quality is None or quality < 0 or quality > 5:
+            raise HTTPException(status_code=400, detail="Invalid quality rating (0-5)")
+        
+        if not topic:
+            raise HTTPException(status_code=400, detail="Topic is required")
+        
+        # Update the card in the flashcard system
+        from flashcards import FlashcardDeck
+        deck = FlashcardDeck(session["username"], topic)
+        
+        # Find the card in the due cards
+        due_cards = session["topics_with_due"].get(topic, [])
+        if not due_cards:
+            raise HTTPException(status_code=400, detail="No cards found for topic")
+        
+        current_card = due_cards[0]
+        
+        # Update card scheduling
+        deck.update_card_schedule(current_card, quality)
+        deck.update_stats(quality >= 3)  # Consider 3+ as correct
+        
+        # Update session stats
+        session["cards_reviewed"] += 1
+        if quality >= 3:
+            session["total_correct"] += 1
+        
+        # Record performance
+        performance_entry = {
+            'topic': topic,
+            'card_front': current_card['front'],
+            'quality': quality,
+            'correct': quality >= 3,
+            'timestamp': datetime.now().isoformat(),
+            'ease_factor': current_card.get('ease_factor', 2.5),
+            'repetitions': current_card.get('repetitions', 0)
+        }
+        session["performance"].append(performance_entry)
+        
+        # Remove the reviewed card from due cards
+        session["topics_with_due"][topic].pop(0)
+        
+        # If no more cards in this topic, remove the topic
+        if not session["topics_with_due"][topic]:
+            del session["topics_with_due"][topic]
+        
+        # Check if session is complete
+        total_remaining = sum(len(cards) for cards in session["topics_with_due"].values())
+        
+        return {
+            "quality": quality,
+            "correct": quality >= 3,
+            "cards_reviewed": session["cards_reviewed"],
+            "total_correct": session["total_correct"],
+            "cards_remaining": total_remaining,
+            "session_complete": total_remaining == 0,
+            "accuracy": session["total_correct"] / session["cards_reviewed"] if session["cards_reviewed"] > 0 else 0
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -1175,7 +1346,7 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
         else:
             # If it's a string, create a basic question dict
             question_dict = {
-                "text": request.question_id.text,
+                "text": str(request.question_id),
                 "type": "objective",
                 "options": ["Option A", "Option B", "Option C", "Option D"],
                 "correct_option": 0,
@@ -1196,58 +1367,60 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
         
         # Record performance with detailed data
         performance_entry = {
-            'subtopic': f"{session['current_topic']} - Round {session['current_round']}",
+            'subtopic': f"{session.get('current_topic', 'Unknown')} - Round {session.get('current_round', 1)}",
             'question': question_dict.get('text', str(request.question_id)),
             'user_answer': request.answer,
             'correct': correct,
             'score': 1 if correct else 0,
             'feedback': feedback,
-            'difficulty': session["difficulty"],
+            'difficulty': session.get("difficulty", "medium"),
             'timestamp': datetime.now().isoformat(),
             'time_spent': request.time_spent
         }
+        if "performance" not in session:
+            session["performance"] = []
         session["performance"].append(performance_entry)
         
         # Auto-create flashcard for correct answers at medium+ difficulty
-        if correct and session["difficulty"] in ["medium", "hard"]:
+        if correct and session.get("difficulty", "medium") in ["medium", "hard"]:
             try:
                 from flashcards import auto_create_flashcard_from_review
                 auto_create_flashcard_from_review(
                     session["username"], 
-                    session["current_topic"], 
+                    session.get("current_topic", "Unknown"), 
                     str(question_dict.get('text', request.question_id)),
                     feedback.split('\n')[0] if '\n' in feedback else feedback,
-                    session["difficulty"]
+                    session.get("difficulty", "medium")
                 )
             except ImportError:
                 # Flashcard module not available, skip
                 pass
         
         # Adaptive difficulty adjustment
-        if session["adaptive"]:
-            if session["consecutive_correct"] >= 2 and session["difficulty"] != "hard":
-                if session["difficulty"] == "easy":
+        if session.get("adaptive", False):
+            if session["consecutive_correct"] >= 2 and session.get("difficulty", "medium") != "hard":
+                if session.get("difficulty", "medium") == "easy":
                     session["difficulty"] = "medium"
-                elif session["difficulty"] == "medium":
+                elif session.get("difficulty", "medium") == "medium":
                     session["difficulty"] = "hard"
                 session["consecutive_correct"] = 0
-            elif session["consecutive_wrong"] >= 2 and session["difficulty"] != "easy":
-                if session["difficulty"] == "hard":
+            elif session["consecutive_wrong"] >= 2 and session.get("difficulty", "medium") != "easy":
+                if session.get("difficulty", "medium") == "hard":
                     session["difficulty"] = "medium"
-                elif session["difficulty"] == "medium":
+                elif session.get("difficulty", "medium") == "medium":
                     session["difficulty"] = "easy"
                 session["consecutive_wrong"] = 0
         
         return {
             "correct": correct,
             "feedback": feedback,
-            "new_difficulty": session["difficulty"],
-            "consecutive_correct": session["consecutive_correct"],
-            "consecutive_wrong": session["consecutive_wrong"],
-            "total_questions": session["total_questions"],
-            "total_correct": session["total_correct"],
-            "question_number": session["current_round"],
-            "max_questions": session["max_questions"]
+            "new_difficulty": session.get("difficulty", "medium"),
+            "consecutive_correct": session.get("consecutive_correct", 0),
+            "consecutive_wrong": session.get("consecutive_wrong", 0),
+            "total_questions": session.get("total_questions", 0),
+            "total_correct": session.get("total_correct", 0),
+            "question_number": session.get("current_round", 1),
+            "max_questions": session.get("max_questions", 7)
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

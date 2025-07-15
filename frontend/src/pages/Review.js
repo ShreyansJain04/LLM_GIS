@@ -16,6 +16,8 @@ import { contentAPI, userAPI, reviewAPI } from "../services/api";
 import toast from "react-hot-toast";
 import ReviewModeSelector from "../components/ReviewModeSelector";
 import ReviewSession from "../components/ReviewSession";
+import FlashcardTopicSelector from "../components/FlashcardTopicSelector";
+import FlashcardReview from "../components/FlashcardReview";
 
 const ReviewCard = ({ topic, progress, onSelect }) => (
   <motion.div
@@ -173,6 +175,7 @@ const Review = () => {
   const [selectedMode, setSelectedMode] = useState(null);
   const [sessionId, setSessionId] = useState(null);
   const [sessionResult, setSessionResult] = useState(null);
+  const [flashcardMode, setFlashcardMode] = useState(false);
   const [weakTopics, setWeakTopics] = useState([]);
   const [progress, setProgress] = useState({});
   const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -232,6 +235,12 @@ const Review = () => {
   };
 
   const handleSelectMode = async (mode) => {
+    if (mode === "flashcards") {
+      setFlashcardMode(true);
+      setSelectedMode(mode);
+      return;
+    }
+
     setLoading(true);
     try {
       let sessionResponse;
@@ -250,9 +259,6 @@ const Review = () => {
         case "quick":
           sessionResponse = await reviewAPI.startQuickReview(user.username);
           break;
-        case "flashcards":
-          sessionResponse = await reviewAPI.startFlashcardReview(user.username);
-          break;
         default:
           // Fallback to generic endpoint
           sessionResponse = await reviewAPI.startSession(user.username, mode);
@@ -266,6 +272,11 @@ const Review = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleStartFlashcardSession = (sessionId) => {
+    setSessionId(sessionId);
+    setFlashcardMode(false);
   };
 
   const handleAnswer = async (answer) => {
@@ -334,6 +345,7 @@ const Review = () => {
     setSessionId(null);
     setSelectedMode(null);
     setSessionResult(null);
+    setFlashcardMode(false);
   };
 
   const handleEndSession = (result) => {
@@ -429,6 +441,28 @@ const Review = () => {
     );
   }
 
+  // Show flashcard topic selection
+  if (flashcardMode) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto">
+        <div className="mb-6">
+          <button
+            onClick={handleBackToModeSelection}
+            className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 mb-4"
+          >
+            <ArrowPathIcon className="w-5 h-5" />
+            <span>Back to Review Modes</span>
+          </button>
+        </div>
+
+        <FlashcardTopicSelector
+          username={user.username}
+          onStartSession={handleStartFlashcardSession}
+        />
+      </div>
+    );
+  }
+
   // Show active session
   if (sessionId && selectedMode) {
     return (
@@ -443,12 +477,20 @@ const Review = () => {
           </button>
         </div>
 
-        <ReviewSession
-          sessionId={sessionId}
-          mode={selectedMode}
-          onEndSession={handleEndSession}
-          onPauseSession={handlePauseSession}
-        />
+        {selectedMode === "flashcards" ? (
+          <FlashcardReview
+            sessionId={sessionId}
+            onEndSession={handleEndSession}
+            onPauseSession={handlePauseSession}
+          />
+        ) : (
+          <ReviewSession
+            sessionId={sessionId}
+            mode={selectedMode}
+            onEndSession={handleEndSession}
+            onPauseSession={handlePauseSession}
+          />
+        )}
       </div>
     );
   }

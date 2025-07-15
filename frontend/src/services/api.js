@@ -286,6 +286,33 @@ export const reviewAPI = {
     return response.data;
   },
 
+  getFlashcardTopics: async (username) => {
+    const response = await api.get(`/api/review/flashcards/topics/${username}`);
+    return response.data;
+  },
+
+  getNextFlashcard: async (sessionId, topic = null) => {
+    const response = await api.post(
+      `/api/review/session/${sessionId}/flashcard`,
+      {
+        topic,
+      }
+    );
+    return response.data;
+  },
+
+  submitFlashcardAnswer: async (sessionId, quality, topic, cardId) => {
+    const response = await api.post(
+      `/api/review/session/${sessionId}/flashcard/answer`,
+      {
+        quality,
+        topic,
+        card_id: cardId,
+      }
+    );
+    return response.data;
+  },
+
   getSession: async (sessionId) => {
     const response = await api.get(`/api/review/session/${sessionId}`);
     return response.data;

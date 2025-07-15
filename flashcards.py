@@ -1,6 +1,6 @@
 """Flashcard system with spaced repetition."""
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 import json
 from pathlib import Path
 
@@ -32,7 +32,7 @@ class FlashcardDeck:
         with self.deck_file.open('w') as f:
             json.dump(self.deck, f, indent=2)
     
-    def add_card(self, front: str, back: str, subtopic: str = None) -> Dict:
+    def add_card(self, front: str, back: str, subtopic: Optional[str] = None) -> Dict:
         """Add a new flashcard to the deck."""
         if self.topic not in self.deck['decks']:
             self.deck['decks'][self.topic] = []
@@ -161,7 +161,7 @@ def create_flashcards_from_qa(username: str, topic: str, qa_pairs: List[Dict]) -
         deck.add_card(
             front=qa['question'],
             back=qa['answer'],
-            subtopic=qa.get('subtopic')
+            subtopic=qa.get('subtopic') or None
         )
     
     return deck
