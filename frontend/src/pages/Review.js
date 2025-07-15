@@ -18,6 +18,7 @@ import ReviewModeSelector from "../components/ReviewModeSelector";
 import ReviewSession from "../components/ReviewSession";
 import FlashcardTopicSelector from "../components/FlashcardTopicSelector";
 import FlashcardReview from "../components/FlashcardReview";
+import { useNavigate } from "react-router-dom";
 
 const ReviewCard = ({ topic, progress, onSelect }) => (
   <motion.div
@@ -170,6 +171,7 @@ const QuestionCard = ({ question, onAnswer, loading, feedback, isCorrect }) => {
 
 const Review = () => {
   const { user } = useUser();
+  const navigate = useNavigate();
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedMode, setSelectedMode] = useState(null);
@@ -210,8 +212,9 @@ const Review = () => {
 
       // Get performance summary
       const summaryData = userInsights.performance_summary || {
-        total_topics_studied: 0,
-        topics_mastered: 0,
+        topics_studied: 0,
+        average_mastery: 0.0,
+        study_streak: 0,
         weak_areas_count: 0,
       };
 
@@ -264,8 +267,13 @@ const Review = () => {
           sessionResponse = await reviewAPI.startSession(user.username, mode);
       }
 
-      setSessionId(sessionResponse.session_id);
-      setSelectedMode(mode);
+      if (sessionResponse && sessionResponse.session_id) {
+        console.log("sessionResponse", sessionResponse);
+        setSessionId(sessionResponse.session_id);
+        setSelectedMode(mode);
+      } else {
+        toast.error("Failed to start review session. Please try again.");
+      }
     } catch (error) {
       console.error("Failed to start review session:", error);
       toast.error("Failed to start review session");
@@ -300,9 +308,6 @@ const Review = () => {
       // Extract question text for the API
       const questionId = cleanQuestion.text || JSON.stringify(cleanQuestion);
 
-      console.log("sessionId", sessionId);
-      console.log("questionId", questionId);
-      console.log("answer", answer);
       const result = await reviewAPI.submitAnswer(
         sessionId,
         questionId,
@@ -349,6 +354,7 @@ const Review = () => {
   };
 
   const handleEndSession = (result) => {
+    console.log("handleEndSession", result);
     setSessionResult(result);
   };
 
@@ -430,7 +436,7 @@ const Review = () => {
               Start Another Review
             </button>
             <button
-              onClick={() => window.history.back()}
+              onClick={() => navigate("/dashboard")}
               className="bg-secondary-200 text-secondary-700 px-6 py-2 rounded-lg hover:bg-secondary-300"
             >
               Back to Dashboard
@@ -521,18 +527,28 @@ const Review = () => {
               Your Learning Progress
             </h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary-600">
-                {summary.total_topics_studied || 0}
+                {summary.topics_studied || 0}
               </div>
               <div className="text-sm text-secondary-600">Topics Studied</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {summary.topics_mastered || 0}
+              <div className="text-2xl font-bold text-blue-600">
+                {typeof summary.average_mastery === "number"
+                  ? `${Math.round(summary.average_mastery * 100)}%`
+                  : "0%"}
               </div>
-              <div className="text-sm text-secondary-600">Topics Mastered</div>
+              <div className="text-sm text-secondary-600">Average Mastery</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">
+                {summary.study_streak || 0}
+              </div>
+              <div className="text-sm text-secondary-600">
+                Study Streak (days)
+              </div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-orange-600">

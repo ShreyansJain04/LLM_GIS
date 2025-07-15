@@ -145,37 +145,6 @@ const ReviewModeSelector = ({ onSelectMode, insights, loading }) => {
           );
         })}
       </div>
-
-      {/* Show insights summary */}
-      {insights && (
-        <div className="bg-blue-50 rounded-lg p-4">
-          <h3 className="font-medium text-blue-900 mb-2">
-            Your Learning Status
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-              <span className="text-blue-600 font-medium">Topics Studied:</span>
-              <span className="ml-1 text-blue-800">
-                {insights.summary?.total_topics_studied || 0}
-              </span>
-            </div>
-            <div>
-              <span className="text-blue-600 font-medium">Weak Areas:</span>
-              <span className="ml-1 text-blue-800">
-                {insights.summary?.weak_areas_count || 0}
-              </span>
-            </div>
-            <div>
-              <span className="text-blue-600 font-medium">Due Items:</span>
-              <span className="ml-1 text-blue-800">{getDueItemsCount()}</span>
-            </div>
-            <div>
-              <span className="text-blue-600 font-medium">Focus Areas:</span>
-              <span className="ml-1 text-blue-800">{getFocusAreasCount()}</span>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

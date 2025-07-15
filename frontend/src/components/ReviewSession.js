@@ -23,6 +23,11 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
   const [answer, setAnswer] = useState("");
   const [selectedOption, setSelectedOption] = useState(null);
   const [sessionState, setSessionState] = useState("active");
+  const [readyForNext, setReadyForNext] = useState(false);
+  const [questionIndex, setQuestionIndex] = useState(1); // Start at 1 for first question
+
+  // Add this line to define reviewMode
+  const reviewMode = mode || session?.mode || "Review";
 
   useEffect(() => {
     loadSession();
@@ -73,35 +78,31 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     try {
       // Send the full question object to the API
       const questionData = currentQuestion.question || currentQuestion;
-      console.log("ReviewSession.js sessionId", sessionId);
-      console.log("ReviewSession.js questionData", questionData);
-      console.log("ReviewSession.js userAnswer", userAnswer);
-      const result = await reviewAPI.submitAnswer(
+
+      const response = await reviewAPI.submitAnswer(
         sessionId,
         questionData,
         String(userAnswer)
       );
-
-      setFeedback(result.feedback);
-      setIsCorrect(result.correct);
-
-      // Update session state
-      setSession((prev) => ({
-        ...prev,
-        total_questions: result.total_questions,
-        total_correct: result.total_correct,
-        consecutive_correct: result.consecutive_correct,
-        consecutive_wrong: result.consecutive_wrong,
-        difficulty: result.new_difficulty,
-      }));
-
-      // Load next question after delay
-      setTimeout(() => {
-        loadNextQuestion();
-      }, 2000);
+      // If backend returns error, do not advance
+      if (response && response.feedback !== undefined) {
+        setFeedback(response.feedback);
+        setIsCorrect(response.correct);
+        setSession((prev) => ({
+          ...prev,
+          total_questions: response.total_questions,
+          total_correct: response.total_correct,
+          consecutive_correct: response.consecutive_correct,
+          consecutive_wrong: response.consecutive_wrong,
+          difficulty: response.new_difficulty,
+        }));
+        setReadyForNext(true);
+      } else {
+        toast.error("Failed to submit answer. Please try again.");
+      }
     } catch (error) {
       console.error("Failed to submit answer:", error);
-      toast.error("Failed to submit answer");
+      toast.error("Failed to submit answer. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -133,6 +134,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     try {
       const result = await reviewAPI.endSession(sessionId);
       onEndSession?.(result);
+      console.log("result", result);
     } catch (error) {
       console.error("Failed to end session:", error);
       toast.error("Failed to end session");
@@ -204,7 +206,8 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
             <div className="flex items-center space-x-2">
               <LightBulbIcon className="w-5 h-5 text-primary-600" />
               <span className="font-medium text-secondary-900">
-                {mode.charAt(0).toUpperCase() + mode.slice(1)} Review
+                {reviewMode.charAt(0).toUpperCase() + reviewMode.slice(1)}{" "}
+                Review
               </span>
             </div>
             <div
@@ -236,7 +239,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
         <div className="mt-4">
           <div className="flex justify-between text-sm text-secondary-600 mb-1">
             <span>Progress</span>
-            <span>{session?.total_questions || 0}/7 questions</span>
+            <span>{questionIndex}/7 questions</span>
           </div>
           <div className="w-full bg-secondary-200 rounded-full h-2">
             <div
@@ -248,8 +251,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
           </div>
           <div className="flex justify-between text-sm mt-2">
             <span className="text-secondary-600">
-              Score: {session?.total_correct || 0}/
-              {session?.total_questions || 0}
+              Score: {session?.total_correct || 0}
             </span>
             <span
               className={`font-medium ${
@@ -288,112 +290,140 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
           </motion.div>
         ) : (
           currentQuestion && (
-            <motion.div
-              key={currentQuestion.id || currentQuestion}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <ChartBarIcon className="w-5 h-5 text-primary-600" />
-                    <span className="text-sm text-secondary-600">
-                      Question {(session?.total_questions || 0) + 1}/7
-                    </span>
-                  </div>
-                  {session?.current_topic && (
-                    <span className="text-sm text-secondary-500">
-                      Topic: {session.current_topic}
-                    </span>
-                  )}
+            <>
+              {loading && !isSessionComplete ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                  <span className="ml-3 text-primary-600">
+                    Loading next question...
+                  </span>
                 </div>
-
-                <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown>
-                    {currentQuestion.question?.text ||
-                      currentQuestion.text ||
-                      currentQuestion}
-                  </ReactMarkdown>
-                </div>
-
-                <form onSubmit={handleSubmitAnswer} className="space-y-4">
-                  {currentQuestion.question?.type === "objective" &&
-                  currentQuestion.question?.options ? (
-                    <div className="space-y-2">
-                      {currentQuestion.question.options.map((option, index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() => setSelectedOption(index)}
-                          className={`w-full text-left p-3 rounded-lg border transition-all ${
-                            selectedOption === index
-                              ? "border-primary-500 bg-primary-50 text-primary-700"
-                              : "border-secondary-200 hover:bg-secondary-50"
-                          }`}
-                          disabled={submitting || feedback}
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <textarea
-                      value={answer}
-                      onChange={(e) => setAnswer(e.target.value)}
-                      placeholder="Type your answer here..."
-                      className="w-full h-32 p-3 rounded-lg border border-secondary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      disabled={submitting || feedback}
-                    />
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={
-                      submitting ||
-                      feedback ||
-                      (currentQuestion.question?.type === "objective"
-                        ? selectedOption === null
-                        : !answer)
-                    }
-                    className="w-full py-2 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
-                  >
-                    {submitting ? "Checking..." : "Submit Answer"}
-                  </button>
-                </form>
-
-                <AnimatePresence>
-                  {feedback && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className={`p-4 rounded-lg ${
-                        isCorrect
-                          ? "bg-green-50 border border-green-200"
-                          : "bg-red-50 border border-red-200"
-                      }`}
-                    >
-                      <div className="flex items-start space-x-2">
-                        {isCorrect ? (
-                          <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0" />
-                        ) : (
-                          <XCircleIcon className="w-5 h-5 text-red-500 flex-shrink-0" />
-                        )}
-                        <div className="prose prose-sm max-w-none">
-                          <ReactMarkdown>
-                            {typeof feedback === "string"
-                              ? feedback
-                              : JSON.stringify(feedback)}
-                          </ReactMarkdown>
-                        </div>
+              ) : (
+                <motion.div
+                  key={questionIndex}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6"
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <ChartBarIcon className="w-5 h-5 text-primary-600" />
+                        <span className="text-sm text-secondary-600">
+                          Question {questionIndex}/7
+                        </span>
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
+                      {session?.current_topic && (
+                        <span className="text-sm text-secondary-500">
+                          Topic: {session.current_topic}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="prose prose-sm max-w-none">
+                      <ReactMarkdown>
+                        {currentQuestion.question?.text ||
+                          currentQuestion.text ||
+                          currentQuestion}
+                      </ReactMarkdown>
+                    </div>
+
+                    <form onSubmit={handleSubmitAnswer} className="space-y-4">
+                      {currentQuestion.question?.type === "objective" &&
+                      currentQuestion.question?.options ? (
+                        <div className="space-y-2">
+                          {currentQuestion.question.options.map(
+                            (option, index) => (
+                              <button
+                                key={index}
+                                type="button"
+                                onClick={() => setSelectedOption(index)}
+                                className={`w-full text-left p-3 rounded-lg border transition-all ${
+                                  selectedOption === index
+                                    ? "border-primary-500 bg-primary-50 text-primary-700"
+                                    : "border-secondary-200 hover:bg-secondary-50"
+                                }`}
+                                disabled={submitting || feedback}
+                              >
+                                {option}
+                              </button>
+                            )
+                          )}
+                        </div>
+                      ) : (
+                        <textarea
+                          value={answer}
+                          onChange={(e) => setAnswer(e.target.value)}
+                          placeholder="Type your answer here..."
+                          className="w-full h-32 p-3 rounded-lg border border-secondary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          disabled={submitting || feedback}
+                        />
+                      )}
+
+                      <button
+                        type="submit"
+                        disabled={
+                          submitting ||
+                          feedback ||
+                          (currentQuestion.question?.type === "objective"
+                            ? selectedOption === null
+                            : !answer)
+                        }
+                        className="w-full py-2 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                      >
+                        {submitting ? "Checking..." : "Submit Answer"}
+                      </button>
+                    </form>
+
+                    <AnimatePresence>
+                      {feedback && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className={`p-4 rounded-lg ${
+                            isCorrect
+                              ? "bg-green-50 border border-green-200"
+                              : "bg-red-50 border border-red-200"
+                          }`}
+                        >
+                          <div className="flex items-start space-x-2">
+                            {isCorrect ? (
+                              <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0" />
+                            ) : (
+                              <XCircleIcon className="w-5 h-5 text-red-500 flex-shrink-0" />
+                            )}
+                            <div className="prose prose-sm max-w-none">
+                              <ReactMarkdown>
+                                {typeof feedback === "string"
+                                  ? feedback
+                                  : JSON.stringify(feedback)}
+                              </ReactMarkdown>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Next Question button appears only after feedback is shown and not at session end */}
+                    {feedback && readyForNext && !isSessionComplete && (
+                      <button
+                        onClick={() => {
+                          setReadyForNext(false);
+                          setQuestionIndex((prev) => prev + 1);
+                          loadNextQuestion();
+                        }}
+                        className="mt-4 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
+                        disabled={loading}
+                      >
+                        Next Question
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </>
           )
         )}
       </AnimatePresence>
