@@ -1,184 +1,3 @@
-# import os
-# import time
-# import logging
-# import openai
-# import requests
-# import pandas as pd
-# from datetime import datetime
-# import subprocess
-# import sys
-
-
-# # ========== CONFIGURATION ========== #
-# OPENAI_MODELS = [
-#     # "gpt-3.5-turbo",
-#     "gpt-4",
-#     "gpt-4o",
-#     "gpt-o4-mini",
-# ]
-# OLLAMA_MODELS = [
-#     "llama3.1:8b",
-#     "mixtral:8x7b",
-#     "phi4:14b",
-#     "gemma:7b",
-#     # "wizardlm2:7b",
-#     "mistral:7b",
-#     "qwen3:8b",
-#     "qwen3:14b",
-#     "deepseek-r1:14b",
-#     "deepseek-r1:8b",
-# ]
-# OLLAMA_URL = "http://localhost:11434/api/generate"
-# QUESTIONS_CSV = "eval/Objective Questions.csv"
-# LOG_FILE = f"eval/eval_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
-# RESULTS_FILE = f"eval/eval_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-# WIDE_RESULTS_FILE = f"eval/eval_results_wide_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
-
-# # ========== LOGGING SETUP ========== #
-# logging.basicConfig(
-#     level=logging.INFO,
-#     format='%(asctime)s %(levelname)s %(message)s',
-#     handlers=[
-#         logging.FileHandler(LOG_FILE),
-#         logging.StreamHandler(sys.stdout)
-#     ]
-# )
-
-# def stream_ollama_pull(model_name):
-#     """Stream the output of ollama pull so user sees progress live."""
-#     logging.info(f"Pulling Ollama model: {model_name} ...")
-#     try:
-#         process = subprocess.Popen(["ollama", "pull", model_name], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-#         for line in iter(process.stdout.readline, ''):
-#             if line:
-#                 print(line, end='')
-#                 logging.info(line.strip())
-#         process.stdout.close()
-#         process.wait()
-#         if process.returncode != 0:
-#             logging.error(f"Failed to pull {model_name}")
-#         else:
-#             logging.info(f"Model {model_name} pulled successfully.")
-#     except Exception as e:
-#         logging.error(f"Error pulling Ollama model {model_name}: {e}")
-
-# def ensure_ollama_model(model_name):
-#     """Pull the model if not already available, with live progress."""
-#     try:
-#         result = subprocess.run(["ollama", "list"], capture_output=True, text=True)
-#         if model_name not in result.stdout:
-#             stream_ollama_pull(model_name)
-#         else:
-#             logging.info(f"Ollama model {model_name} already available.")
-#     except Exception as e:
-#         logging.error(f"Error checking/pulling Ollama model {model_name}: {e}")
-
-# def get_openai_response(model, prompt):
-#     try:
-#         response = openai.chat.completions.create(
-#             model=model,
-#             messages=[{"role": "user", "content": prompt}],
-#             temperature=0
-#         )
-#         return response.choices[0].message.content.strip()
-#     except Exception as e:
-#         logging.error(f"OpenAI {model} error: {e}")
-#         return None
-
-# def get_ollama_response(model, prompt):
-#     try:
-#         data = {"model": model, "prompt": prompt, "stream": False}
-#         r = requests.post(OLLAMA_URL, json=data, timeout=120)
-#         r.raise_for_status()
-#         return r.json().get("response", "").strip()
-#     except Exception as e:
-#         logging.error(f"Ollama {model} error: {e}")
-#         return None
-
-# def normalize_answer(ans):
-#     if not ans:
-#         return ""
-#     return ans.strip().lower().replace(".", "").replace(",", "").replace("'", "").replace('"', "")
-
-# def print_progress_bar(iteration, total, prefix='', suffix='', length=40):
-#     percent = f"{100 * (iteration / float(total)):.1f}"
-#     filled_length = int(length * iteration // total)
-#     bar = '█' * filled_length + '-' * (length - filled_length)
-#     print(f'\r{prefix} |{bar}| {percent}% {suffix}', end='\r')
-#     if iteration == total:
-#         print()
-
-# def main():
-#     # Ensure Ollama models are available
-#     for model in OLLAMA_MODELS:
-#         ensure_ollama_model(model)
-
-#     # Load questions
-#     df = pd.read_csv(QUESTIONS_CSV)
-#     questions = df.to_dict(orient="records")
-#     total = len(questions)
-#     logging.info(f"Loaded {total} questions from {QUESTIONS_CSV}")
-
-#     all_models = [("openai", m) for m in OPENAI_MODELS] + [("ollama", m) for m in OLLAMA_MODELS]
-#     results = []
-#     wide_results = []
-#     # Prepare wide-format base
-#     wide_base = [
-#         {
-#             "question": q['Question'],
-#             "ground_truth": normalize_answer(q['Answer']),
-#             "category": q.get('Category', ''),
-#             **{f"{model_type}_{model_name}": None for model_type, model_name in all_models}
-#         }
-#         for q in questions
-#     ]
-
-#     for model_type, model_name in all_models:
-#         logging.info(f"\n===== Evaluating {model_type.upper()} model: {model_name} =====")
-#         correct = 0
-#         for idx, q in enumerate(questions):
-#             prompt = f"Question: {q['Question']}\nOptions: A) {q['Option A']} B) {q['Option B']} C) {q['Option C']} D) {q['Option D']}\nAnswer with the correct option text only."
-#             gt = normalize_answer(q['Answer'])
-#             if model_type == "openai":
-#                 response = get_openai_response(model_name, prompt)
-#             else:
-#                 response = get_ollama_response(model_name, prompt)
-#             norm_resp = normalize_answer(response)
-#             is_correct = norm_resp == gt
-#             if is_correct:
-#                 correct += 1
-#             # Log progress
-#             logging.info(f"[{model_name}] Q{idx+1}/{total} | GT: {gt} | Model: {norm_resp} | {'✔' if is_correct else '✘'}")
-#             print_progress_bar(idx + 1, total, prefix=f'{model_name}', suffix=f'Q{idx+1}/{total}', length=30)
-#             results.append({
-#                 "model_type": model_type,
-#                 "model_name": model_name,
-#                 "question": q['Question'],
-#                 "ground_truth": gt,
-#                 "model_response": norm_resp,
-#                 "is_correct": is_correct,
-#                 "category": q.get('Category', ''),
-#             })
-#             # Save to wide format
-#             wide_base[idx][f"{model_type}_{model_name}"] = norm_resp
-#             # Save intermediate results after each question
-#             if (idx + 1) % 20 == 0 or (idx + 1) == total:
-#                 pd.DataFrame(results).to_csv(RESULTS_FILE, index=False)
-#                 pd.DataFrame(wide_base).to_csv(WIDE_RESULTS_FILE, index=False)
-#             # time.sleep(0.5)  # To avoid rate limits
-#         acc = correct / total
-#         logging.info(f"===== {model_name} Accuracy: {acc:.2%} =====\n")
-#         # Save after each model
-#         pd.DataFrame(results).to_csv(RESULTS_FILE, index=False)
-#         pd.DataFrame(wide_base).to_csv(WIDE_RESULTS_FILE, index=False)
-
-#     logging.info(f"Results saved to {RESULTS_FILE}")
-#     logging.info(f"Wide-format results saved to {WIDE_RESULTS_FILE}")
-
-# if __name__ == "__main__":
-#     main() 
-
-
 import os
 import time
 import logging
@@ -192,67 +11,130 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 import re
 
-def extract_choice_text(question, raw_resp):
-    """Extract the full option text from a response that might be just a letter or partial answer."""
-    if not raw_resp:
-        return ""
-    
-    # Clean the response
-    resp = raw_resp.strip().lower()
-    
-    # Try to match letter-based responses (A, B, C, D) with various formats
-    letter_match = re.match(r'^([a-d])[\s\.\)\-\:]?\s*(.*)?$', resp)
-    if letter_match:
-        letter = letter_match.group(1).upper()
-        option_key = f"Option {letter}"
-        return question.get(option_key, "").strip()
-    
-    # If no letter match, try to match against the actual option texts
-    for letter in ['A', 'B', 'C', 'D']:
-        option_text = question.get(f"Option {letter}", "").strip().lower()
-        if resp == option_text:
-            return option_text
-        # Also check if the response is a substring of the option
-        elif option_text and resp in option_text:
-            return option_text
-    
-    # If no matches found, return the cleaned response
-    return resp
-
 def normalize_answer(text):
-    """Normalize answer text for comparison by removing punctuation and standardizing whitespace."""
+    """
+    Normalize answer text for comparison by removing punctuation, 
+    standardizing whitespace, and converting to lowercase.
+    """
     if not text:
         return ""
     # Convert to lowercase and remove punctuation
     text = text.strip().lower()
+    # Remove punctuation but keep spaces
     text = re.sub(r'[^\w\s]', '', text)
     # Standardize whitespace
     text = ' '.join(text.split())
     return text
 
-def answers_match(response, ground_truth, question):
-    """Compare if a response matches the ground truth, handling various answer formats."""
-    if not response or not ground_truth:
+def extract_choice_text(question, raw_response):
+    """
+    Extract the full option text from a response that might be:
+    - Just a letter (A, B, C, D)
+    - Letter followed by text (A) option text, A. option text, etc.)
+    - Just the option text
+    - Mixed format
+    """
+    if not raw_response:
+        return ""
+    
+    # Clean the response
+    response = raw_response.strip()
+    
+    # First, try to match exact letter patterns at the beginning
+    letter_patterns = [
+        r'^([A-Da-d])[\s\.\)\-\:]',  # A. or A) or A: or A-
+        r'^([A-Da-d])$',              # Just A
+        r'^Option\s*([A-Da-d])',      # Option A
+        r'^\(([A-Da-d])\)',           # (A)
+    ]
+    
+    for pattern in letter_patterns:
+        match = re.match(pattern, response, re.IGNORECASE)
+        if match:
+            letter = match.group(1).upper()
+            option_key = f"Option {letter}"
+            return question.get(option_key, "").strip()
+    
+    # If no letter pattern matches, try to match against option texts directly
+    response_normalized = normalize_answer(response)
+    
+    # Check for exact matches with option texts
+    for letter in ['A', 'B', 'C', 'D']:
+        option_text = question.get(f"Option {letter}", "").strip()
+        if option_text:
+            option_normalized = normalize_answer(option_text)
+            if response_normalized == option_normalized:
+                return option_text
+    
+    # Check for partial matches (response is contained in option or vice versa)
+    for letter in ['A', 'B', 'C', 'D']:
+        option_text = question.get(f"Option {letter}", "").strip()
+        if option_text:
+            option_normalized = normalize_answer(option_text)
+            # Check if response is a significant substring of option (at least 3 chars)
+            if len(response_normalized) >= 3 and response_normalized in option_normalized:
+                return option_text
+            # Check if option is contained in response (for verbose responses)
+            if len(option_normalized) >= 3 and option_normalized in response_normalized:
+                return option_text
+    
+    # Check for key phrase matches (for responses that explain the answer)
+    for letter in ['A', 'B', 'C', 'D']:
+        option_text = question.get(f"Option {letter}", "").strip()
+        if option_text:
+            option_normalized = normalize_answer(option_text)
+            # Split into words and check for significant overlap
+            option_words = set(option_normalized.split())
+            response_words = set(response_normalized.split())
+            if option_words and response_words:
+                # If at least 60% of option words are in response
+                overlap = len(option_words.intersection(response_words))
+                if overlap / len(option_words) >= 0.6:
+                    return option_text
+    
+    # If no matches found, return the cleaned response
+    return response.strip()
+
+def answers_match(predicted_answer, ground_truth_answer, question):
+    """
+    Compare if a predicted answer matches the ground truth answer.
+    Handles various answer formats and normalizes for comparison.
+    """
+    if not predicted_answer or not ground_truth_answer:
         return False
     
-    # Normalize both texts
-    resp_norm = normalize_answer(response)
-    gt_norm = normalize_answer(ground_truth)
+    # Normalize both answers
+    pred_norm = normalize_answer(predicted_answer)
+    gt_norm = normalize_answer(ground_truth_answer)
     
     # Direct match
-    if resp_norm == gt_norm:
+    if pred_norm == gt_norm:
         return True
     
-    # Check if response matches any option that matches ground truth
+    # Check if both answers correspond to the same option
+    pred_option = None
+    gt_option = None
+    
+    # Find which option the predicted answer corresponds to
     for letter in ['A', 'B', 'C', 'D']:
-        option_text = normalize_answer(question.get(f"Option {letter}", ""))
+        option_text = question.get(f"Option {letter}", "").strip()
         if option_text:
-            # If ground truth matches this option and response matches this option
-            if gt_norm == option_text and resp_norm == option_text:
-                return True
-            # If ground truth matches this option and response is the letter
-            if gt_norm == option_text and resp_norm == letter.lower():
-                return True
+            option_norm = normalize_answer(option_text)
+            if pred_norm == option_norm:
+                pred_option = letter
+            if gt_norm == option_norm:
+                gt_option = letter
+    
+    # If both answers correspond to the same option, they match
+    if pred_option and gt_option and pred_option == gt_option:
+        return True
+    
+    # Check if predicted answer is just a letter that matches the ground truth option
+    if len(pred_norm) == 1 and pred_norm.upper() in ['A', 'B', 'C', 'D']:
+        letter = pred_norm.upper()
+        option_text = question.get(f"Option {letter}", "").strip()
+        if option_text and normalize_answer(option_text) == gt_norm:
+            return True
     
     return False
 
@@ -280,6 +162,7 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout)
     ]
 )
+
 # ========== HELPER FUNCTIONS ========== #
 def print_progress_bar(iteration, total, prefix='', suffix='', length=50):
     """Print a clean progress bar"""
@@ -289,12 +172,6 @@ def print_progress_bar(iteration, total, prefix='', suffix='', length=50):
     print(f'\r{prefix} |{bar}| {percent}% {suffix}', end='', flush=True)
     if iteration == total:
         print()
-
-def normalize_answer(answer):
-    """Normalize answer for comparison"""
-    if not answer:
-        return ""
-    return answer.strip().lower().translate(str.maketrans('', '', ".,'\""))
 
 def stream_ollama_pull(model):
     """Pull Ollama model with live progress"""
@@ -386,12 +263,15 @@ def evaluate_single_model(model_info, questions):
     total_questions = len(questions)
     
     for idx, question in enumerate(questions):
-        # Create prompt
+        # Create consistent prompt
         prompt = (
             f"Question: {question['Question']}\n"
-            f"Options: A) {question['Option A']} B) {question['Option B']} "
-            f"C) {question['Option C']} D) {question['Option D']}\n"
-            f"Answer with the correct option letter (A, B, C, or D) or the exact option text."
+            f"Options:\n"
+            f"A) {question['Option A']}\n"
+            f"B) {question['Option B']}\n"
+            f"C) {question['Option C']}\n"
+            f"D) {question['Option D']}\n\n"
+            f"Please answer with either the letter (A, B, C, or D) or the exact option text."
         )
         
         # Get model response
@@ -439,6 +319,9 @@ def evaluate_single_model(model_info, questions):
     accuracy = correct_count / total_questions
     
     # Calculate other metrics
+    ground_truths = [r["is_correct"] for r in results]
+    predictions = [r["is_correct"] for r in results]
+    
     metrics = {
         "model_type": model_type,
         "model_name": model_name,
@@ -537,28 +420,25 @@ def run_ollama_parallel(ollama_models, questions, wide_results):
         total_questions = len(questions)
         
         for idx, question in enumerate(questions):
-            # Create prompt
+            # Create consistent prompt
             prompt = (
                 f"Question: {question['Question']}\n"
-                f"Options: A) {question['Option A']} B) {question['Option B']} "
-                f"C) {question['Option C']} D) {question['Option D']}\n"
-                f"Answer with the correct option text only."
+                f"Options:\n"
+                f"A) {question['Option A']}\n"
+                f"B) {question['Option B']}\n"
+                f"C) {question['Option C']}\n"
+                f"D) {question['Option D']}\n\n"
+                f"Please answer with either the letter (A, B, C, or D) or the exact option text."
             )
             
             response = get_ollama_response(model_name, prompt)
             
-            # Get the ground-truth text once
-            gt_text = question['Answer']
-            gt_norm = normalize(gt_text)
-
-            # Get raw model reply
-            raw = response or ""
-
-            # Extract the option text (handles letters, letter+text, or pure text)
-            pred_text = extract_choice_text(question, raw)
-            pred_norm = normalize(pred_text)
-
-            is_correct = (pred_norm == gt_norm)
+            # Process the response
+            raw_response = response or ""
+            extracted_response = extract_choice_text(question, raw_response)
+            
+            # Compare with ground truth
+            is_correct = answers_match(extracted_response, question['Answer'], question)
             
             if is_correct:
                 correct_count += 1
@@ -568,9 +448,9 @@ def run_ollama_parallel(ollama_models, questions, wide_results):
                 "model_type": model_type,
                 "model_name": model_name,
                 "question": question['Question'],
-                "ground_truth": gt_norm,
-                "model_response": pred_norm,
-                "raw_response": response,
+                "ground_truth": question['Answer'],
+                "model_response": extracted_response,
+                "raw_response": raw_response,
                 "is_correct": is_correct,
                 "category": question.get('Category', '')
             }
@@ -594,16 +474,11 @@ def run_ollama_parallel(ollama_models, questions, wide_results):
             time.sleep(0.05)  # Small delay to prevent overwhelming
         
         # Calculate metrics
-        ground_truths = [r["ground_truth"] for r in results]
-        predictions = [r["model_response"] for r in results]
-        metrics = compute_metrics(ground_truths, predictions)
-        
         accuracy = correct_count / total_questions
         model_metrics = {
             "model_type": model_type,
             "model_name": model_name,
             "accuracy": accuracy,
-            **metrics,
             "correct_count": correct_count,
             "total_questions": total_questions
         }
