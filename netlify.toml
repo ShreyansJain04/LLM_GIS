@@ -11,9 +11,9 @@
   [build.environment]
     NODE_VERSION = "20"
 
-# --- Proxy API calls to Render --------------
+# --- Proxy API calls to your local ngrok tunnel --------------
 [[redirects]]
   from   = "/api/*"
-  to     = "https://c0275f2199d2.ngrok-free.app/:splat"
+  to     = "https://c0275f2199d2.ngrok-free.app/api/:splat"
   status = 200
   force  = true
