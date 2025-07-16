@@ -1,0 +1,10 @@
+[build]
+  base    = "frontend"
+  command = "npm run build"
+  publish = "frontend/build"
+
+[[redirects]]
+  from = "/api/*"
+  to   = "https://llm-gis.onrender.com/:splat"
+  status = 200
+  force  = true   # override any existing file
