@@ -1096,6 +1096,10 @@ async def submit_flashcard_answer(session_id: str, request: dict):
         quality = request.get("quality")  # 0-5 rating
         topic = request.get("topic")
         card_id = request.get("card_id")
+        print(f"Quality: {quality}, Topic: {topic}, Card ID: {card_id}")
+        print(type(quality))
+        print(type(topic))
+        print(type(card_id))
         
         if quality is None or quality < 0 or quality > 5:
             raise HTTPException(status_code=400, detail="Invalid quality rating (0-5)")
@@ -1106,6 +1110,7 @@ async def submit_flashcard_answer(session_id: str, request: dict):
         # Update the card in the flashcard system
         from flashcards import FlashcardDeck
         deck = FlashcardDeck(session["username"], topic)
+        print(session["username"])
         
         # Find the card in the due cards
         due_cards = session["topics_with_due"].get(topic, [])
@@ -1113,6 +1118,7 @@ async def submit_flashcard_answer(session_id: str, request: dict):
             raise HTTPException(status_code=400, detail="No cards found for topic")
         
         current_card = due_cards[0]
+        print(f"Current card: {current_card}")
         
         # Update card scheduling
         deck.update_card_schedule(current_card, quality)
@@ -1121,8 +1127,8 @@ async def submit_flashcard_answer(session_id: str, request: dict):
         # Update session stats
         session["cards_reviewed"] += 1
         if quality >= 3:
-            session["total_correct"] += 1
-        
+            session["correct_answers"] += 1 # This is the total correct answers but session["total_correct"] gives error
+        print(f"Session: {session}")
         # Record performance
         performance_entry = {
             'topic': topic,
@@ -1144,15 +1150,16 @@ async def submit_flashcard_answer(session_id: str, request: dict):
         
         # Check if session is complete
         total_remaining = sum(len(cards) for cards in session["topics_with_due"].values())
+        print(f"Total remaining: {total_remaining}")
         
         return {
             "quality": quality,
             "correct": quality >= 3,
             "cards_reviewed": session["cards_reviewed"],
-            "total_correct": session["total_correct"],
+            "total_correct": session["correct_answers"],
             "cards_remaining": total_remaining,
             "session_complete": total_remaining == 0,
-            "accuracy": session["total_correct"] / session["cards_reviewed"] if session["cards_reviewed"] > 0 else 0
+            "accuracy": session["correct_answers"] / session["cards_reviewed"] if session["cards_reviewed"] > 0 else 0
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -1210,23 +1217,28 @@ async def end_review_session(session_id: str):
         session["completed_at"] = datetime.now().isoformat()
         
         # Calculate final results
-        total_questions = session["total_questions"]
-        total_correct = session["total_correct"]
+        total_questions = session.get("total_questions") or session.get("total_cards", 0)
+        total_correct = session.get("total_correct") or session.get("correct_answers", 0)
         final_score = total_correct / total_questions if total_questions > 0 else 0
         
-        # Determine mastery level based on difficulty and consistency
-        high_difficulty_correct = sum(1 for perf in session["performance"] 
-                                     if perf['correct'] and perf['difficulty'] in ['medium', 'hard'])
         
-        if final_score >= 0.8 and high_difficulty_correct >= 2:
-            mastery_level = 'mastered'
-        elif final_score >= 0.6:
-            mastery_level = 'intermediate'
+        # Determine mastery level based on difficulty and consistency
+        if session["mode"] != "flashcards":
+            high_difficulty_correct = sum(1 for perf in session["performance"] 
+                                        if perf['correct'] and perf['difficulty'] in ['medium', 'hard'])
         else:
-            mastery_level = 'beginner'
+            high_difficulty_correct = sum(1 for perf in session["performance"]
+                                          if perf["quality"] >= 3)
+        
+            if final_score >= 0.8 and high_difficulty_correct >= 2:
+                mastery_level = 'mastered'
+            elif final_score >= 0.6:
+                mastery_level = 'intermediate'
+            else:
+                mastery_level = 'beginner'
         
         # Record the session with detailed performance data
-        if session["performance"]:
+        if session["performance"] and session["mode"] != "flashcards":
             record_learning_session(
                 username=session["username"],
                 topic=f"{session['mode'].title()} Review Session",
