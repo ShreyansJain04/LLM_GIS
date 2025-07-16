@@ -55,8 +55,8 @@ const Chat = () => {
 
   const loadSuggestions = async () => {
     try {
-      const suggestionsData = await chatAPI.getChatSuggestions(user.username);
-      setSuggestions(suggestionsData.suggestions || []);
+      const suggestionsData = await chatAPI.getSuggestions(user.username);
+      setSuggestions(suggestionsData.suggestions.slice(0, 3) || []);
     } catch (error) {
       console.error("Failed to load suggestions:", error);
     }

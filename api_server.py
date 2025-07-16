@@ -1,5 +1,5 @@
 """FastAPI backend server for the AI Tutoring System."""
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Optional, Any, Union
@@ -40,7 +40,7 @@ class UserCreate(BaseModel):
 
 class QuestionRequest(BaseModel):
     topic: str
-    previous_questions: List[str] = []
+    previous_questions: Optional[List[Union[str, Dict]]] = None
     difficulty: str = "medium"
     question_type: str = "conceptual"
 
@@ -195,7 +195,11 @@ async def get_user_profile(username: str):
         performance = get_performance_summary(username)
         weak_areas = get_weak_areas(username)
         recommended_topics = get_recommended_review_topics(username, limit=5)
-        
+        print(f"Active sessions: {active_sessions}\n")
+        print(f"Profile: {profile}\n")
+        print(f"Performance: {performance}\n")
+        print(f"Weak areas: {weak_areas}\n")
+        print(f"Recommended topics: {recommended_topics}\n")
         return {
             "profile": profile,
             "performance": performance,
@@ -254,7 +258,7 @@ async def generate_question_endpoint(request: QuestionRequest):
     try:
         question = generate_question(
             request.topic, 
-            request.previous_questions,
+            list(request.previous_questions or []),
             request.difficulty,
             request.question_type
         )
@@ -266,11 +270,6 @@ async def generate_question_endpoint(request: QuestionRequest):
 async def check_answer_endpoint(request: AnswerRequest):
     """Check if an answer is correct."""
     try:
-        print(f"Received question: {request.question}")
-        print(f"Received answer: {request.answer}")
-        print(f"Question type: {type(request.question)}")
-        print(f"Answer type: {type(request.answer)}")
-        # Convert Question model to dict for check_answer function
         question_dict = request.question.dict()
         correct, feedback = check_answer(question_dict, request.answer)
         return {"correct": correct, "feedback": feedback}
@@ -288,6 +287,8 @@ async def get_summary(topic: str, length: str = "medium"):
         raise HTTPException(status_code=500, detail=str(e))
 
 # Learning session endpoints
+
+# Get learning plan for a topic and username
 @app.get("/api/learning/{username}/plan/{topic}")
 async def get_learning_plan(username: str, topic: str):
     """Get a learning plan for a topic."""
@@ -297,6 +298,109 @@ async def get_learning_plan(username: str, topic: str):
         return plan
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# Start an interactive learning session
+@app.post("/api/learning/session/start")
+async def start_learning_session(request: dict = Body(...)):
+    """Start a learning session."""
+    try:
+        username = request["username"]
+        topic = request["topic"]
+        session_id = f"learning_{username}_{topic}_{datetime.now().timestamp()}"
+        # Build initial session state (dict, not InteractiveSession object)
+        agent = PlannerAgent(username)
+        plan = agent.build_learning_plan(topic)
+        session_state = {
+            'session_id': session_id,
+            'username': username,
+            'topic': topic,
+            'status': 'active',
+            'started_at': datetime.now().isoformat(),
+            'current_subtopic_index': 0,
+            'subtopics_completed': [],
+            'questions_asked': [],
+            'performance': [],
+            'total_score': 0,
+            'total_questions': 0,
+            'user_questions': [],
+            'difficulty_adjustments': [],
+            'plan': plan
+        }
+        active_sessions[session_id] = session_state
+        
+        return {"session_id": session_id, "plan": plan, "status": "started"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/learning/session/{session_id}")
+async def get_learning_session(session_id: str):
+    """Get the current learning session state."""
+    if session_id not in active_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return active_sessions[session_id]
+
+@app.put("/api/learning/session/{session_id}")
+async def update_learning_session(session_id: str, data: dict = Body(...)):
+    """Update a learning session with a new question/answer/performance entry."""
+    if session_id not in active_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    s = active_sessions[session_id]
+    # Update questions_asked
+    if "question" in data:
+        s['questions_asked'].append(data["question"])
+    # Update total_questions/score
+    if "correct" in data:
+        s['total_questions'] += 1
+        if data["correct"]:
+            s['total_score'] += 1
+    # Update performance
+    if "performance_entry" in data:
+        s['performance'].append(data["performance_entry"])
+    # Update subtopics_completed
+    if "subtopic" in data and data["subtopic"] not in s['subtopics_completed']:
+        s['subtopics_completed'].append(data["subtopic"])
+    # Update current_subtopic_index
+    if "current_subtopic_index" in data:
+        s['current_subtopic_index'] = data["current_subtopic_index"]
+    # Update user_questions
+    if "user_question" in data:
+        s['user_questions'].append(data["user_question"])
+    # Update difficulty_adjustments
+    if "difficulty_adjustment" in data:
+        s['difficulty_adjustments'].append(data["difficulty_adjustment"])
+    return {"success": True, "message": "Session updated successfully"}
+
+@app.delete("/api/learning/session/{session_id}")
+async def end_learning_session(session_id: str):
+    """End a learning session, record results, and remove from active sessions."""
+    if session_id not in active_sessions:
+        raise HTTPException(status_code=404, detail="Session not found")
+    s = active_sessions[session_id]
+    s['status'] = 'completed'
+    s['completed_at'] = datetime.now().isoformat()
+    # Compute final score/mastery
+    total_questions = s.get('total_questions', 0)
+    total_score = s.get('total_score', 0)
+    final_score = total_score / total_questions if total_questions > 0 else 0
+    if final_score >= 0.8:
+        mastery_level = 'mastered'
+    elif final_score >= 0.6:
+        mastery_level = 'intermediate'
+    else:
+        mastery_level = 'beginner'
+    # Record session
+    try:
+        record_learning_session(
+            s['username'],
+            s['topic'],
+            s['performance'],
+            final_score,
+            mastery_level
+        )
+    except Exception as e:
+        print(f"Failed to record session: {e}")
+    del active_sessions[session_id]
+    return {"success": True, "message": "Session ended and recorded", "final_score": final_score, "mastery_level": mastery_level}
 
 @app.post("/api/learning/record-session")
 async def record_session(request: LearningSessionRequest):
@@ -314,46 +418,46 @@ async def record_session(request: LearningSessionRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 # Interactive session endpoints
-@app.post("/api/sessions/{username}/start/{topic}")
-async def start_interactive_session(username: str, topic: str):
-    """Start an interactive learning session."""
-    try:
-        session_id = f"{username}_{topic}_{datetime.now().timestamp()}"
-        session = InteractiveSession(username, topic)
-        active_sessions[session_id] = session
+# @app.post("/api/sessions/{username}/start/{topic}")
+# async def start_interactive_session(username: str, topic: str):
+#     """Start an interactive learning session."""
+#     try:
+#         session_id = f"{username}_{topic}_{datetime.now().timestamp()}"
+#         session = InteractiveSession(username, topic)
+#         active_sessions[session_id] = session
         
-        # Get initial content
-        plan = PlannerAgent(username).build_learning_plan(topic)
+#         # Get initial content
+#         plan = PlannerAgent(username).build_learning_plan(topic)
         
-        return {
-            "session_id": session_id,
-            "topic": topic,
-            "plan": plan,
-            "status": "started"
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+#         return {
+#             "session_id": session_id,
+#             "topic": topic,
+#             "plan": plan,
+#             "status": "started"
+#         }
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/sessions/{session_id}/status")
-async def get_session_status(session_id: str):
-    """Get the status of an interactive session."""
-    if session_id not in active_sessions:
-        raise HTTPException(status_code=404, detail="Session not found")
+# @app.get("/api/sessions/{session_id}/status")
+# async def get_session_status(session_id: str):
+#     """Get the status of an interactive session."""
+#     if session_id not in active_sessions:
+#         raise HTTPException(status_code=404, detail="Session not found")
     
-    session = active_sessions[session_id]
-    return {
-        "session_id": session_id,
-        "username": session.username,
-        "topic": session.topic,
-        "status": "active"
-    }
+#     session = active_sessions[session_id]
+#     return {
+#         "session_id": session_id,
+#         "username": session.username,
+#         "topic": session.topic,
+#         "status": "active"
+#     }
 
-@app.delete("/api/sessions/{session_id}")
-async def end_session(session_id: str):
-    """End an interactive session."""
-    if session_id in active_sessions:
-        del active_sessions[session_id]
-    return {"success": True, "message": "Session ended"}
+# @app.delete("/api/sessions/{session_id}")
+# async def end_session(session_id: str):
+#     """End an interactive session."""
+#     if session_id in active_sessions:
+#         del active_sessions[session_id]
+#     return {"success": True, "message": "Session ended"}
 
 # Document and source management
 @app.get("/api/sources")
@@ -1408,6 +1512,7 @@ async def get_next_question(session_id: str, topic: Optional[str] = None):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# This endpoint doesn't track repeated questions
 @app.post("/api/review/session/{session_id}/answer")
 async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
     """Submit an answer for the current question or flashcard with adaptive difficulty adjustment."""

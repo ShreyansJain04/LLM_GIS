@@ -174,10 +174,11 @@ def generate_question(topic: str, previous_questions: Optional[List[Union[str, D
     """
     if previous_questions is None:
         previous_questions = []
-    
+    print("Previous questions", previous_questions)
     # Extract question texts from previous_questions (handle both strings and dicts)
     previous_texts = []
     for q in previous_questions:
+        print("Question", q)
         if isinstance(q, dict):
             # Extract text from question dictionary
             if 'text' in q:
@@ -284,11 +285,11 @@ def check_answer(question: Dict, answer: str) -> Tuple[bool, str]:
         Tuple of (is_correct, feedback)
     """
     
-    print(f"check_answer received question: {question}")
-    print(f"check_answer received answer: {answer}")
-    print(f"Question type: {question.get('type')}")
-    print(f"Question options: {question.get('options', [])}")
-    print(f"Question correct_option: {question.get('correct_option')}")
+    # print(f"check_answer received question: {question}")
+    # print(f"check_answer received answer: {answer}")
+    # print(f"Question type: {question.get('type')}")
+    # print(f"Question options: {question.get('options', [])}")
+    # print(f"Question correct_option: {question.get('correct_option')}")
     
     if question.get("type") == "objective":
         try:

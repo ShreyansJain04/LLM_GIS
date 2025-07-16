@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ChartBarIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  LightBulbIcon,
   ArrowPathIcon,
   BookmarkIcon,
   TrophyIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import ReactMarkdown from "react-markdown";
 import { useUser } from "../contexts/UserContext";
-import { contentAPI, userAPI, reviewAPI } from "../services/api";
+import { userAPI, reviewAPI } from "../services/api";
 import toast from "react-hot-toast";
 import ReviewModeSelector from "../components/ReviewModeSelector";
 import ReviewSession from "../components/ReviewSession";
@@ -65,111 +61,6 @@ const ReviewCard = ({ topic, progress, onSelect }) => (
   </motion.div>
 );
 
-const QuestionCard = ({ question, onAnswer, loading, feedback, isCorrect }) => {
-  const [answer, setAnswer] = useState("");
-  const [selectedOption, setSelectedOption] = useState(null);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (question.question?.type === "objective") {
-      onAnswer(selectedOption);
-    } else {
-      onAnswer(answer);
-    }
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6"
-    >
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <LightBulbIcon className="w-5 h-5 text-yellow-500" />
-          <h3 className="text-lg font-medium text-secondary-900">Question</h3>
-        </div>
-
-        <div className="prose prose-sm max-w-none">
-          <ReactMarkdown>
-            {question.question?.text || question.text || question}
-          </ReactMarkdown>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {question.question?.type === "objective" ? (
-            <div className="space-y-2">
-              {question.question.options.map((option, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => setSelectedOption(index)}
-                  className={`w-full text-left p-3 rounded-lg border ${
-                    selectedOption === index
-                      ? "border-primary-500 bg-primary-50 text-primary-700"
-                      : "border-secondary-200 hover:bg-secondary-50"
-                  }`}
-                  disabled={loading || feedback}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <textarea
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              placeholder="Type your answer here..."
-              className="w-full h-32 p-3 rounded-lg border border-secondary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              disabled={loading || feedback}
-            />
-          )}
-
-          <button
-            type="submit"
-            disabled={
-              loading || feedback || (!answer && selectedOption === null)
-            }
-            className="w-full py-2 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
-          >
-            {loading ? "Checking..." : "Submit Answer"}
-          </button>
-        </form>
-
-        <AnimatePresence>
-          {feedback && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className={`p-4 rounded-lg ${
-                isCorrect
-                  ? "bg-green-50 border border-green-200"
-                  : "bg-red-50 border border-red-200"
-              }`}
-            >
-              <div className="flex items-start space-x-2">
-                {isCorrect ? (
-                  <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0" />
-                ) : (
-                  <XCircleIcon className="w-5 h-5 text-red-500 flex-shrink-0" />
-                )}
-                <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown>
-                    {typeof feedback === "string"
-                      ? feedback
-                      : JSON.stringify(feedback)}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.div>
-  );
-};
-
 const Review = () => {
   const { user } = useUser();
   const navigate = useNavigate();
@@ -181,10 +72,10 @@ const Review = () => {
   const [flashcardMode, setFlashcardMode] = useState(false);
   const [weakTopics, setWeakTopics] = useState([]);
   const [progress, setProgress] = useState({});
-  const [currentQuestion, setCurrentQuestion] = useState(null);
-  const [feedback, setFeedback] = useState(null);
-  const [isCorrect, setIsCorrect] = useState(null);
-  const [selectedTopic, setSelectedTopic] = useState(null);
+  // const [currentQuestion, setCurrentQuestion] = useState(null);
+  // const [feedback, setFeedback] = useState(null);
+  // const [isCorrect, setIsCorrect] = useState(null);
+  // const [selectedTopic, setSelectedTopic] = useState(null);
   const [dueItems, setDueItems] = useState([]);
   const [summary, setSummary] = useState(null);
   const [showIntensiveTopicSelector, setShowIntensiveTopicSelector] =
@@ -210,6 +101,7 @@ const Review = () => {
 
       // Check for due spaced repetition items
       const spacedSchedule = recommendations.spaced_repetition_schedule || [];
+
       const dueItemsData = spacedSchedule.filter(
         (item) => item.days_until_review <= 0
       );
@@ -291,65 +183,6 @@ const Review = () => {
   const handleStartFlashcardSession = (sessionId) => {
     setSessionId(sessionId);
     setFlashcardMode(false);
-  };
-
-  const handleAnswer = async (answer) => {
-    try {
-      // Create a clean question object with only the fields the backend expects
-      const cleanQuestion = {
-        text: currentQuestion.question?.text || currentQuestion.text,
-        type: currentQuestion.question?.type || currentQuestion.type,
-        options:
-          currentQuestion.question?.options || currentQuestion.options || [],
-        correct_option:
-          currentQuestion.question?.correct_option ||
-          currentQuestion.correct_option ||
-          0,
-        explanation:
-          currentQuestion.question?.explanation ||
-          currentQuestion.explanation ||
-          "",
-      };
-
-      // Extract question text for the API
-      const questionId = cleanQuestion.text || JSON.stringify(cleanQuestion);
-
-      const result = await reviewAPI.submitAnswer(
-        sessionId,
-        questionId,
-        answer
-      );
-      setFeedback(result.feedback);
-      setIsCorrect(result.correct);
-
-      // Update progress
-      if (result.correct) {
-        setProgress((prev) => ({
-          ...prev,
-          [selectedTopic]: Math.min(1, (prev[selectedTopic] || 0) + 0.1),
-        }));
-      }
-
-      // Load next question after delay
-      setTimeout(() => {
-        loadQuestion(selectedTopic);
-      }, 2000);
-    } catch (error) {
-      console.error("Failed to check answer:", error);
-      toast.error("Failed to check answer");
-    }
-  };
-
-  const loadQuestion = async (topic) => {
-    try {
-      const response = await reviewAPI.getNextQuestion(sessionId, topic);
-      setCurrentQuestion(response);
-      setFeedback(null);
-      setIsCorrect(null);
-    } catch (error) {
-      console.error("Failed to load question:", error);
-      toast.error("Failed to load question");
-    }
   };
 
   const handleBackToModeSelection = () => {

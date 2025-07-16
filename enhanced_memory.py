@@ -22,31 +22,32 @@ class LearningPatternAnalyzer:
         """Load existing analytics or create new ones."""
         if self.analytics_file.exists():
             with self.analytics_file.open('r') as f:
-                data = json.load(f)
-                tod_perf = data['learning_patterns']['time_of_day_performance']
-                # Convert keys to int if they are strings
-                data['learning_patterns']['time_of_day_performance'] = {int(k): v for k, v in tod_perf.items()}
-                # Ensure all 24 hours are present
-                for h in range(24):
-                    if h not in data['learning_patterns']['time_of_day_performance']:
-                        data['learning_patterns']['time_of_day_performance'][h] = []
-                # Rebuild detailed_weaknesses as defaultdict with correct nested structure
-                from collections import defaultdict
-                def _default_weakness():
-                    return {
-                        'error_types': defaultdict(int),
-                        'confusion_indicators': [],
-                        'required_repetitions': 0,
-                        'last_reviewed': None
-                    }
-                dw = data['detailed_weaknesses']
-                new_dw = defaultdict(_default_weakness)
-                for k, v in dw.items():
-                    v['error_types'] = defaultdict(int, v.get('error_types', {}))
-                    new_dw[k] = v
-                data['detailed_weaknesses'] = new_dw
-                return data
-        
+                try:
+                    data = json.load(f)
+                    tod_perf = data['learning_patterns']['time_of_day_performance']
+                    # Convert keys to int if they are strings
+                    data['learning_patterns']['time_of_day_performance'] = {int(k): v for k, v in tod_perf.items()}
+                    # Ensure all 24 hours are present
+                    for h in range(24):
+                        if h not in data['learning_patterns']['time_of_day_performance']:
+                            data['learning_patterns']['time_of_day_performance'][h] = []
+                    # Rebuild detailed_weaknesses as defaultdict with correct nested structure
+                    def _default_weakness():
+                        return {
+                            'error_types': defaultdict(int),
+                            'confusion_indicators': [],
+                            'required_repetitions': 0,
+                            'last_reviewed': None
+                        }
+                    dw = data['detailed_weaknesses']
+                    new_dw = defaultdict(_default_weakness)
+                    for k, v in dw.items():
+                        v['error_types'] = defaultdict(int, v.get('error_types', {}))
+                        new_dw[k] = v
+                    data['detailed_weaknesses'] = new_dw
+                    return data
+                except json.JSONDecodeError:
+                    pass  # Fall through to return default structure
         # Initialize time_of_day_performance with all 24 hours
         time_of_day_performance = {h: [] for h in range(24)}
         return {

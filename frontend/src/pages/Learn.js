@@ -30,6 +30,7 @@ const Learn = () => {
   const [currentQuizTopic, setCurrentQuizTopic] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const [sessionId, setSessionId] = useState(null);
 
   // Combined question state
   const [questionState, setQuestionState] = useState({
@@ -136,6 +137,7 @@ const Learn = () => {
     setSessionState("revealing");
     setQuestionState({ text: "", options: [], type: null });
     setSelectedOption("");
+    setSessionId(null);
 
     try {
       // Add initial message
@@ -144,22 +146,22 @@ const Learn = () => {
         message: `Creating a learning plan for: **${topicText}** ...`,
       });
 
-      const learningPlan = await learningAPI.getLearningPlan(
+      const result = await learningAPI.startLearningSession(
         user.username,
         topicText
       );
-      setPlan(learningPlan);
+      setSessionId(result.session_id);
+      setPlan(result.plan);
 
-      // Add success message and trigger subtopic processing
       addMessage({
         type: "assistant",
         message: `✅ Learning plan created! ${
-          learningPlan.subtopics?.length || 0
+          result.plan.subtopics?.length || 0
         } subtopics to cover.`,
       });
 
-      if (learningPlan.subtopics?.length > 0) {
-        await buildSubtopicMessages(learningPlan.subtopics[0], 0, true);
+      if (result.plan.subtopics?.length > 0) {
+        await buildSubtopicMessages(result.plan.subtopics[0], 0, true);
       }
     } catch (error) {
       addMessage({
@@ -248,6 +250,7 @@ const Learn = () => {
         questionType: questionData.question.type || "objective",
         correct_option: questionData.question.correct_option || 0,
         explanation: questionData.question.explanation || "",
+        questionObj: questionData.question,
       });
     } catch {
       messages.push({
@@ -384,7 +387,7 @@ const Learn = () => {
     }
   };
 
-  // Clear chat
+  // Clear chat <-- this is for chat instead of learn mode
   const clearChat = async () => {
     try {
       await chatAPI.clearChatHistory(user.username);
@@ -411,13 +414,10 @@ const Learn = () => {
         parseInt(answer) >= 0 &&
         parseInt(answer) < questionState.options.length
       ) {
-        // For objective questions, selectedOption is the index as string
         answerToSend = answer;
       } else {
-        // For subjective questions, use the text answer
         answerToSend = answer;
       }
-      // Create a clean question object with only the fields the backend expects
       const cleanQuestion = {
         text: questionState.text,
         type: questionState.type,
@@ -425,40 +425,52 @@ const Learn = () => {
         correct_option: parseInt(questionState.correct_option) || 0,
         explanation: questionState.explanation || "",
       };
-
-      // Validate that all required fields are present
       if (!cleanQuestion.text) {
-        console.error("Missing question text");
         addMessage({
           type: "assistant",
           message: "Error: Question text is missing.",
         });
         return;
       }
-
       if (!cleanQuestion.type) {
-        console.error("Missing question type");
         addMessage({
           type: "assistant",
           message: "Error: Question type is missing.",
         });
         return;
       }
-
-      console.log("QuestionState:", questionState);
-      console.log("Clean question object:", cleanQuestion);
-      console.log("Answer:", answerToSend);
-      console.log("Answer type:", typeof answerToSend);
-
       const result = await contentAPI.checkAnswer(cleanQuestion, answerToSend);
-
+      // Build performance entry
+      const performanceEntry = {
+        subtopic: plan?.subtopics?.[currentStep]?.name || topic,
+        question: cleanQuestion.text,
+        answer: answerToSend,
+        correct: result.correct,
+        question_type: cleanQuestion.type,
+        difficulty: "medium",
+        timestamp: new Date().toISOString(),
+        options: cleanQuestion.options,
+        correct_option: cleanQuestion.correct_option,
+        selected_option: parseInt(answerToSend),
+        explanation: cleanQuestion.explanation,
+      };
+      // Update session incrementally
+      if (sessionId) {
+        await learningAPI.updateLearningSession(sessionId, {
+          question: cleanQuestion,
+          correct: result.correct,
+          performance_entry: performanceEntry,
+          subtopic: plan?.subtopics?.[currentStep]?.name || topic,
+          current_subtopic_index: currentStep,
+        });
+      }
       addMessageWithContinue(
         {
           type: "assistant",
           message: `**Feedback:** ${result.feedback}`,
           showContinueButton: true,
         },
-        () => {
+        async () => {
           if (plan && currentStep < plan.subtopics.length - 1) {
             const nextStep = currentStep + 1;
             addMessage({
@@ -467,7 +479,11 @@ const Learn = () => {
             });
             setSessionState("preparingSubtopic");
             setIsLoading(true);
-            buildSubtopicMessages(plan.subtopics[nextStep], nextStep, false);
+            await buildSubtopicMessages(
+              plan.subtopics[nextStep],
+              nextStep,
+              false
+            );
             setCurrentStep(nextStep);
             setQuestionState({
               text: "",
@@ -487,10 +503,17 @@ const Learn = () => {
               type: null,
             });
             setSelectedOption("");
+            // End and record session
+            if (sessionId) {
+              try {
+                await learningAPI.endLearningSession(sessionId);
+              } catch (err) {
+                console.error("Failed to end session", err);
+              }
+            }
           }
         }
       );
-
       setSessionState("waitingForUserAfterFeedback");
     } catch (error) {
       addMessage({ type: "assistant", message: `Failed to check answer.` });
@@ -719,19 +742,19 @@ const Learn = () => {
               ref={inputRef}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter" && !isLoading) {
-                  // Allow Enter for continue actions even with empty input
-                  if (
-                    inputMessage.trim() ||
-                    sessionState === "waitingForUserAfterExplanation" ||
-                    sessionState === "waitingForUserAfterExample"
-                  ) {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }
-                }
-              }}
+              // onKeyPress={(e) => {
+              //   if (e.key === "Enter" && !isLoading) {
+              //     // Allow Enter for continue actions even with empty input
+              //     if (
+              //       inputMessage.trim() ||
+              //       sessionState === "waitingForUserAfterExplanation" ||
+              //       sessionState === "waitingForUserAfterExample"
+              //     ) {
+              //       e.preventDefault();
+              //       handleSendMessage();
+              //     }
+              //   }
+              // }}
               placeholder={getPlaceholder()}
               className="w-full resize-none px-4 py-3 pr-12 border border-secondary-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 max-h-32"
               rows={1}

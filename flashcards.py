@@ -17,7 +17,17 @@ class FlashcardDeck:
         """Load existing deck or create new one."""
         if self.deck_file.exists():
             with self.deck_file.open('r') as f:
-                return json.load(f)
+                try:
+                    return json.load(f)
+                except json.JSONDecodeError:
+                    return {
+                        'decks': {},
+                        'stats': {
+                            'cards_studied': 0,
+                            'correct_answers': 0,
+                            'study_sessions': 0
+                        }
+                    }
         return {
             'decks': {},
             'stats': {
@@ -199,13 +209,13 @@ def get_all_due_cards_for_user(username: str) -> List[Dict]:
     flashcards_file = Path(f'flashcards_{username}.json')
     if not flashcards_file.exists():
         return []
-    
     with flashcards_file.open('r') as f:
-        data = json.load(f)
-    
+        try:
+            data = json.load(f)
+        except json.JSONDecodeError:
+            data = {}
     all_due_cards = []
     now = datetime.now()
-    
     for topic, cards in data.get('decks', {}).items():
         for card in cards:
             next_review = datetime.fromisoformat(card['next_review'])
@@ -214,7 +224,6 @@ def get_all_due_cards_for_user(username: str) -> List[Dict]:
                 card_info['topic'] = topic
                 card_info['days_overdue'] = (now - next_review).days
                 all_due_cards.append(card_info)
-    
     # Sort by most overdue first
     all_due_cards.sort(key=lambda x: x['days_overdue'], reverse=True)
     return all_due_cards
@@ -224,14 +233,14 @@ def get_spaced_repetition_schedule_for_user(username: str, days_ahead: int = 7) 
     flashcards_file = Path(f'flashcards_{username}.json')
     if not flashcards_file.exists():
         return []
-    
     with flashcards_file.open('r') as f:
-        data = json.load(f)
-    
+        try:
+            data = json.load(f)
+        except json.JSONDecodeError:
+            data = {}
     schedule = []
     now = datetime.now()
     cutoff = now + timedelta(days=days_ahead)
-    
     for topic, cards in data.get('decks', {}).items():
         for card in cards:
             next_review = datetime.fromisoformat(card['next_review'])
@@ -247,7 +256,6 @@ def get_spaced_repetition_schedule_for_user(username: str, days_ahead: int = 7) 
                     'ease_factor': card.get('ease_factor', 2.5),
                     'repetitions': card.get('repetitions', 0)
                 })
-    
     # Sort by review date (overdue first)
     schedule.sort(key=lambda x: x['days_until_review'])
     return schedule 

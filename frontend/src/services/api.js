@@ -119,28 +119,34 @@ export const learningAPI = {
     return response.data;
   },
 
+  startLearningSession: async (username, topic) => {
+    const response = await api.post("/api/learning/session/start", {
+      username,
+      topic,
+    });
+    return response.data;
+  },
+
+  getLearningSession: async (sessionId) => {
+    const response = await api.get(`/api/learning/session/${sessionId}`);
+    return response.data;
+  },
+
+  updateLearningSession: async (sessionId, data) => {
+    const response = await api.put(`/api/learning/session/${sessionId}`, data);
+    return response.data;
+  },
+
+  endLearningSession: async (sessionId) => {
+    const response = await api.delete(`/api/learning/session/${sessionId}`);
+    return response.data;
+  },
+
   recordSession: async (sessionData) => {
     const response = await api.post(
       "/api/learning/record-session",
       sessionData
     );
-    return response.data;
-  },
-
-  startInteractiveSession: async (username, topic) => {
-    const response = await api.post(
-      `/api/sessions/${username}/start/${encodeURIComponent(topic)}`
-    );
-    return response.data;
-  },
-
-  getSessionStatus: async (sessionId) => {
-    const response = await api.get(`/api/sessions/${sessionId}/status`);
-    return response.data;
-  },
-
-  endSession: async (sessionId) => {
-    const response = await api.delete(`/api/sessions/${sessionId}`);
     return response.data;
   },
 };
