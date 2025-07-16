@@ -1230,11 +1230,11 @@ async def end_review_session(session_id: str):
             high_difficulty_correct = sum(1 for perf in session["performance"]
                                           if perf["quality"] >= 3)
         
-            if final_score >= 0.8 and high_difficulty_correct >= 2:
+        if final_score >= 0.8 and high_difficulty_correct >= 2:
                 mastery_level = 'mastered'
-            elif final_score >= 0.6:
+        elif final_score >= 0.6:
                 mastery_level = 'intermediate'
-            else:
+        else:
                 mastery_level = 'beginner'
         
         # Record the session with detailed performance data

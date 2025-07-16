@@ -30,8 +30,20 @@
         "back": "\u2705 Correct! The context mentions that in the polar coordinate system, the radius vector always points out from the origin and is always positive. For the cartesian system, coordinates must be on a clearly defined surface, called the datum.",
         "subtopic": "gis coordinates",
         "created_at": "2025-07-15T17:31:12.054780",
-        "last_reviewed": "2025-07-15T17:32:18.695095",
-        "next_review": "2025-07-15T17:32:18.695095",
+        "last_reviewed": "2025-07-16T00:12:05.374868",
+        "next_review": "2025-07-17T00:12:05.374868",
+        "interval": 1,
+        "ease_factor": 2.5,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "What is the role of a datum in the context of GIS coordinates?",
+        "back": "\u2705 Correct! A datum in GIS coordinates serves as a framework for the origin of coordinates, similar to the function of a checkerboard for arranging checkers. Without a datum, coordinates lack a clear reference point on a defined surface.",
+        "subtopic": "gis coordinates",
+        "created_at": "2025-07-16T00:22:02.074832",
+        "last_reviewed": null,
+        "next_review": "2025-07-16T00:22:02.074832",
         "interval": 0,
         "ease_factor": 2.5,
         "repetitions": 0,
@@ -56,18 +68,18 @@
         "back": "\u2705 Correct! In the given context, '2' appears immediately before the topic 'Cartesian Coordinates', and after the heading 'No claim to original U.S. Government works', which suggests it is the number of a chapter or section in a book. Other options are incorrect because '2' does not correspond to any such details in the provided context.",
         "subtopic": "2",
         "created_at": "2025-07-15T16:35:48.301003",
-        "last_reviewed": "2025-07-15T16:39:15.736110",
-        "next_review": "2025-07-15T16:39:15.736110",
-        "interval": 0,
-        "ease_factor": 2.5,
-        "repetitions": 0,
+        "last_reviewed": "2025-07-16T00:12:03.381335",
+        "next_review": "2025-07-17T00:12:03.381335",
+        "interval": 1,
+        "ease_factor": 2.36,
+        "repetitions": 1,
         "difficulty_level": "medium"
       }
     ]
   },
   "stats": {
-    "cards_studied": 35,
-    "correct_answers": 22,
+    "cards_studied": 40,
+    "correct_answers": 25,
     "study_sessions": 0
   }
 }
