@@ -278,10 +278,11 @@ export const reviewAPI = {
     return response.data;
   },
 
-  startFlashcardReview: async (username) => {
+  startFlashcardReview: async (username, topics = []) => {
     const response = await api.post("/api/review/flashcards", {
       username,
       mode: "flashcards",
+      topics,
     });
     return response.data;
   },
@@ -305,6 +306,7 @@ export const reviewAPI = {
     const response = await api.post(
       `/api/review/session/${sessionId}/flashcard/answer`,
       {
+        session_id: sessionId,
         quality,
         topic,
         card_id: cardId,

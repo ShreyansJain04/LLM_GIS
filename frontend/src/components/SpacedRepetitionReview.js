@@ -8,14 +8,20 @@ import {
   LightBulbIcon,
   CheckCircleIcon,
   XCircleIcon,
+  ClockIcon,
 } from "@heroicons/react/24/outline";
 import ReactMarkdown from "react-markdown";
 import { reviewAPI } from "../services/api";
 import toast from "react-hot-toast";
+import FlashcardCard from "./FlashcardCard";
 
-const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
+const SpacedRepetitionReview = ({
+  sessionId,
+  onEndSession,
+  onPauseSession,
+}) => {
   const [session, setSession] = useState(null);
-  const [currentItem, setCurrentItem] = useState(null); // holds question
+  const [currentItem, setCurrentItem] = useState(null); // holds question or flashcard
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
@@ -24,10 +30,11 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [sessionState, setSessionState] = useState("active");
   const [readyForNext, setReadyForNext] = useState(false);
-  const [questionIndex, setQuestionIndex] = useState(1); // Start at 1 for first question
+  const [itemIndex, setItemIndex] = useState(1); // Start at 1 for first item
+  const [showFlashcardAnswer, setShowFlashcardAnswer] = useState(false);
+  const [flashcardSubmitting, setFlashcardSubmitting] = useState(false);
 
-  const reviewMode = mode || session?.mode || "Review";
-  const maxQuestions = session?.max_questions || 7;
+  const maxItems = session?.max_questions || 10;
 
   useEffect(() => {
     loadSession();
@@ -43,7 +50,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
       }
     } catch (error) {
       console.error("Failed to load session:", error);
-      toast.error("Failed to load review session");
+      toast.error("Failed to load spaced repetition session");
     } finally {
       setLoading(false);
     }
@@ -57,6 +64,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
       setFeedback(null);
       setAnswer("");
       setSelectedOption(null);
+      setShowFlashcardAnswer(false);
     } catch (error) {
       console.error("Failed to load item:", error);
       toast.error("Failed to load review item");
@@ -69,10 +77,12 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     e.preventDefault();
     if (submitting) return;
     if (!currentItem) return;
+    if (currentItem.type === "flashcard") return; // handled separately
 
     const userAnswer =
       currentItem.question?.type === "objective" ? selectedOption : answer;
     if (userAnswer === null || userAnswer === "") return;
+
     setSubmitting(true);
     try {
       const questionData = currentItem.question || currentItem;
@@ -81,6 +91,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
         questionData,
         String(userAnswer)
       );
+
       if (response && response.feedback !== undefined) {
         setFeedback(response.feedback);
         setIsCorrect(response.correct);
@@ -103,6 +114,42 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
       setSubmitting(false);
     }
   };
+
+  // Handler for flashcard recall rating
+  const handleFlashcardSelfAssessment = async (quality) => {
+    if (!currentItem || !currentItem.card) return;
+    setFlashcardSubmitting(true);
+    try {
+      console.log("sessionId", sessionId);
+      console.log("currentItem card", currentItem.card);
+      console.log("quality", quality, typeof quality);
+      // Call backend to update flashcard schedule
+      const response = await reviewAPI.submitFlashcardAnswer(
+        sessionId,
+        quality,
+        currentItem.card.topic,
+        currentItem.card.id
+      );
+      setShowFlashcardAnswer(false);
+      setFeedback(null);
+      setIsCorrect(null);
+      setSession((prev) => ({
+        ...prev,
+        total_questions: response.total_questions,
+        total_correct: response.total_correct,
+      }));
+
+      // Move to next item immediately
+      handleNext();
+    } catch (error) {
+      console.error("Failed to submit flashcard assessment:", error);
+      toast.error("Failed to submit assessment");
+    } finally {
+      setFlashcardSubmitting(false);
+    }
+  };
+
+  const handleShowFlashcardAnswer = () => setShowFlashcardAnswer(true);
 
   const handlePauseSession = async () => {
     try {
@@ -137,11 +184,16 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     }
   };
 
+  const handleNext = async () => {
+    setReadyForNext(false);
+    setItemIndex((prev) => prev + 1);
+    await loadNextItem();
+  };
+
   const getProgressPercentage = () => {
     if (!session) return 0;
-    // Calculate progress based on questions answered (not just correct answers)
-    const questionsAnswered = session.total_questions || 0;
-    return (questionsAnswered / maxQuestions) * 100;
+    const itemsAnswered = session.total_questions || 0;
+    return (itemsAnswered / maxItems) * 100;
   };
 
   const getScorePercentage = () => {
@@ -149,26 +201,21 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     return (session.total_correct / session.total_questions) * 100;
   };
 
-  const getDifficultyColor = (difficulty) => {
-    switch (difficulty) {
-      case "easy":
-        return "text-green-600 bg-green-100";
-      case "medium":
-        return "text-yellow-600 bg-yellow-100";
-      case "hard":
-        return "text-red-600 bg-red-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
+  const getItemTypeIcon = () => {
+    if (!currentItem)
+      return <ChartBarIcon className="w-5 h-5 text-primary-600" />;
+    return currentItem.type === "flashcard" ? (
+      <ClockIcon className="w-5 h-5 text-blue-600" />
+    ) : (
+      <ChartBarIcon className="w-5 h-5 text-primary-600" />
+    );
   };
 
-  const handleNext = async () => {
-    setReadyForNext(false);
-    setQuestionIndex((prev) => prev + 1);
-    await loadNextItem();
+  const getItemTypeLabel = () => {
+    if (!currentItem) return "Loading...";
+    return currentItem.type === "flashcard" ? "Flashcard" : "Question";
   };
 
-  // Show loading indicator for initial session load
   if (loading && !session) {
     return (
       <div className="space-y-6">
@@ -179,8 +226,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
               <div className="flex items-center space-x-2">
                 <LightBulbIcon className="w-5 h-5 text-primary-600" />
                 <span className="font-medium text-secondary-900">
-                  {reviewMode.charAt(0).toUpperCase() + reviewMode.slice(1)}{" "}
-                  Review
+                  Spaced Repetition Review
                 </span>
               </div>
               <div className="px-2 py-1 rounded-full text-xs font-medium text-gray-600 bg-gray-100">
@@ -193,7 +239,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
           <div className="mt-4">
             <div className="flex justify-between text-sm text-secondary-600 mb-1">
               <span>Progress</span>
-              <span>0/{maxQuestions} questions</span>
+              <span>0/{maxItems} items</span>
             </div>
             <div className="w-full bg-secondary-200 rounded-full h-2">
               <div
@@ -235,7 +281,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     );
   }
 
-  const isSessionComplete = session && session.total_questions >= maxQuestions;
+  const isSessionComplete = session && session.total_questions >= maxItems;
 
   return (
     <div className="space-y-6">
@@ -246,16 +292,11 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
             <div className="flex items-center space-x-2">
               <LightBulbIcon className="w-5 h-5 text-primary-600" />
               <span className="font-medium text-secondary-900">
-                {reviewMode.charAt(0).toUpperCase() + reviewMode.slice(1)}{" "}
-                Review
+                Spaced Repetition Review
               </span>
             </div>
-            <div
-              className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
-                session?.difficulty
-              )}`}
-            >
-              {session?.difficulty?.toUpperCase() || "MEDIUM"}
+            <div className="px-2 py-1 rounded-full text-xs font-medium text-blue-600 bg-blue-100">
+              SPACED
             </div>
           </div>
 
@@ -280,7 +321,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
           <div className="flex justify-between text-sm text-secondary-600 mb-1">
             <span>Progress</span>
             <span>
-              {questionIndex}/{maxQuestions} questions
+              {itemIndex}/{maxItems} items
             </span>
           </div>
           <div className="w-full bg-secondary-200 rounded-full h-2">
@@ -308,10 +349,10 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
         </div>
       </div>
 
-      {/* Question Interface */}
+      {/* Question or Flashcard Interface */}
       <AnimatePresence mode="wait">
         {loading && session ? (
-          // Show loading indicator for next question while keeping session header
+          // Show loading indicator for next item while keeping session header
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -322,7 +363,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
                 <div className="flex items-center space-x-2">
                   <ChartBarIcon className="w-5 h-5 text-primary-600" />
                   <span className="text-sm text-secondary-600">
-                    Loading next question...
+                    Loading next item...
                   </span>
                 </div>
                 {session?.current_topic && (
@@ -353,10 +394,10 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
           >
             <CheckCircleIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-secondary-900 mb-2">
-              Review Session Complete!
+              Spaced Repetition Complete!
             </h3>
             <p className="text-secondary-600 mb-6">
-              You've completed all {maxQuestions} questions. Great job!
+              You've completed all {maxItems} items. Great job!
             </p>
             <button
               onClick={handleEndSession}
@@ -365,10 +406,20 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
               View Results
             </button>
           </motion.div>
+        ) : currentItem && currentItem.type === "flashcard" ? (
+          <FlashcardCard
+            card={currentItem.card}
+            loading={false}
+            submitting={flashcardSubmitting}
+            showAnswer={showFlashcardAnswer}
+            onShowAnswer={handleShowFlashcardAnswer}
+            onSelfAssessment={handleFlashcardSelfAssessment}
+            progress={{ current: itemIndex, total: maxItems }}
+          />
         ) : (
           currentItem && (
             <motion.div
-              key={questionIndex}
+              key={itemIndex}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -377,9 +428,9 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <ChartBarIcon className="w-5 h-5 text-primary-600" />
+                    {getItemTypeIcon()}
                     <span className="text-sm text-secondary-600">
-                      Question {questionIndex}/{maxQuestions}
+                      {getItemTypeLabel()} {itemIndex}/{maxItems}
                     </span>
                   </div>
                   {session?.current_topic && (
@@ -472,14 +523,14 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
                   )}
                 </AnimatePresence>
 
-                {/* Next Question button appears only after feedback is shown and not at session end */}
+                {/* Next Item button appears only after feedback is shown and not at session end */}
                 {readyForNext && !isSessionComplete && (
                   <button
                     onClick={handleNext}
                     className="mt-4 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
                     disabled={loading}
                   >
-                    Next Question
+                    Next Item
                   </button>
                 )}
               </div>
@@ -491,4 +542,4 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
   );
 };
 
-export default ReviewSession;
+export default SpacedRepetitionReview;

@@ -58,7 +58,10 @@ const FlashcardTopicSelector = ({ username, onStartSession }) => {
 
     setStartingSession(true);
     try {
-      const sessionResponse = await reviewAPI.startFlashcardReview(username);
+      const sessionResponse = await reviewAPI.startFlashcardReview(
+        username,
+        selectedTopics
+      );
       onStartSession(sessionResponse.session_id);
     } catch (error) {
       console.error("Failed to start flashcard session:", error);

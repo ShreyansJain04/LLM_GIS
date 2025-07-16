@@ -16,6 +16,7 @@ import { contentAPI, userAPI, reviewAPI } from "../services/api";
 import toast from "react-hot-toast";
 import ReviewModeSelector from "../components/ReviewModeSelector";
 import ReviewSession from "../components/ReviewSession";
+import SpacedRepetitionReview from "../components/SpacedRepetitionReview";
 import FlashcardTopicSelector from "../components/FlashcardTopicSelector";
 import FlashcardReview from "../components/FlashcardReview";
 import { useNavigate } from "react-router-dom";
@@ -486,6 +487,12 @@ const Review = () => {
 
         {selectedMode === "flashcards" ? (
           <FlashcardReview
+            sessionId={sessionId}
+            onEndSession={handleEndSession}
+            onPauseSession={handlePauseSession}
+          />
+        ) : selectedMode === "spaced" ? (
+          <SpacedRepetitionReview
             sessionId={sessionId}
             onEndSession={handleEndSession}
             onPauseSession={handlePauseSession}

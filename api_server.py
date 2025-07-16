@@ -816,6 +816,9 @@ async def start_spaced_review(request: ReviewSessionRequest):
             recommendations = insights.get('personalized_recommendations', {})
             spaced_schedule = recommendations.get('spaced_repetition_schedule', [])
             due_items_raw = [item for item in spaced_schedule if item.get('days_until_review', 0) <= 0]
+            print("Recommendations: ", recommendations, "\n")
+            print("Spaced schedule: ", spaced_schedule, "\n")
+            print("Due items raw: ", due_items_raw, "\n")
         except Exception as e:
             print(f"Enhanced memory failed: {e}")
             due_items_raw = []
@@ -825,14 +828,18 @@ async def start_spaced_review(request: ReviewSessionRequest):
                 {"topic": "GIS Basics", "subtopic": "Fundamentals", "days_until_review": 0, "priority": "high"},
                 {"topic": "Coordinate Systems", "subtopic": "Projections", "days_until_review": 0, "priority": "medium"}
             ]
-        # Build mixed due_items list
+        # Build mixed due_items list - matching main.py logic
         mixed_due_items = []
+       
+        # The issue is due_items_raw is a list of similar item dicts of the only topic "gis coordinates"
         for item in due_items_raw:
             topic = item["topic"]
             subtopic = item.get("subtopic", topic)
             deck = FlashcardDeck(request.username, topic)
-            due_cards = deck.get_due_cards(limit=2)  # Limit to 2 per topic for session
+            due_cards = deck.get_due_cards(limit=2)  # Limit to 2 cards per topic (matching main.py)
+            
             if due_cards:
+                # Use flashcard system (matching main.py)
                 for card in due_cards:
                     mixed_due_items.append({
                         "type": "flashcard",
@@ -850,6 +857,7 @@ async def start_spaced_review(request: ReviewSessionRequest):
                         }
                     })
             else:
+                # Generate a question for this topic (matching main.py)
                 mixed_due_items.append({
                     "type": "question",
                     "topic": topic,
@@ -942,6 +950,8 @@ async def start_flashcard_review(request: ReviewSessionRequest):
         # Get all topics with due cards
         from flashcards import get_all_due_cards_for_user
         all_due_cards = get_all_due_cards_for_user(request.username)
+        if request.topics:
+            all_due_cards = [card for card in all_due_cards if card['topic'] in request.topics]
         
         
         # Group by topic
@@ -1017,10 +1027,12 @@ async def get_flashcard_topics(username: str):
             topics_with_due[topic]['total_cards'] = stats['total_cards']
             
             # Get next review date (if any cards exist) -- Error here for now
-            # if stats['total_cards'] > 0:
-            #     upcoming_cards = deck.get_cards_due_within_days(30)  # Next 30 days
-            #     if upcoming_cards:
-            #         topics_with_due[topic]['next_review'] = upcoming_cards[0]['review_date']
+            if stats['total_cards'] > 0:
+                upcoming_cards = deck.get_cards_due_within_days(30)  # Next 30 days
+                print("Upcoming cards: ", upcoming_cards, type(upcoming_cards), "\n")
+                print("Topics with due: ", topics_with_due[topic], type(topics_with_due[topic]), "\n")
+                if upcoming_cards:
+                    topics_with_due[topic]['next_review'] = upcoming_cards[0]['next_review']    
             
         
         return {
@@ -1090,16 +1102,13 @@ async def submit_flashcard_answer(session_id: str, request: dict):
         
         session = active_sessions[session_id]
         
-        if session["mode"] != "flashcards":
+        if session["mode"] != "flashcards" and session["mode"] != "spaced":
             raise HTTPException(status_code=400, detail="Not a flashcard session")
         
         quality = request.get("quality")  # 0-5 rating
         topic = request.get("topic")
         card_id = request.get("card_id")
-        print(f"Quality: {quality}, Topic: {topic}, Card ID: {card_id}")
-        print(type(quality))
-        print(type(topic))
-        print(type(card_id))
+        
         
         if quality is None or quality < 0 or quality > 5:
             raise HTTPException(status_code=400, detail="Invalid quality rating (0-5)")
@@ -1110,29 +1119,32 @@ async def submit_flashcard_answer(session_id: str, request: dict):
         # Update the card in the flashcard system
         from flashcards import FlashcardDeck
         deck = FlashcardDeck(session["username"], topic)
-        print(session["username"])
+        
         
         # Find the card in the due cards
-        due_cards = session["topics_with_due"].get(topic, [])
+        due_cards = deck.get_due_cards()
         if not due_cards:
             raise HTTPException(status_code=400, detail="No cards found for topic")
         
         current_card = due_cards[0]
-        print(f"Current card: {current_card}")
+        print("Current card: ", current_card, "\n")
+       
         
         # Update card scheduling
         deck.update_card_schedule(current_card, quality)
         deck.update_stats(quality >= 3)  # Consider 3+ as correct
+        print("Session: ", session, "\n")
         
         # Update session stats
-        session["cards_reviewed"] += 1
-        if quality >= 3:
-            session["correct_answers"] += 1 # This is the total correct answers but session["total_correct"] gives error
-        print(f"Session: {session}")
+        if session["mode"] == "flashcards":
+            session["cards_reviewed"] += 1
+            if quality >= 3:
+                session["correct_answers"] += 1 # This is the total correct answers but session["total_correct"] gives error
+        
         # Record performance
         performance_entry = {
             'topic': topic,
-            'card_front': current_card['front'],
+            'card_front': current_card['front'],    
             'quality': quality,
             'correct': quality >= 3,
             'timestamp': datetime.now().isoformat(),
@@ -1141,7 +1153,8 @@ async def submit_flashcard_answer(session_id: str, request: dict):
         }
         session["performance"].append(performance_entry)
         
-        # Remove the reviewed card from due cards
+        # Remove the reviewed card from due cards -- this is the issue
+        print(session["topics_with_due"][topic])
         session["topics_with_due"][topic].pop(0)
         
         # If no more cards in this topic, remove the topic
@@ -1223,7 +1236,9 @@ async def end_review_session(session_id: str):
         
         
         # Determine mastery level based on difficulty and consistency
-        if session["mode"] != "flashcards":
+        if session["mode"] == "spaced":
+            high_difficulty_correct = 0
+        elif session["mode"] != "flashcards":
             high_difficulty_correct = sum(1 for perf in session["performance"] 
                                         if perf['correct'] and perf['difficulty'] in ['medium', 'hard'])
         else:
@@ -1238,7 +1253,7 @@ async def end_review_session(session_id: str):
                 mastery_level = 'beginner'
         
         # Record the session with detailed performance data
-        if session["performance"] and session["mode"] != "flashcards":
+        if session["performance"] and session["mode"] != "flashcards" and session["mode"] != "spaced":
             record_learning_session(
                 username=session["username"],
                 topic=f"{session['mode'].title()} Review Session",
@@ -1406,8 +1421,8 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
         session = active_sessions[session_id]
         # For spaced mode, handle flashcard or question
         if session["mode"] == "spaced":
-            idx = session["total_questions"]
             due_items = session["due_items"]
+            idx = session["total_questions"]
             if idx >= len(due_items):
                 raise HTTPException(status_code=400, detail="No more due items for review")
             item = due_items[idx]
@@ -1423,21 +1438,25 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
                     raise HTTPException(status_code=400, detail="Invalid quality rating (0-5) for flashcard")
                 from flashcards import FlashcardDeck
                 deck = FlashcardDeck(session["username"], item["topic"])
-                # Find the card by id (created_at)
-                card_id = item["card"]["id"].split("_", 1)[-1]
-                card = None
-                for c in deck.get_due_cards():
-                    if c.get("created_at", "unknown") == card_id:
-                        card = c
-                        break
-                if not card:
-                    # fallback: match by front text
-                    for c in deck.get_due_cards():
-                        if c["front"] == item["card"]["front"]:
-                            card = c
-                            break
-                if not card:
-                    raise HTTPException(status_code=404, detail="Flashcard not found for update")
+                
+                # Use the card data from the session item instead of searching
+                # This avoids the 404 error when card is no longer in due cards
+                card_data = item["card"]
+                
+                # Create a card object that matches what the flashcard system expects
+                card = {
+                    'front': card_data['front'],
+                    'back': card_data['back'],
+                    'topic': card_data['topic'],
+                    'subtopic': card_data.get('subtopic', card_data['topic']),
+                    'created_at': card_data['id'].split("_", 1)[-1] if '_' in card_data['id'] else 'unknown',
+                    'ease_factor': card_data.get('ease_factor', 2.5),
+                    'repetitions': card_data.get('repetitions', 0),
+                    'difficulty_level': card_data.get('difficulty_level', 'medium'),
+                    'last_reviewed': None,
+                    'next_review': datetime.now().isoformat(),
+                    'interval': 0
+                }
                 deck.update_card_schedule(card, quality)
                 deck.update_stats(quality >= 3)
                 if quality >= 3:
@@ -1457,7 +1476,7 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
                     "type": "flashcard",
                     "quality": quality,
                     "correct": quality >= 3,
-                    "cards_reviewed": session["total_questions"],
+                    "total_questions": session["total_questions"],
                     "total_correct": session["total_correct"],
                     "session_complete": session["total_questions"] >= session["max_questions"],
                     "accuracy": session["total_correct"] / session["total_questions"] if session["total_questions"] > 0 else 0
