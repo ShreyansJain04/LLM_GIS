@@ -388,7 +388,11 @@ async def end_learning_session(session_id: str):
         mastery_level = 'intermediate'
     else:
         mastery_level = 'beginner'
-    # Record session
+    
+    # Update session state with final score for enhanced memory
+    s['final_score'] = final_score
+    
+    # Record session in basic memory system
     try:
         record_learning_session(
             s['username'],
@@ -398,66 +402,18 @@ async def end_learning_session(session_id: str):
             mastery_level
         )
     except Exception as e:
-        print(f"Failed to record session: {e}")
+        print(f"Failed to record session in basic memory: {e}")
+    
+    # Record session in enhanced memory system for focus area updates
+    try:
+        from enhanced_memory import EnhancedMemorySystem
+        enhanced_memory = EnhancedMemorySystem(s['username'])
+        enhanced_memory.record_interactive_session(s)
+    except Exception as e:
+        print(f"Failed to record session in enhanced memory: {e}")
+    
     del active_sessions[session_id]
     return {"success": True, "message": "Session ended and recorded", "final_score": final_score, "mastery_level": mastery_level}
-
-@app.post("/api/learning/record-session")
-async def record_session(request: LearningSessionRequest):
-    """Record a learning session."""
-    try:
-        record_learning_session(
-            request.username,
-            request.topic,
-            request.subtopics_performance,
-            request.final_score,
-            request.mastery_level
-        )
-        return {"success": True, "message": "Session recorded successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-# Interactive session endpoints
-# @app.post("/api/sessions/{username}/start/{topic}")
-# async def start_interactive_session(username: str, topic: str):
-#     """Start an interactive learning session."""
-#     try:
-#         session_id = f"{username}_{topic}_{datetime.now().timestamp()}"
-#         session = InteractiveSession(username, topic)
-#         active_sessions[session_id] = session
-        
-#         # Get initial content
-#         plan = PlannerAgent(username).build_learning_plan(topic)
-        
-#         return {
-#             "session_id": session_id,
-#             "topic": topic,
-#             "plan": plan,
-#             "status": "started"
-#         }
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
-
-# @app.get("/api/sessions/{session_id}/status")
-# async def get_session_status(session_id: str):
-#     """Get the status of an interactive session."""
-#     if session_id not in active_sessions:
-#         raise HTTPException(status_code=404, detail="Session not found")
-    
-#     session = active_sessions[session_id]
-#     return {
-#         "session_id": session_id,
-#         "username": session.username,
-#         "topic": session.topic,
-#         "status": "active"
-#     }
-
-# @app.delete("/api/sessions/{session_id}")
-# async def end_session(session_id: str):
-#     """End an interactive session."""
-#     if session_id in active_sessions:
-#         del active_sessions[session_id]
-#     return {"success": True, "message": "Session ended"}
 
 # Document and source management
 @app.get("/api/sources")

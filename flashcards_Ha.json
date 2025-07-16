@@ -12,6 +12,30 @@
         "ease_factor": 2.6,
         "repetitions": 1,
         "difficulty_level": "medium"
+      },
+      {
+        "front": "What is the role of a Geographic Information System (GIS) in solving geospatial problems?",
+        "back": "\u2705 Correct! The context explains that a GIS is a tool that can be used to answer questions, support decision making, keep a record of geographic data, and make maps. Furthermore, it indicates that a GIS often uncovers new potential questions and problems, expanding the scope of inquiry.",
+        "subtopic": "GIS Basics",
+        "created_at": "2025-07-16T19:18:51.585936",
+        "last_reviewed": "2025-07-16T19:51:43.667661",
+        "next_review": "2025-07-17T19:51:43.667661",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "What is the primary purpose of a GIS as per the application approach?",
+        "back": "\u2705 Correct! The application approach to GISs sees it primarily as a tool used to answer questions, support decision making, maintain an inventory of geographic data and information, and make maps. Although GIS can generate more complex problems and provide future pathways, these are not its primary purpose under this approach.",
+        "subtopic": "GIS Basics",
+        "created_at": "2025-07-16T19:52:04.192500",
+        "last_reviewed": null,
+        "next_review": "2025-07-16T19:52:04.192500",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
       }
     ],
     "Coordinate Systems": [
@@ -27,11 +51,73 @@
         "repetitions": 1,
         "difficulty_level": "medium"
       }
+    ],
+    "geocoding": [
+      {
+        "front": "What is the process of assigning latitude and longitude to specific geographic data such as street addresses, zip codes, and place names called?",
+        "back": "\u2705 Correct! The process of assigning latitude and longitude to specific geographic data such as street addresses, zip codes, and place names is called geocoding. Geotagging, on the other hand, is the process of adding geographic information to various types of content like text, photographs, video, and music. Geomapping and geotracking are not defined in the provided context.",
+        "subtopic": "geocoding",
+        "created_at": "2025-07-16T19:46:39.530362",
+        "last_reviewed": null,
+        "next_review": "2025-07-16T19:46:39.530362",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "What is the primary function of the process known as geocoding in the context of geographic data?",
+        "back": "\u2705 Correct! Geocoding refers to the process of assigning geographical coordinates (i.e., latitude and longitude) to specific geographic data such as street addresses, zip codes, and place names. This makes it possible to locate these data points on a map or use them for spatial analysis.",
+        "subtopic": "geocoding",
+        "created_at": "2025-07-16T19:46:57.817817",
+        "last_reviewed": null,
+        "next_review": "2025-07-16T19:46:57.817817",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "What is the primary purpose of geocoding in the context of geographic data management?",
+        "back": "\u2705 Correct! Geocoding is the process of converting addresses into geographic coordinates (like latitude and longitude), which you can use to place markers on a map, or position the map. So, the right answer is to assign latitude and longitude to specific geographic data. The other options describe different processes related to geographic data but they are not what geocoding is primarily used for.",
+        "subtopic": "geocoding",
+        "created_at": "2025-07-16T19:49:23.950384",
+        "last_reviewed": null,
+        "next_review": "2025-07-16T19:49:23.950384",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "What is the process of geocoding in the context of geographic data? ",
+        "back": "\u2705 Correct! According to the provided context, geocoding refers to the process of assigning latitude and longitude to specific geographic data such as street addresses, zip codes, etc., thus mapping them to specific locations on the Earth's surface.",
+        "subtopic": "geocoding",
+        "created_at": "2025-07-16T19:50:58.871911",
+        "last_reviewed": null,
+        "next_review": "2025-07-16T19:50:58.871911",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "What is the primary purpose of geocoding in the context of geospatial data management?",
+        "back": "\u2705 Correct! Geocoding is the process of converting addresses into geographic coordinates (latitude and longitude), which can be used to place markers on a map or position the map. It does not involve adding multimedia content to geographic information, creating cadastral maps, or managing geospatial data in general.",
+        "subtopic": "geocoding",
+        "created_at": "2025-07-16T19:51:21.711934",
+        "last_reviewed": null,
+        "next_review": "2025-07-16T19:51:21.711934",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
+      }
     ]
   },
   "stats": {
-    "cards_studied": 2,
-    "correct_answers": 2,
+    "cards_studied": 4,
+    "correct_answers": 3,
     "study_sessions": 0
   }
 }

@@ -4,7 +4,6 @@ import {
   Routes,
   Route,
   Navigate,
-  useParams,
 } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { UserProvider, useUser } from "./contexts/UserContext";
@@ -16,27 +15,7 @@ import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
 import Sources from "./pages/Sources";
 import Review from "./pages/Review";
-import ReviewSession from "./components/ReviewSession";
 import Test from "./pages/Test";
-// import Insights from './pages/Insights';
-
-// Placeholder components for pages not yet created
-const PlaceholderPage = ({ title }) => (
-  <div className="p-6">
-    <div className="max-w-2xl mx-auto text-center">
-      <h1 className="text-3xl font-bold text-secondary-900 mb-4">{title}</h1>
-      <p className="text-secondary-600">This page is coming soon!</p>
-    </div>
-  </div>
-);
-
-const Insights = () => <PlaceholderPage title="Learning Insights" />;
-
-// Helper wrapper to pass sessionId from URL to ReviewSession
-function ReviewSessionRouteWrapper() {
-  const { sessionId } = useParams();
-  return <ReviewSession sessionId={sessionId} />;
-}
 
 const MainApp = () => {
   const { isAuthenticated, loading } = useUser();
@@ -67,7 +46,6 @@ const MainApp = () => {
           <Route path="/chat" element={<Chat />} />
           <Route path="/review" element={<Review />} />
           <Route path="/test" element={<Test />} />
-          <Route path="/insights" element={<Insights />} />
           <Route path="/sources" element={<Sources />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

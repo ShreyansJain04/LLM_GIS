@@ -5,7 +5,6 @@ import {
   HomeIcon,
   BookOpenIcon,
   AcademicCapIcon,
-  ChartBarIcon,
   DocumentTextIcon,
   CogIcon,
   ArrowRightOnRectangleIcon,
@@ -20,7 +19,6 @@ const navigationItems = [
   { id: "learn", name: "Learn", icon: BookOpenIcon, path: "/learn" },
   { id: "review", name: "Review", icon: AcademicCapIcon, path: "/review" },
   { id: "test", name: "Test", icon: DocumentTextIcon, path: "/test" },
-  { id: "insights", name: "Insights", icon: ChartBarIcon, path: "/insights" },
   { id: "sources", name: "Sources", icon: DocumentTextIcon, path: "/sources" },
   { id: "settings", name: "Settings", icon: CogIcon, path: "/settings" },
 ];

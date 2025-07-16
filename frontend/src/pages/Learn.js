@@ -742,19 +742,19 @@ const Learn = () => {
               ref={inputRef}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              // onKeyPress={(e) => {
-              //   if (e.key === "Enter" && !isLoading) {
-              //     // Allow Enter for continue actions even with empty input
-              //     if (
-              //       inputMessage.trim() ||
-              //       sessionState === "waitingForUserAfterExplanation" ||
-              //       sessionState === "waitingForUserAfterExample"
-              //     ) {
-              //       e.preventDefault();
-              //       handleSendMessage();
-              //     }
-              //   }
-              // }}
+              onKeyPress={(e) => {
+                if (e.key === "Enter" && !isLoading) {
+                  // Allow Enter for continue actions even with empty input
+                  if (
+                    inputMessage.trim() ||
+                    sessionState === "waitingForUserAfterExplanation" ||
+                    sessionState === "waitingForUserAfterExample"
+                  ) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }
+              }}
               placeholder={getPlaceholder()}
               className="w-full resize-none px-4 py-3 pr-12 border border-secondary-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 max-h-32"
               rows={1}

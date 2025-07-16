@@ -1,15 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  EyeIcon,
-  EyeSlashIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  ChartBarIcon,
-  LightBulbIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
-import ReactMarkdown from "react-markdown";
+import React, { useState, useEffect, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
+import { LightBulbIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { reviewAPI } from "../services/api";
 import toast from "react-hot-toast";
 import FlashcardCard from "./FlashcardCard";
@@ -22,28 +13,17 @@ const FlashcardReview = ({ sessionId, onEndSession, onPauseSession }) => {
   const [showAnswer, setShowAnswer] = useState(false);
   const [sessionState, setSessionState] = useState("active");
 
-  useEffect(() => {
-    loadSession();
-  }, [sessionId]);
-
-  const loadSession = async () => {
+  const handleEndSession = useCallback(async () => {
     try {
-      const sessionData = await reviewAPI.getSession(sessionId);
-      setSession(sessionData);
-      setSessionState(sessionData.session_state);
-
-      if (sessionData.session_state === "active") {
-        await loadNextCard();
-      }
+      const result = await reviewAPI.endSession(sessionId);
+      onEndSession?.(result);
     } catch (error) {
-      console.error("Failed to load session:", error);
-      toast.error("Failed to load flashcard session");
-    } finally {
-      setLoading(false);
+      console.error("Failed to end session:", error);
+      toast.error("Failed to end session");
     }
-  };
+  }, [sessionId, onEndSession]);
 
-  const loadNextCard = async () => {
+  const loadNextCard = useCallback(async () => {
     setLoading(true);
     try {
       const cardData = await reviewAPI.getNextFlashcard(sessionId);
@@ -63,7 +43,28 @@ const FlashcardReview = ({ sessionId, onEndSession, onPauseSession }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [sessionId, handleEndSession]);
+
+  const loadSession = useCallback(async () => {
+    try {
+      const sessionData = await reviewAPI.getSession(sessionId);
+      setSession(sessionData);
+      setSessionState(sessionData.session_state);
+
+      if (sessionData.session_state === "active") {
+        await loadNextCard();
+      }
+    } catch (error) {
+      console.error("Failed to load session:", error);
+      toast.error("Failed to load flashcard session");
+    } finally {
+      setLoading(false);
+    }
+  }, [sessionId, loadNextCard]);
+
+  useEffect(() => {
+    loadSession();
+  }, [loadSession]);
 
   const handleShowAnswer = () => {
     setShowAnswer(true);
@@ -130,31 +131,9 @@ const FlashcardReview = ({ sessionId, onEndSession, onPauseSession }) => {
     }
   };
 
-  const handleEndSession = async () => {
-    try {
-      const result = await reviewAPI.endSession(sessionId);
-      onEndSession?.(result);
-    } catch (error) {
-      console.error("Failed to end session:", error);
-      toast.error("Failed to end session");
-    }
-  };
-
   const getProgressPercentage = () => {
     if (!session || session.total_cards === 0) return 0;
     return (session.cards_reviewed / session.total_cards) * 100;
-  };
-
-  const getQualityDescription = (quality) => {
-    const descriptions = {
-      0: "Complete blackout",
-      1: "Incorrect, but remembered",
-      2: "Incorrect, but seemed easy",
-      3: "Correct, but difficult",
-      4: "Correct",
-      5: "Correct and easy",
-    };
-    return descriptions[quality] || "";
   };
 
   if (loading && !session) {

@@ -17,50 +17,6 @@ import FlashcardTopicSelector from "../components/FlashcardTopicSelector";
 import FlashcardReview from "../components/FlashcardReview";
 import { useNavigate } from "react-router-dom";
 
-const ReviewCard = ({ topic, progress, onSelect }) => (
-  <motion.div
-    whileHover={{ scale: 1.02 }}
-    className="bg-white rounded-xl shadow-sm border border-secondary-200 p-4 cursor-pointer"
-    onClick={() => onSelect(topic)}
-  >
-    <div className="flex items-start justify-between">
-      <div className="flex items-center space-x-3">
-        <div className="p-2 bg-primary-100 rounded-lg">
-          <BookmarkIcon className="w-5 h-5 text-primary-600" />
-        </div>
-        <div>
-          <h3 className="font-medium text-secondary-900">{topic}</h3>
-          <p className="text-sm text-secondary-600">
-            Mastery: {Math.round(progress * 100)}%
-          </p>
-        </div>
-      </div>
-      <div className="w-16 h-16">
-        <svg className="transform -rotate-90">
-          <circle
-            cx="32"
-            cy="32"
-            r="28"
-            stroke="#E2E8F0"
-            strokeWidth="4"
-            fill="none"
-          />
-          <circle
-            cx="32"
-            cy="32"
-            r="28"
-            stroke="#4F46E5"
-            strokeWidth="4"
-            fill="none"
-            strokeDasharray={`${progress * 175.93} 175.93`}
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
-    </div>
-  </motion.div>
-);
-
 const Review = () => {
   const { user } = useUser();
   const navigate = useNavigate();
@@ -72,10 +28,6 @@ const Review = () => {
   const [flashcardMode, setFlashcardMode] = useState(false);
   const [weakTopics, setWeakTopics] = useState([]);
   const [progress, setProgress] = useState({});
-  // const [currentQuestion, setCurrentQuestion] = useState(null);
-  // const [feedback, setFeedback] = useState(null);
-  // const [isCorrect, setIsCorrect] = useState(null);
-  // const [selectedTopic, setSelectedTopic] = useState(null);
   const [dueItems, setDueItems] = useState([]);
   const [summary, setSummary] = useState(null);
   const [showIntensiveTopicSelector, setShowIntensiveTopicSelector] =
@@ -92,10 +44,10 @@ const Review = () => {
     try {
       // Use existing user insights endpoint
       const userInsights = await userAPI.getUserInsights(user.username);
-
+      console.log("userInsights", userInsights);
       // Process insights like main.py does
       const recommendations = userInsights.personalized_recommendations || {};
-
+      console.log("recommendations", recommendations);
       // Get focus areas from enhanced memory
       const focusAreas = recommendations.focus_areas || [];
 
@@ -113,7 +65,7 @@ const Review = () => {
         study_streak: 0,
         weak_areas_count: 0,
       };
-
+      console.log("focusAreas", focusAreas);
       setWeakTopics(focusAreas);
       setDueItems(dueItemsData);
       setSummary(summaryData);
@@ -374,28 +326,28 @@ const Review = () => {
             </button>
             {weakTopics.map((area, idx) => (
               <button
-                key={area.topic}
+                key={idx}
                 className={`mr-2 mb-2 px-4 py-2 rounded-lg border ${
-                  intensiveSelectedTopics.includes(area.topic)
+                  intensiveSelectedTopics.includes(area.subtopic)
                     ? "bg-primary-600 text-white border-primary-600"
                     : "border-secondary-200"
                 }`}
                 onClick={() => {
                   if (intensiveSelectedTopics.includes("__ALL__")) {
-                    setIntensiveSelectedTopics([area.topic]);
-                  } else if (intensiveSelectedTopics.includes(area.topic)) {
+                    setIntensiveSelectedTopics([area.subtopic]);
+                  } else if (intensiveSelectedTopics.includes(area.subtopic)) {
                     setIntensiveSelectedTopics(
-                      intensiveSelectedTopics.filter((t) => t !== area.topic)
+                      intensiveSelectedTopics.filter((t) => t !== area.subtopic)
                     );
                   } else {
                     setIntensiveSelectedTopics([
                       ...intensiveSelectedTopics,
-                      area.topic,
+                      area.subtopic,
                     ]);
                   }
                 }}
               >
-                {area.topic}
+                {area.subtopic}
               </button>
             ))}
           </div>

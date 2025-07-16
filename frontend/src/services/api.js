@@ -141,14 +141,6 @@ export const learningAPI = {
     const response = await api.delete(`/api/learning/session/${sessionId}`);
     return response.data;
   },
-
-  recordSession: async (sessionData) => {
-    const response = await api.post(
-      "/api/learning/record-session",
-      sessionData
-    );
-    return response.data;
-  },
 };
 
 // Document Sources API

@@ -1,12 +1,25 @@
 {
   "weak_areas": [
-    "GIS coordinates - Introduction to GIS Coordinates",
     "GIS coordinates",
+    "Intensive Review Session - Introduction to Geocoding - Round 5",
+    "GIS coordinates - Types of GIS Coordinates",
+    "Intensive Review Session",
+    "Quick Review Session - geocoding - Round 3",
+    "geocoding",
     "GIS coordinates - Using GIS Coordinates",
-    "GIS coordinates - Types of GIS Coordinates"
+    "geocoding - Practical Geocoding",
+    "Intensive Review Session - Introduction to Geocoding - Round 2",
+    "geocoding - Geocoding Process",
+    "geocoding - Introduction to Geocoding",
+    "GIS coordinates - Introduction to GIS Coordinates",
+    "Intensive Review Session - Introduction to Geocoding - Round 6",
+    "Intensive Review Session - Introduction to Geocoding - Round 3"
   ],
   "topic_mastery": {
-    "GIS coordinates": "beginner"
+    "GIS coordinates": "beginner",
+    "geocoding": "beginner",
+    "Intensive Review Session": "beginner",
+    "Quick Review Session": "intermediate"
   },
   "history": [
     {
@@ -92,6 +105,458 @@
           }
         }
       }
+    },
+    {
+      "date": "2025-07-16T19:34:54.050093",
+      "topic": "geocoding",
+      "subtopics_performance": [
+        {
+          "subtopic": "Introduction to Geocoding",
+          "question": "What is the purpose of geocoding in the context of geographic data?",
+          "answer": "2",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T23:33:22.377Z",
+          "options": [
+            "It is the process of producing maps that visually represent geographic data.",
+            "Geocoding refers to the data structures and formats used in organizing geospatial data.",
+            "It is the process of tagging content with geographic information such as location.",
+            "It is the process of assigning geographical coordinates to particular addresses, zip codes, place names, and other geographic data."
+          ],
+          "correct_option": 3,
+          "selected_option": 2,
+          "explanation": "In the provided context, geocoding is described as the process of assigning geographical coordinates (e.g., latitude and longitude) to elements like street addresses, zip codes, place names, and other geographic data."
+        },
+        {
+          "subtopic": "Geocoding Process",
+          "question": "What is the main purpose of the geocoding process as described in the context?",
+          "answer": "2",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T23:33:50.447Z",
+          "options": [
+            "To create web-based applications that combine data and information from one source and map it with online mapping applications.",
+            "To add text, photographs, video, and music to geographic information.",
+            "To manage different formats and qualities of geospatial data in a single, unified dataset.",
+            "To convert particular street addresses, zip codes, place names and other geographic data into latitude and longitude coordinates."
+          ],
+          "correct_option": 3,
+          "selected_option": 2,
+          "explanation": "The context describes geocoding as a process that converts geographic data like street addresses, zip codes, and place names into latitude and longitude coordinates. The other options are related to geotagging, data management, and mapping mashups, respectively, which are different from geocoding."
+        },
+        {
+          "subtopic": "Geocoding Data Sources",
+          "question": "What is the process of converting street addresses, zip codes, place names and other geographic data into coordinates like latitude and longitude?",
+          "answer": "1",
+          "correct": true,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T23:34:20.148Z",
+          "options": [
+            "Alphanumeric coding",
+            "Geocoding",
+            "Geotagging",
+            "Mapping mashups"
+          ],
+          "correct_option": 1,
+          "selected_option": 1,
+          "explanation": "The context mentions that geocoding is the process of converting various location data, such as street addresses and zip codes, into geographical coordinates like latitude and longitude. Geotagging refers to the addition of geographic information to content, mapping mashups involve combining data with online mapping applications, and alphanumeric coding is not a term associated with geospatial data."
+        },
+        {
+          "subtopic": "Practical Geocoding",
+          "question": "What is a significant use of geocoding in the context of the geoweb?",
+          "answer": "2",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T23:34:52.563Z",
+          "options": [
+            "It facilitates the creation of geospatial databases.",
+            "It enables the integration of geographic information with different types of content like text, photographs, video, and music.",
+            "It allows for the conversion of GPS coordinates into street addresses.",
+            "It aids in the management and storage of geospatial data."
+          ],
+          "correct_option": 1,
+          "selected_option": 2,
+          "explanation": "The context mentions geocoding in the context of the geoweb, where it is used to add geographic information to different types of content, a process known as geotagging. This allows for new ways to access, search, organize, share, and distribute information. It doesn't mention geocoding's role in converting GPS coordinates into street addresses or aiding in geospatial data management and storage."
+        }
+      ],
+      "final_score": 0.25,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 4,
+        "objective_correct": 1,
+        "subjective_questions": 0,
+        "subjective_correct": 0,
+        "average_objective_score": 0.25,
+        "average_subjective_score": 0,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 4,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-16T19:34:54.099282",
+      "topic": "geocoding",
+      "subtopics_performance": [
+        {
+          "subtopic": "Introduction to Geocoding",
+          "question": "What is the purpose of geocoding in the context of geographic data?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Geocoding Process",
+          "question": "What is the main purpose of the geocoding process as described in the context?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Geocoding Data Sources",
+          "question": "What is the process of converting street addresses, zip codes, place names and other geographic data into coordinates like latitude and longitude?",
+          "user_answer": "1",
+          "correct": true,
+          "score": 1,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Practical Geocoding",
+          "question": "What is a significant use of geocoding in the context of the geoweb?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        }
+      ],
+      "final_score": 0.25,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 4,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.25,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 4,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-16T19:44:57.125479",
+      "topic": "Intensive Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "Introduction to Geocoding - Round 2",
+          "question": "What is the process of adding geographic data such as latitude and longitude to various locations and addresses called?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: Geocoding\n\nExplanation: The process of adding geographic data such as latitude and longitude to various locations and addresses is called geocoding. While geotagging also involves adding geographic information, it is typically used in the context of adding location information to media like photographs, video, and music.",
+          "difficulty": "easy",
+          "timestamp": "2025-07-16T19:44:04.692407",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "Introduction to Geocoding - Round 3",
+          "question": "What is the main purpose of geocoding as described in the text?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: To attach the latitude and longitude to specific street addresses, zip codes, place names, and other geographic data.\n\nExplanation: Geocoding is described in the text as the process of adding the geographic coordinates, specifically latitude and longitude, to specific locations such as addresses, zip codes, and place names. This makes the information spatially explicit and usable in various applications, including online mapping.",
+          "difficulty": "easy",
+          "timestamp": "2025-07-16T19:44:16.697130",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "Introduction to Geocoding - Round 4",
+          "question": "What is the relationship between geocoding and geotagging?",
+          "user_answer": "0",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! The text explains that geotagging, which involves adding geographic information to various content, is similar to geocoding, which involves adding geographic data like latitude and longitude to different locations and addresses.",
+          "difficulty": "easy",
+          "timestamp": "2025-07-16T19:44:28.252602",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "Introduction to Geocoding - Round 5",
+          "question": "What is an important tool that has contributed to the advent and ease of geocoding?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: Global Positioning System (GPS)\n\nExplanation: The context mentions that the Global Positioning System (GPS) has contributed to the advent of geocoding. Although GIS, online mapping applications, and geospatial data management are all linked to the process of geocoding, they are not specifically mentioned as tools that have driven its advent.",
+          "difficulty": "easy",
+          "timestamp": "2025-07-16T19:44:38.138045",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "Introduction to Geocoding - Round 6",
+          "question": "What is one significant benefit of integrating geographic information with different types of content like text, photographs, video, and music?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It opens up new ways to access, search, organize, share, and distribute information.\n\nExplanation: The integration of geographic information with different types of content, also known as geotagging, allows for new ways to access, search, organize, share, and distribute information, as stated in the context. The other options, while related to content and information management, are not mentioned or implied in the provided context.",
+          "difficulty": "easy",
+          "timestamp": "2025-07-16T19:44:50.257226",
+          "time_spent": null,
+          "type": "question"
+        }
+      ],
+      "final_score": 0.2,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 5,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.2,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 5,
+            "correct": 1
+          },
+          "medium": {
+            "total": 0,
+            "correct": 0
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-16T19:47:17.731824",
+      "topic": "Quick Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "geocoding - Round 2",
+          "question": "What is the process of assigning latitude and longitude to specific geographic data such as street addresses, zip codes, and place names called?",
+          "user_answer": "1",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! The process of assigning latitude and longitude to specific geographic data such as street addresses, zip codes, and place names is called geocoding. Geotagging, on the other hand, is the process of adding geographic information to various types of content like text, photographs, video, and music. Geomapping and geotracking are not defined in the provided context.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T19:46:39.530362",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "geocoding - Round 3",
+          "question": "What is the primary function of the process known as geocoding in the context of geographic data?",
+          "user_answer": "3",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! Geocoding refers to the process of assigning geographical coordinates (i.e., latitude and longitude) to specific geographic data such as street addresses, zip codes, and place names. This makes it possible to locate these data points on a map or use them for spatial analysis.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T19:46:57.796634",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "geocoding - Round 4",
+          "question": "How does geocoding contribute to geospatial data management?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It assigns latitude and longitude to geographic data which aids in organizing and storing the data.\n\nExplanation: Geocoding is a process used in geospatial data management that assigns latitude and longitude to specific geographic data like street addresses and zip codes, contributing to the organization and storage of the data. The other options are incorrect as they refer to other processes, not geocoding.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T19:47:10.994514",
+          "time_spent": null,
+          "type": "question"
+        }
+      ],
+      "final_score": 0.6666666666666666,
+      "mastery_level": "intermediate",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 3,
+        "subjective_correct": 2,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.6666666666666666,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 3,
+            "correct": 2
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-16T19:49:55.684444",
+      "topic": "Quick Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "geocoding - Round 2",
+          "question": "What is the process of assigning latitude and longitude to specific geographic data such as street addresses, zip codes, and place names called?",
+          "user_answer": "1",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! Geocoding is the process of transforming a description of a location\u2014such as a pair of coordinates, an address, or a name of a place\u2014to a location on the earth's surface. You can geocode by entering one location description at a time or by providing many of them at once in a table. The resulting locations are output as geographic features with attributes, which can be used for mapping or spatial analysis.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T19:48:57.833821",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "geocoding - Round 3",
+          "question": "What is the relationship between geocoding and the global positioning system (GPS)?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: GPS uses geocoding to assign latitude and longitude to specific locations.\n\nExplanation: Geocoding is the process of assigning latitude and longitude to specific locations. GPS, which provides geographic location data, uses this information to pinpoint locations.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T19:49:10.119182",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "geocoding - Round 4",
+          "question": "What is the primary purpose of geocoding in the context of geographic data management?",
+          "user_answer": "1",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! Geocoding is the process of converting addresses into geographic coordinates (like latitude and longitude), which you can use to place markers on a map, or position the map. So, the right answer is to assign latitude and longitude to specific geographic data. The other options describe different processes related to geographic data but they are not what geocoding is primarily used for.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T19:49:23.948624",
+          "time_spent": null,
+          "type": "question"
+        }
+      ],
+      "final_score": 0.6666666666666666,
+      "mastery_level": "intermediate",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 3,
+        "subjective_correct": 2,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.6666666666666666,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 3,
+            "correct": 2
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-16T19:51:25.457464",
+      "topic": "Quick Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "geocoding - Round 2",
+          "question": "What is the process of geocoding in the context of geographic data? ",
+          "user_answer": "3",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! According to the provided context, geocoding refers to the process of assigning latitude and longitude to specific geographic data such as street addresses, zip codes, etc., thus mapping them to specific locations on the Earth's surface.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T19:50:58.864833",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "geocoding - Round 3",
+          "question": "How does geocoding relate to the use of Global Positioning System (GPS)?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: Geocoding is the process of assigning latitude and longitude to places or addresses, similar to how GPS uses these coordinates for location.\n\nExplanation: The context mentions that geocoding involves the assignment of latitude and longitude to various geographic data like street addresses or places, which is a method similar to how GPS operates by using these coordinates for identifying locations.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T19:51:09.634833",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "geocoding - Round 4",
+          "question": "What is the primary purpose of geocoding in the context of geospatial data management?",
+          "user_answer": "1",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! Geocoding is the process of converting addresses into geographic coordinates (latitude and longitude), which can be used to place markers on a map or position the map. It does not involve adding multimedia content to geographic information, creating cadastral maps, or managing geospatial data in general.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T19:51:21.684672",
+          "time_spent": null,
+          "type": "question"
+        }
+      ],
+      "final_score": 0.6666666666666666,
+      "mastery_level": "intermediate",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 3,
+        "subjective_correct": 2,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.6666666666666666,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 3,
+            "correct": 2
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
     }
   ],
   "learning_plan": {},
@@ -141,7 +606,168 @@
       "common_mistakes": [],
       "last_attempt": "2025-07-16T16:20:08.661669",
       "improvement_rate": 0
+    },
+    "geocoding": {
+      "attempts": 2,
+      "average_score": 0.25,
+      "subtopic_scores": {
+        "Introduction to Geocoding": [
+          0,
+          0
+        ],
+        "Geocoding Process": [
+          0,
+          0
+        ],
+        "Geocoding Data Sources": [
+          1,
+          1
+        ],
+        "Practical Geocoding": [
+          0,
+          0
+        ]
+      },
+      "question_type_performance": {
+        "objective": {
+          "total": 4,
+          "correct": 1,
+          "trend": [
+            0.25
+          ]
+        },
+        "subjective": {
+          "total": 4,
+          "correct": 1,
+          "trend": [
+            0.25
+          ]
+        }
+      },
+      "difficulty_performance": {
+        "easy": {
+          "total": 0,
+          "correct": 0
+        },
+        "medium": {
+          "total": 8,
+          "correct": 2
+        },
+        "hard": {
+          "total": 0,
+          "correct": 0
+        }
+      },
+      "common_mistakes": [],
+      "last_attempt": "2025-07-16T19:34:54.099282",
+      "improvement_rate": 0.0
+    },
+    "Intensive Review Session": {
+      "attempts": 1,
+      "average_score": 0.2,
+      "subtopic_scores": {
+        "Introduction to Geocoding - Round 2": [
+          0
+        ],
+        "Introduction to Geocoding - Round 3": [
+          0
+        ],
+        "Introduction to Geocoding - Round 4": [
+          1
+        ],
+        "Introduction to Geocoding - Round 5": [
+          0
+        ],
+        "Introduction to Geocoding - Round 6": [
+          0
+        ]
+      },
+      "question_type_performance": {
+        "objective": {
+          "total": 0,
+          "correct": 0,
+          "trend": []
+        },
+        "subjective": {
+          "total": 5,
+          "correct": 1,
+          "trend": [
+            0.2
+          ]
+        }
+      },
+      "difficulty_performance": {
+        "easy": {
+          "total": 5,
+          "correct": 1
+        },
+        "medium": {
+          "total": 0,
+          "correct": 0
+        },
+        "hard": {
+          "total": 0,
+          "correct": 0
+        }
+      },
+      "common_mistakes": [],
+      "last_attempt": "2025-07-16T19:44:57.125479",
+      "improvement_rate": 0
+    },
+    "Quick Review Session": {
+      "attempts": 3,
+      "average_score": 0.6666666666666666,
+      "subtopic_scores": {
+        "geocoding - Round 2": [
+          1,
+          1,
+          1
+        ],
+        "geocoding - Round 3": [
+          1,
+          0,
+          0
+        ],
+        "geocoding - Round 4": [
+          0,
+          1,
+          1
+        ]
+      },
+      "question_type_performance": {
+        "objective": {
+          "total": 0,
+          "correct": 0,
+          "trend": []
+        },
+        "subjective": {
+          "total": 9,
+          "correct": 6,
+          "trend": [
+            0.6666666666666666,
+            0.6666666666666666,
+            0.6666666666666666
+          ]
+        }
+      },
+      "difficulty_performance": {
+        "easy": {
+          "total": 0,
+          "correct": 0
+        },
+        "medium": {
+          "total": 9,
+          "correct": 6
+        },
+        "hard": {
+          "total": 0,
+          "correct": 0
+        }
+      },
+      "common_mistakes": [],
+      "last_attempt": "2025-07-16T19:51:25.457464",
+      "improvement_rate": 0.0
     }
   },
-  "last_active": "2025-07-16T16:20:08.661669"
+  "last_active": "2025-07-16T19:51:25.457464"
 }

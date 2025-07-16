@@ -93,6 +93,10 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
           consecutive_wrong: response.consecutive_wrong,
           difficulty: response.new_difficulty,
         }));
+
+        // Check if this was the last question
+        const isLastQuestion = response.total_questions >= maxQuestions;
+        // Always show the next button immediately after feedback
         setReadyForNext(true);
       } else {
         toast.error("Failed to submit answer. Please try again.");
@@ -346,26 +350,6 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
               </div>
             </div>
           </motion.div>
-        ) : isSessionComplete ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6 text-center"
-          >
-            <CheckCircleIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-secondary-900 mb-2">
-              Review Session Complete!
-            </h3>
-            <p className="text-secondary-600 mb-6">
-              You've completed all {maxQuestions} questions. Great job!
-            </p>
-            <button
-              onClick={handleEndSession}
-              className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700"
-            >
-              View Results
-            </button>
-          </motion.div>
         ) : (
           currentItem && (
             <motion.div
@@ -473,14 +457,20 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
                   )}
                 </AnimatePresence>
 
-                {/* Next Question button appears only after feedback is shown and not at session end */}
-                {readyForNext && !isSessionComplete && (
+                {/* Next Question or View Results button appears after feedback is shown */}
+                {readyForNext && (
                   <button
-                    onClick={handleNext}
+                    onClick={
+                      session.total_questions >= maxQuestions
+                        ? handleEndSession
+                        : handleNext
+                    }
                     className="mt-4 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
                     disabled={loading}
                   >
-                    Next Question
+                    {session.total_questions >= maxQuestions
+                      ? "Continue to Results"
+                      : "Next Question"}
                   </button>
                 )}
               </div>
