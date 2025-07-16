@@ -48,6 +48,18 @@
         "ease_factor": 2.5,
         "repetitions": 0,
         "difficulty_level": "medium"
+      },
+      {
+        "front": "In the context of GIS coordinates, what is the significance of the datum?",
+        "back": "\u2705 Correct! The datum in GIS coordinates serves as a clearly defined surface or framework in which the coordinates have an origin. Without this datum, it's like having checkers without a checkerboard, where you can arrange and analyze the pieces, but without the framework, you never really know what you have.",
+        "subtopic": "gis coordinates",
+        "created_at": "2025-07-16T00:27:18.931906",
+        "last_reviewed": null,
+        "next_review": "2025-07-16T00:27:18.931906",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
       }
     ],
     "2": [

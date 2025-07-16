@@ -2,17 +2,19 @@
   "weak_areas": [
     "Spaced Review Session - 2 - Round 5",
     "Intensive Review Session - GIS Basics - Round 4",
-    "Intensive Review Session - GIS Basics - Round 5",
     "Spaced Review Session - gis coordinates - Round 2",
     "Adaptive Review Session - gis coordinates - Round 7",
+    "Adaptive Review Session - 2 - Round 4",
     "Intensive Review Session - GIS Basics - Round 2",
+    "Intensive Review Session - GIS Basics - Round 5",
     "Spaced Review Session - gis coordinates - Round 3",
     "Adaptive Review Session - gis coordinates - Round 6",
     "Adaptive Review Session - gis coordinates - Round 3",
     "Spaced Review Session",
-    "Spaced Review Session - gis coordinates - Round 5",
     "Spaced Review Session - 2 - Round 6",
+    "Spaced Review Session - gis coordinates - Round 5",
     "Spaced Review Session - 2 - Round 7",
+    "Adaptive Review Session",
     "Intensive Review Session",
     "Spaced Review Session - gis coordinates - Round 4",
     "Intensive Review Session - GIS Basics - Round 6"
@@ -20,7 +22,7 @@
   "topic_mastery": {
     "gis coordinates": "beginner",
     "Intensive Review Session": "beginner",
-    "Adaptive Review Session": "intermediate",
+    "Adaptive Review Session": "beginner",
     "Spaced Review Session": "beginner"
   },
   "history": [
@@ -2631,6 +2633,72 @@
           }
         }
       }
+    },
+    {
+      "date": "2025-07-16T00:28:15.753056",
+      "topic": "Adaptive Review Session",
+      "subtopics_performance": [
+        {
+          "subtopic": "gis coordinates - Round 2",
+          "question": "In the context of GIS coordinates, what is the significance of the datum?",
+          "user_answer": "1",
+          "correct": true,
+          "score": 1,
+          "feedback": "\u2705 Correct! The datum in GIS coordinates serves as a clearly defined surface or framework in which the coordinates have an origin. Without this datum, it's like having checkers without a checkerboard, where you can arrange and analyze the pieces, but without the framework, you never really know what you have.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T00:27:18.922160",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "gis coordinates - Round 3",
+          "question": "In a polar coordinate system used in GIS, what does the radius vector (\u03c1) represent and which direction does it point?",
+          "user_answer": "3",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It represents the distance from the origin and always points out from the origin.\n\nExplanation: In a polar coordinate system, the radius vector (\u03c1) is the distance from the origin and it always points out from the origin, as mentioned in the first provided context. The angle (\u03b8) would represent the rotation from a reference direction, not the radius vector.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T00:27:53.055485",
+          "time_spent": null,
+          "type": "question"
+        },
+        {
+          "subtopic": "2 - Round 4",
+          "question": "What does the '2' signify in the context provided?",
+          "user_answer": "0",
+          "correct": false,
+          "score": 0,
+          "feedback": "\u274c Incorrect. The correct answer was: It refers to the page number in the book.\n\nExplanation: In the given context, '2' is associated with topics discussed in the book and considering the formatting, it appears to be the page number where that information can be found.",
+          "difficulty": "medium",
+          "timestamp": "2025-07-16T00:28:12.216727",
+          "time_spent": null,
+          "type": "question"
+        }
+      ],
+      "final_score": 0.3333333333333333,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 3,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.3333333333333333,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 3,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
     }
   ],
   "learning_plan": {},
@@ -2689,8 +2757,8 @@
       "improvement_rate": -0.25
     },
     "Adaptive Review Session": {
-      "attempts": 25,
-      "average_score": 0.37094966660148676,
+      "attempts": 26,
+      "average_score": 0.3596647666210407,
       "subtopic_scores": {
         "gis coordinates - Round 2": [
           0,
@@ -2730,6 +2798,7 @@
           0,
           0,
           0,
+          1,
           1
         ],
         "gis coordinates - Round 3": [
@@ -2744,6 +2813,7 @@
           0,
           0,
           1,
+          0,
           0,
           0,
           0,
@@ -2801,7 +2871,8 @@
           0,
           0,
           1,
-          1
+          1,
+          0
         ],
         "2 - Round 5": [
           1,
@@ -2817,10 +2888,9 @@
           "trend": []
         },
         "subjective": {
-          "total": 95,
-          "correct": 31,
+          "total": 98,
+          "correct": 32,
           "trend": [
-            0.3333333333333333,
             0.0,
             0.0,
             0.3333333333333333,
@@ -2829,7 +2899,8 @@
             0.0,
             0.3333333333333333,
             0.0,
-            1.0
+            1.0,
+            0.3333333333333333
           ]
         }
       },
@@ -2839,8 +2910,8 @@
           "correct": 12
         },
         "medium": {
-          "total": 66,
-          "correct": 19
+          "total": 69,
+          "correct": 20
         },
         "hard": {
           "total": 0,
@@ -2848,8 +2919,8 @@
         }
       },
       "common_mistakes": [],
-      "last_attempt": "2025-07-16T00:22:31.916119",
-      "improvement_rate": 0.8986433334264475
+      "last_attempt": "2025-07-16T00:28:15.753056",
+      "improvement_rate": -0.037616333268153446
     },
     "Quick Review Session": {
       "attempts": 1,
@@ -3081,5 +3152,5 @@
       "improvement_rate": 0
     }
   },
-  "last_active": "2025-07-16T00:22:31.918308"
+  "last_active": "2025-07-16T00:28:15.753056"
 }

@@ -203,11 +203,51 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     await loadNextItem();
   };
 
+  // Show loading indicator for initial session load
   if (loading && !session) {
     return (
-      <div className="animate-pulse space-y-4">
-        <div className="h-8 bg-secondary-200 rounded w-1/4"></div>
-        <div className="h-64 bg-secondary-200 rounded"></div>
+      <div className="space-y-6">
+        {/* Session Header with Progress Bar */}
+        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <LightBulbIcon className="w-5 h-5 text-primary-600" />
+                <span className="font-medium text-secondary-900">
+                  {reviewMode.charAt(0).toUpperCase() + reviewMode.slice(1)}{" "}
+                  Review
+                </span>
+              </div>
+              <div className="px-2 py-1 rounded-full text-xs font-medium text-gray-600 bg-gray-100">
+                LOADING
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mt-4">
+            <div className="flex justify-between text-sm text-secondary-600 mb-1">
+              <span>Progress</span>
+              <span>0/{maxQuestions} questions</span>
+            </div>
+            <div className="w-full bg-secondary-200 rounded-full h-2">
+              <div
+                className="h-2 rounded-full bg-primary-600"
+                style={{ width: "0%" }}
+              ></div>
+            </div>
+            <div className="flex justify-between text-sm mt-2">
+              <span className="text-secondary-600">Score: 0</span>
+              <span className="font-medium text-primary-600">0%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Loading Content */}
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-secondary-200 rounded w-1/4"></div>
+          <div className="h-64 bg-secondary-200 rounded"></div>
+        </div>
       </div>
     );
   }
@@ -305,7 +345,42 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
 
       {/* Question or Flashcard Interface */}
       <AnimatePresence mode="wait">
-        {isSessionComplete ? (
+        {loading && session ? (
+          // Show loading indicator for next question while keeping session header
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6"
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <ChartBarIcon className="w-5 h-5 text-primary-600" />
+                  <span className="text-sm text-secondary-600">
+                    Loading next question...
+                  </span>
+                </div>
+                {session?.current_topic && (
+                  <span className="text-sm text-secondary-500">
+                    Topic: {session.current_topic}
+                  </span>
+                )}
+              </div>
+
+              <div className="animate-pulse space-y-4">
+                <div className="h-4 bg-secondary-200 rounded w-3/4"></div>
+                <div className="h-4 bg-secondary-200 rounded w-1/2"></div>
+                <div className="h-4 bg-secondary-200 rounded w-2/3"></div>
+                <div className="space-y-2">
+                  <div className="h-12 bg-secondary-200 rounded"></div>
+                  <div className="h-12 bg-secondary-200 rounded"></div>
+                  <div className="h-12 bg-secondary-200 rounded"></div>
+                  <div className="h-12 bg-secondary-200 rounded"></div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ) : isSessionComplete ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -328,7 +403,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
         ) : currentItem && currentItem.type === "flashcard" ? (
           <FlashcardCard
             card={currentItem.card}
-            loading={loading}
+            loading={false} // Don't show loading here since we handle it above
             submitting={flashcardSubmitting}
             showAnswer={showFlashcardAnswer}
             onShowAnswer={handleShowFlashcardAnswer}
