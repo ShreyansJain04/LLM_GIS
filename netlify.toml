@@ -1,10 +1,19 @@
+# --- Netlify build settings -----------------
 [build]
+  # tell Netlify to cd into the React project first
   base    = "frontend"
-  command = "npm run build"
-  publish = "frontend/build"
+  # skip ESLint + force CI=false so CRA treats warnings as warnings
+  command = "CI=false DISABLE_ESLINT_PLUGIN=true npm run build"
+  # CRA writes its output to <base>/build, so this is just 'build'
+  publish = "build"
 
+  # use a stable Node such as 20
+  [build.environment]
+    NODE_VERSION = "20"
+
+# --- Proxy API calls to Render --------------
 [[redirects]]
-  from = "/api/*"
-  to   = "https://llm-gis.onrender.com/:splat"
+  from   = "/api/*"
+  to     = "https://llm-gis.onrender.com//:splat"
   status = 200
-  force  = true   # override any existing file
+  force  = true
