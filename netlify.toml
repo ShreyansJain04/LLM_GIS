@@ -1,17 +1,15 @@
-# --- Netlify build settings -----------------
+# Tell Netlify to run your build from the repo root:
 [build]
-  # tell Netlify to cd into the React project first
-  base    = "frontend"
-  # skip ESLint + force CI=false so CRA treats warnings as warnings
-  command = "CI=false DISABLE_ESLINT_PLUGIN=true npm run build"
-  # CRA writes its output to <base>/build, so this is just 'build'
-  publish = "build"
+  # Run your React build in the frontend folder
+  command = "cd frontend && CI=false DISABLE_ESLINT_PLUGIN=true npm run build"
+  # Publish the built files from frontend/build
+  publish = "frontend/build"
 
-  # use a stable Node such as 20
+  # Keep your Node version
   [build.environment]
     NODE_VERSION = "20"
 
-# --- Proxy API calls to your local ngrok tunnel --------------
+# Proxy API calls to your ngrok backend:
 [[redirects]]
   from   = "/api/*"
   to     = "https://c0275f2199d2.ngrok-free.app/:splat"
