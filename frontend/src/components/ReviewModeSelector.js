@@ -21,7 +21,7 @@ const ReviewModeSelector = ({ onSelectMode, insights, loading }) => {
     {
       id: "intensive",
       title: "Intensive Review",
-      description: "Deep dive into specific weak areas",
+      description: "Focus on high-priority weaknesses",
       icon: AcademicCapIcon,
       color: "bg-purple-500",
     },

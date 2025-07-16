@@ -26,6 +26,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
   const [readyForNext, setReadyForNext] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(1); // Start at 1 for first question
 
+  console.log("session", session);
   const reviewMode = mode || session?.mode || "Review";
   const maxQuestions = session?.max_questions || 7;
 

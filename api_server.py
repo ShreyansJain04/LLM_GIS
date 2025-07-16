@@ -734,10 +734,9 @@ async def start_adaptive_review(request: ReviewSessionRequest):
 
 @app.post("/api/review/intensive")
 async def start_intensive_review(request: ReviewSessionRequest):
-    """Start intensive review session - Deep dive into specific weak areas."""
+    """Start intensive review session - Deep dive into specific weak areas or user-selected topics."""
     try:
         session_id = f"intensive_{request.username}_{datetime.now().isoformat()}"
-        
         # Get enhanced memory insights
         try:
             enhanced_memory = EnhancedMemorySystem(request.username)
@@ -747,20 +746,13 @@ async def start_intensive_review(request: ReviewSessionRequest):
         except Exception as e:
             print(f"Enhanced memory failed: {e}")
             focus_areas = []
-        
-        # Get highest priority area or use default
-        if focus_areas:
-            highest_priority = focus_areas[0]
-            topic = highest_priority['topic']
-        else:
-            topic = "GIS Basics"
-        
-        # Set initial difficulty based on past performance
+        # Use topics from request if provided, else fallback to focus_areas
+        topics = request.topics if request.topics else [fa['topic'] for fa in focus_areas] if focus_areas else ["GIS Basics"]
+        # Set initial difficulty based on past performance for the first topic
         try:
             profile = load_user(request.username)
-            topic_mastery = profile.get('performance_data', {}).get(topic, {})
+            topic_mastery = profile.get('performance_data', {}).get(topics[0], {})
             avg_score = topic_mastery.get('average_score', 0.5)
-            
             if avg_score >= 0.8:
                 difficulty = "hard"
             elif avg_score >= 0.6:
@@ -769,12 +761,13 @@ async def start_intensive_review(request: ReviewSessionRequest):
                 difficulty = "easy"
         except:
             difficulty = "medium"
-        
         session_state = {
             "session_id": session_id,
             "username": request.username,
             "mode": "intensive",
-            "current_topic": topic,
+            "topics": topics,
+            "current_topic_index": 0,
+            "current_topic": topics[0],
             "difficulty": difficulty,
             "consecutive_correct": 0,
             "consecutive_wrong": 0,
@@ -786,19 +779,17 @@ async def start_intensive_review(request: ReviewSessionRequest):
             "asked_questions": [],
             "started_at": datetime.now().isoformat(),
             "current_round": 0,
-            "max_questions": 5,
+            "max_questions": 5 * len(topics),
             "adaptive": True
         }
-        
         active_sessions[session_id] = session_state
-        
         return {
             "session_id": session_id,
             "mode": "intensive",
-            "topic": topic,
+            "topics": topics,
             "difficulty": difficulty,
             "focus_areas": focus_areas,
-            "message": f"Started intensive review session on {topic}"
+            "message": f"Started intensive review session on {', '.join(topics)}"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -1348,10 +1339,15 @@ async def get_next_question(session_id: str, topic: Optional[str] = None):
                 session["current_topic"] = topic
             
         elif session["mode"] == "intensive":
-            if not topic:
-                # Fallback to default topic for intensive mode
+            # Cycle through topics if multiple provided
+            topics = session.get("topics", [session.get("current_topic", "GIS Basics")])
+            idx = session.get("current_topic_index", 0)
+            if not topics:
                 topic = "GIS Basics"
+            else:
+                topic = topics[idx % len(topics)]
             session["current_topic"] = topic
+            session["current_topic_index"] = (idx + 1) % len(topics)
             
             # Set initial difficulty based on past performance
             profile = load_user(session["username"])

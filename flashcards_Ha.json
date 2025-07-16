@@ -222,11 +222,11 @@
         "back": "\u2705 Correct! A datum in GIS coordinates provides a clearly defined surface on which the origin of the coordinates lies. Without a datum, coordinates lack a framework, making it difficult to understand or use them effectively.",
         "subtopic": "gis coordinates",
         "created_at": "2025-07-16T02:15:17.295719",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T02:15:17.295719",
-        "interval": 0,
-        "ease_factor": 2.5,
-        "repetitions": 0,
+        "last_reviewed": "2025-07-16T11:53:06.376360",
+        "next_review": "2025-07-17T11:53:06.376360",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
         "difficulty_level": "medium"
       },
       {
@@ -234,11 +234,11 @@
         "back": "\u2705 Correct! In the right-handed three-dimensional coordinate system known as CTRS, the x-coordinate is positive both to the west and east of the zero meridian until 90\u00b0. Beyond 90\u00b0 in either direction, the x-coordinate turns negative.",
         "subtopic": "gis coordinates",
         "created_at": "2025-07-16T02:15:53.262006",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T02:15:53.262006",
-        "interval": 0,
-        "ease_factor": 2.5,
-        "repetitions": 0,
+        "last_reviewed": "2025-07-16T11:53:13.589613",
+        "next_review": "2025-07-17T11:53:13.589613",
+        "interval": 1,
+        "ease_factor": 2.36,
+        "repetitions": 1,
         "difficulty_level": "medium"
       },
       {
@@ -246,11 +246,23 @@
         "back": "\u2705 Correct! The datum provides a clearly defined surface or framework for coordinates. Without it, the coordinates can still be arranged and moved around, but without a clear understanding of what you have got.",
         "subtopic": "gis coordinates",
         "created_at": "2025-07-16T02:16:04.896717",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T02:16:04.896717",
-        "interval": 0,
+        "last_reviewed": "2025-07-16T11:53:17.521579",
+        "next_review": "2025-07-17T11:53:17.521579",
+        "interval": 1,
+        "ease_factor": 2.36,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "In the context of GIS coordinates, what is the importance of a datum?",
+        "back": "\u2705 Correct! According to the context, datums are foundational to GIS coordinates because they provide a clearly defined surface. Without a datum, coordinates lack a framework or \"checkerboard\" to give them context and meaning.",
+        "subtopic": "gis coordinates",
+        "created_at": "2025-07-16T12:07:34.850888",
+        "last_reviewed": "2025-07-16T12:08:48.404301",
+        "next_review": "2025-07-17T12:08:48.404301",
+        "interval": 1,
         "ease_factor": 2.5,
-        "repetitions": 0,
+        "repetitions": 1,
         "difficulty_level": "medium"
       }
     ],
@@ -284,11 +296,11 @@
         "back": "\u2705 Correct! In the context, '2' is followed by the topic 'Cartesian Coordinates', suggesting it indicates the page number where this topic is discussed in the book.",
         "subtopic": "2",
         "created_at": "2025-07-16T00:41:33.380576",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T00:41:33.380576",
-        "interval": 0,
-        "ease_factor": 2.5,
-        "repetitions": 0,
+        "last_reviewed": "2025-07-16T11:53:31.982130",
+        "next_review": "2025-07-17T11:53:31.982130",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
         "difficulty_level": "medium"
       },
       {
@@ -296,11 +308,11 @@
         "back": "\u2705 Correct! In the context, '2' is followed by a description of Cartesian Coordinates, suggesting that it represents the page number where this topic is discussed in the book. Other options, while related to Cartesian Coordinates, do not align with the provided context.",
         "subtopic": "2",
         "created_at": "2025-07-16T00:41:58.469498",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T00:41:58.469498",
-        "interval": 0,
-        "ease_factor": 2.5,
-        "repetitions": 0,
+        "last_reviewed": "2025-07-16T11:53:37.271554",
+        "next_review": "2025-07-17T11:53:37.271554",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
         "difficulty_level": "medium"
       },
       {
@@ -308,11 +320,11 @@
         "back": "\u2705 Correct! In the provided context, '2' appears to be a page number associated with the topic of Cartesian Coordinates in the book. There's no information suggesting it refers to an edition number, types of Cartesian Coordinates, or number of authors.",
         "subtopic": "2",
         "created_at": "2025-07-16T00:42:45.385276",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T00:42:45.385276",
-        "interval": 0,
-        "ease_factor": 2.5,
-        "repetitions": 0,
+        "last_reviewed": "2025-07-16T11:53:41.378155",
+        "next_review": "2025-07-17T11:53:41.378155",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
         "difficulty_level": "medium"
       },
       {
@@ -320,8 +332,32 @@
         "back": "\u2705 Correct! In the provided context, '2' is placed before the topics \"No claim to original U.S. Government works\" and \"Cartesian Coordinates\", suggesting it denotes a page number in the book.",
         "subtopic": "2",
         "created_at": "2025-07-16T00:43:00.476881",
+        "last_reviewed": "2025-07-16T11:53:44.806605",
+        "next_review": "2025-07-17T11:53:44.806605",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "According to the context, what does the number '2' represent?",
+        "back": "\u2705 Correct! In the first context, '2' is listed before the topic of Cartesian Coordinates, indicating that it likely designates a chapter or section number in a book. The other options do not align with the provided context.",
+        "subtopic": "2",
+        "created_at": "2025-07-16T12:08:13.829497",
         "last_reviewed": null,
-        "next_review": "2025-07-16T00:43:00.476881",
+        "next_review": "2025-07-16T12:08:13.829497",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "Based on the context, in what way does '2' play a role in the text?",
+        "back": "\u2705 Correct! In the given context, '2' appears after the phrase \"Cartesian Coordinates\", indicating that it's likely referring to a section or chapter about this topic in the text. This interpretation is strengthened by the pattern of numbers followed by topic headers throughout the context.",
+        "subtopic": "2",
+        "created_at": "2025-07-16T12:08:32.707818",
+        "last_reviewed": null,
+        "next_review": "2025-07-16T12:08:32.707818",
         "interval": 0,
         "ease_factor": 2.5,
         "repetitions": 0,
@@ -330,8 +366,8 @@
     ]
   },
   "stats": {
-    "cards_studied": 154,
-    "correct_answers": 125,
+    "cards_studied": 162,
+    "correct_answers": 133,
     "study_sessions": 0
   }
 }

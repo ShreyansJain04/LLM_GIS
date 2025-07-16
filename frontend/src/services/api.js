@@ -254,10 +254,11 @@ export const reviewAPI = {
     return response.data;
   },
 
-  startIntensiveReview: async (username) => {
+  startIntensiveReview: async (username, topics = []) => {
     const response = await api.post("/api/review/intensive", {
       username,
       mode: "intensive",
+      topics,
     });
     return response.data;
   },

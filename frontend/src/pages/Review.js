@@ -187,6 +187,9 @@ const Review = () => {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [dueItems, setDueItems] = useState([]);
   const [summary, setSummary] = useState(null);
+  const [showIntensiveTopicSelector, setShowIntensiveTopicSelector] =
+    useState(false);
+  const [intensiveSelectedTopics, setIntensiveSelectedTopics] = useState([]);
 
   useEffect(() => {
     if (user?.username) {
@@ -201,7 +204,6 @@ const Review = () => {
 
       // Process insights like main.py does
       const recommendations = userInsights.personalized_recommendations || {};
-      console.log("recommendations", recommendations);
 
       // Get focus areas from enhanced memory
       const focusAreas = recommendations.focus_areas || [];
@@ -245,7 +247,12 @@ const Review = () => {
       setSelectedMode(mode);
       return;
     }
-
+    if (mode === "intensive") {
+      // Show topic selector for intensive mode
+      setShowIntensiveTopicSelector(true);
+      setSelectedMode(null);
+      return;
+    }
     setLoading(true);
     try {
       let sessionResponse;
@@ -254,9 +261,6 @@ const Review = () => {
       switch (mode) {
         case "adaptive":
           sessionResponse = await reviewAPI.startAdaptiveReview(user.username);
-          break;
-        case "intensive":
-          sessionResponse = await reviewAPI.startIntensiveReview(user.username);
           break;
         case "spaced":
           sessionResponse = await reviewAPI.startSpacedReview(user.username);
@@ -378,6 +382,35 @@ const Review = () => {
     }
   };
 
+  // New: Start intensive review after topic selection
+  const handleStartIntensive = async () => {
+    setLoading(true);
+    setShowIntensiveTopicSelector(false);
+    try {
+      let topicsToSend = intensiveSelectedTopics;
+      if (intensiveSelectedTopics.includes("__ALL__")) {
+        topicsToSend = weakTopics.map((area) => area.topic);
+      }
+      const sessionResponse = await reviewAPI.startIntensiveReview(
+        user.username,
+        topicsToSend
+      );
+      if (sessionResponse && sessionResponse.session_id) {
+        setSessionId(sessionResponse.session_id);
+        setSelectedMode("intensive");
+      } else {
+        toast.error(
+          "Failed to start intensive review session. Please try again."
+        );
+      }
+    } catch (error) {
+      console.error("Failed to start intensive review session:", error);
+      toast.error("Failed to start intensive review session");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Show session results
   if (sessionResult) {
     return (
@@ -459,7 +492,7 @@ const Review = () => {
             className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 mb-4"
           >
             <ArrowPathIcon className="w-5 h-5" />
-            <span>Back to Review Modes</span>
+            <span>Change Review Mode</span>
           </button>
         </div>
 
@@ -467,6 +500,80 @@ const Review = () => {
           username={user.username}
           onStartSession={handleStartFlashcardSession}
         />
+      </div>
+    );
+  }
+
+  // Show topic selector for intensive mode
+  if (showIntensiveTopicSelector) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto">
+        <div className="mb-6">
+          <button
+            onClick={() => {
+              setShowIntensiveTopicSelector(false);
+              handleBackToModeSelection();
+            }}
+            className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 mb-4"
+          >
+            <ArrowPathIcon className="w-5 h-5" />
+            <span>Change Review Mode</span>
+          </button>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6">
+          <h2 className="text-xl font-bold text-secondary-900 mb-2">
+            Select Topic(s) for Intensive Review
+          </h2>
+          <p className="text-secondary-600 mb-4">
+            Choose one or more topics to focus on. You can also select all
+            topics.
+          </p>
+          <div className="mb-4">
+            <button
+              className={`mr-2 mb-2 px-4 py-2 rounded-lg border ${
+                intensiveSelectedTopics.includes("__ALL__")
+                  ? "bg-primary-600 text-white border-primary-600"
+                  : "border-secondary-200"
+              }`}
+              onClick={() => setIntensiveSelectedTopics(["__ALL__"])}
+            >
+              All Focus Areas
+            </button>
+            {weakTopics.map((area, idx) => (
+              <button
+                key={area.topic}
+                className={`mr-2 mb-2 px-4 py-2 rounded-lg border ${
+                  intensiveSelectedTopics.includes(area.topic)
+                    ? "bg-primary-600 text-white border-primary-600"
+                    : "border-secondary-200"
+                }`}
+                onClick={() => {
+                  if (intensiveSelectedTopics.includes("__ALL__")) {
+                    setIntensiveSelectedTopics([area.topic]);
+                  } else if (intensiveSelectedTopics.includes(area.topic)) {
+                    setIntensiveSelectedTopics(
+                      intensiveSelectedTopics.filter((t) => t !== area.topic)
+                    );
+                  } else {
+                    setIntensiveSelectedTopics([
+                      ...intensiveSelectedTopics,
+                      area.topic,
+                    ]);
+                  }
+                }}
+              >
+                {area.topic}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={handleStartIntensive}
+            disabled={intensiveSelectedTopics.length === 0}
+            className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 disabled:opacity-50"
+          >
+            Start Intensive Review
+          </button>
+        </div>
       </div>
     );
   }
