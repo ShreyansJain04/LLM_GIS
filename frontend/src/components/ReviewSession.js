@@ -74,7 +74,7 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
       currentItem.question?.type === "objective" ? selectedOption : answer;
     if (userAnswer === null || userAnswer === "") return;
     setSubmitting(true);
-    console.log("questionData", currentItem.question);
+
     try {
       const questionData = currentItem.question || currentItem;
       const response = await reviewAPI.submitAnswer(
@@ -135,7 +135,6 @@ const ReviewSession = ({ sessionId, mode, onEndSession, onPauseSession }) => {
     try {
       const result = await reviewAPI.endSession(sessionId);
       onEndSession?.(result);
-      console.log("result", result);
     } catch (error) {
       console.error("Failed to end session:", error);
       toast.error("Failed to end session");

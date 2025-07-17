@@ -27,7 +27,7 @@ const Review = () => {
   const [sessionResult, setSessionResult] = useState(null);
   const [flashcardMode, setFlashcardMode] = useState(false);
   const [weakTopics, setWeakTopics] = useState([]);
-  const [progress, setProgress] = useState({});
+  // const [progress, setProgress] = useState({});
   const [dueItems, setDueItems] = useState([]);
   const [summary, setSummary] = useState(null);
   const [showIntensiveTopicSelector, setShowIntensiveTopicSelector] =
@@ -44,10 +44,10 @@ const Review = () => {
     try {
       // Use existing user insights endpoint
       const userInsights = await userAPI.getUserInsights(user.username);
-      console.log("userInsights", userInsights);
+
       // Process insights like main.py does
       const recommendations = userInsights.personalized_recommendations || {};
-      console.log("recommendations", recommendations);
+
       // Get focus areas from enhanced memory
       const focusAreas = recommendations.focus_areas || [];
 
@@ -65,18 +65,18 @@ const Review = () => {
         study_streak: 0,
         weak_areas_count: 0,
       };
-      console.log("focusAreas", focusAreas);
+
       setWeakTopics(focusAreas);
       setDueItems(dueItemsData);
       setSummary(summaryData);
       setInsights(userInsights);
 
       // Initialize progress from focus areas
-      const progressMap = {};
-      focusAreas.forEach((area) => {
-        progressMap[area.topic] = area.mastery || 0;
-      });
-      setProgress(progressMap);
+      // const progressMap = {};
+      // focusAreas.forEach((area) => {
+      //   progressMap[area.topic] = area.mastery || 0;
+      // });
+      // setProgress(progressMap);
     } catch (error) {
       console.error("Failed to load user insights:", error);
       toast.error("Failed to load user insights");
@@ -118,7 +118,6 @@ const Review = () => {
       }
 
       if (sessionResponse && sessionResponse.session_id) {
-        console.log("sessionResponse", sessionResponse);
         setSessionId(sessionResponse.session_id);
         setSelectedMode(mode);
       } else {
@@ -511,12 +510,14 @@ const Review = () => {
               >
                 <div>
                   <div className="font-medium text-secondary-900">
-                    {area.topic}
-                  </div>
-                  <div className="text-sm text-secondary-600">
                     {area.subtopic}
                   </div>
+                  <div className="text-sm text-secondary-600">
+                    Topic:{" "}
+                    {area.topic.charAt(0).toUpperCase() + area.topic.slice(1)}
+                  </div>
                 </div>
+                {/* TODO: Priority score is calculated based on open-ended questions instead of MCQs */}
                 <div className="text-sm text-secondary-500">
                   Priority: {area.priority_score || "Medium"}
                 </div>
