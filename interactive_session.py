@@ -357,7 +357,7 @@ class InteractiveSession:
                 self.session_state['subtopics_completed'].append(subtopic_name)
             
             # Save progress
-            save_user(self.username, self.user_profile)
+            save_user(self.username, load_user(self.username))
             
             # Show progress
             self._show_progress()

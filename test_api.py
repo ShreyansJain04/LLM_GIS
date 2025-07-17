@@ -1,29 +1,30 @@
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
+import requests
+import json
 
-def test_openai_connection():
-    # Load environment variables
-    load_dotenv()
+# Test the check-answer endpoint
+url = "http://localhost:8000/api/content/check-answer"
+
+# Test data
+test_data = {
+    "question": {
+        "text": "What is GIS?",
+        "type": "objective",
+        "options": ["Geographic Information System", "Global Information System", "Graphical Information System", "Geographic Intelligence System"],
+        "correct_option": 0,
+        "explanation": "GIS stands for Geographic Information System."
+    },
+    "answer": "0"
+}
+
+try:
+    response = requests.post(url, json=test_data)
+    print(f"Status Code: {response.status_code}")
+    print(f"Response: {response.text}")
     
-    # Initialize the OpenAI client
-    client = OpenAI()
-    
-    try:
-        # Make a simple API call
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": "Hello, this is a test message."}
-            ]
-        )
-        print("✅ Successfully connected to OpenAI API")
-        print(f"Response: {response.choices[0].message.content}")
-    except Exception as e:
-        print(f"❌ Failed to connect to OpenAI API: {str(e)}")
-
-if __name__ == "__main__":
-    test_openai_connection()
-
-api_key = os.getenv("OPENAI_API_KEY") 
+    if response.status_code == 422:
+        print("Validation error details:")
+        error_data = response.json()
+        print(json.dumps(error_data, indent=2))
+        
+except Exception as e:
+    print(f"Error: {e}") 

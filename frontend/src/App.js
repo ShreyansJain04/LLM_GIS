@@ -14,23 +14,8 @@ import Learn from "./pages/Learn";
 import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
 import Sources from "./pages/Sources";
-import Review from './pages/Review';
-import Test from './pages/Test';
-// import Insights from './pages/Insights';
-
-// Placeholder components for pages not yet created
-const PlaceholderPage = ({ title }) => (
-  <div className="p-6">
-    <div className="max-w-2xl mx-auto text-center">
-      <h1 className="text-3xl font-bold text-secondary-900 mb-4">{title}</h1>
-      <p className="text-secondary-600">This page is coming soon!</p>
-    </div>
-  </div>
-);
-
-// const Review = () => <PlaceholderPage title="Review Mode" />;
-// const Test = () => <PlaceholderPage title="Test Mode" />;
-const Insights = () => <PlaceholderPage title="Learning Insights" />;
+import Review from "./pages/Review";
+import Test from "./pages/Test";
 
 const MainApp = () => {
   const { isAuthenticated, loading } = useUser();
@@ -61,7 +46,6 @@ const MainApp = () => {
           <Route path="/chat" element={<Chat />} />
           <Route path="/review" element={<Review />} />
           <Route path="/test" element={<Test />} />
-          <Route path="/insights" element={<Insights />} />
           <Route path="/sources" element={<Sources />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
