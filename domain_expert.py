@@ -178,7 +178,6 @@ def generate_question(topic: str, previous_questions: Optional[List[Union[str, D
     # Extract question texts from previous_questions (handle both strings and dicts)
     previous_texts = []
     for q in previous_questions:
-        print("Question", q)
         if isinstance(q, dict):
             # Extract text from question dictionary
             if 'text' in q:

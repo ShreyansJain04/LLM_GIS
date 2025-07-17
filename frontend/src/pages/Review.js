@@ -53,7 +53,10 @@ const Review = () => {
 
       // Check for due spaced repetition items
       const spacedSchedule = recommendations.spaced_repetition_schedule || [];
-
+      console.log(
+        "Line 56 - /pages/Review.js: Spaced schedule: ",
+        spacedSchedule
+      );
       const dueItemsData = spacedSchedule.filter(
         (item) => item.days_until_review <= 0
       );
@@ -144,7 +147,6 @@ const Review = () => {
   };
 
   const handleEndSession = (result) => {
-    console.log("handleEndSession", result);
     setSessionResult(result);
   };
 

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PauseIcon,
-  PlayIcon,
   XMarkIcon,
   ChartBarIcon,
   LightBulbIcon,
@@ -33,42 +32,87 @@ const SpacedRepetitionReview = ({
   const [itemIndex, setItemIndex] = useState(1); // Start at 1 for first item
   const [showFlashcardAnswer, setShowFlashcardAnswer] = useState(false);
   const [flashcardSubmitting, setFlashcardSubmitting] = useState(false);
-  // Remove finalScoreOverride state and related logic
+  const [dueItems, setDueItems] = useState([]);
 
   const maxItems = session?.max_questions || 10;
 
+  // Simplified: always pop the first due item, and for questions call getNextQuestion
+  const loadAndSetNextItem = async (items) => {
+    console.log("[DEBUG] dueItems before processing:", items);
+    if (!items || items.length === 0) {
+      setCurrentItem(null);
+      // Optionally call handleEndSession() or show a completion message here
+      handleEndSession();
+      return;
+    }
+    const [next, ...rest] = items;
+    setDueItems(rest);
+    setItemIndex((prev) => prev + 1);
+    setReadyForNext(false);
+    setAnswer("");
+    setSelectedOption(null);
+    setShowFlashcardAnswer(false);
+    setFeedback(null);
+    setIsCorrect(false);
+    if (next.type === "flashcard") {
+      setCurrentItem(next);
+    } else if (next.type === "question") {
+      setLoading(true);
+      try {
+        console.log(
+          "[DEBUG] Calling getNextQuestion with sessionId:",
+          sessionId
+        );
+        const questionData = await reviewAPI.getNextQuestion(sessionId);
+        console.log("[DEBUG] getNextQuestion response:", questionData);
+        setCurrentItem(questionData);
+      } catch (error) {
+        console.error("[ERROR] Failed to load next question:", error);
+        toast.error("Failed to load next question");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Unknown type, just skip
+      setCurrentItem(null);
+    }
+  };
+
+  // On initial load, load the first item
   useEffect(() => {
-    loadSession();
+    const init = async () => {
+      await loadSession();
+      if (sessionState === "active" && dueItems.length > 0) {
+        await loadAndSetNextItem(dueItems);
+      }
+    };
+    init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId]);
 
   const loadSession = async () => {
     try {
+      console.log("[DEBUG] Calling getSession with sessionId:", sessionId);
       const sessionData = await reviewAPI.getSession(sessionId);
+      console.log("[DEBUG] getSession response:", sessionData);
       setSession(sessionData);
       setSessionState(sessionData.session_state);
-      if (sessionData.session_state === "active") {
-        await loadNextItem();
+      if (
+        sessionData.session_state === "active" &&
+        sessionData.due_items &&
+        sessionData.due_items.length > 0
+      ) {
+        setDueItems(sessionData.due_items);
+        setCurrentItem(sessionData.due_items[0]);
+      } else if (
+        sessionData.session_state === "active" &&
+        (!sessionData.due_items || sessionData.due_items.length === 0)
+      ) {
+        toast("There are no due items for review at this time.");
       }
     } catch (error) {
-      console.error("Failed to load session:", error);
+      console.error("[ERROR] Failed to load session:", error);
       toast.error("Failed to load spaced repetition session");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadNextItem = async () => {
-    setLoading(true);
-    try {
-      const itemData = await reviewAPI.getNextQuestion(sessionId);
-      setCurrentItem(itemData);
-      setFeedback(null);
-      setAnswer("");
-      setSelectedOption(null);
-      setShowFlashcardAnswer(false);
-    } catch (error) {
-      console.error("Failed to load item:", error);
-      toast.error("Failed to load review item");
     } finally {
       setLoading(false);
     }
@@ -87,11 +131,17 @@ const SpacedRepetitionReview = ({
     setSubmitting(true);
     try {
       const questionData = currentItem.question || currentItem;
+      console.log("[DEBUG] Submitting answer:", {
+        sessionId,
+        questionData,
+        userAnswer,
+      });
       const response = await reviewAPI.submitAnswer(
         sessionId,
         questionData,
         String(userAnswer)
       );
+      console.log("[DEBUG] submitAnswer response:", response);
 
       if (response && response.feedback !== undefined) {
         setFeedback(response.feedback);
@@ -109,47 +159,37 @@ const SpacedRepetitionReview = ({
         toast.error("Failed to submit answer. Please try again.");
       }
     } catch (error) {
-      console.error("Failed to submit answer:", error);
+      console.error("[ERROR] Failed to submit answer:", error);
       toast.error("Failed to submit answer. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Handler for flashcard recall rating
   const handleFlashcardSelfAssessment = async (quality) => {
     if (!currentItem || !currentItem.card) return;
     setFlashcardSubmitting(true);
     try {
-      // Call backend to update flashcard schedule
+      console.log("[DEBUG] Submitting flashcard assessment:", {
+        sessionId,
+        quality,
+        topic: currentItem.card.topic,
+        cardId: currentItem.card.id,
+      });
       const response = await reviewAPI.submitFlashcardAnswer(
         sessionId,
         quality,
         currentItem.card.topic,
         currentItem.card.id
       );
+      console.log("[DEBUG] submitFlashcardAnswer response:", response);
       setShowFlashcardAnswer(false);
       setFeedback(null);
-      setIsCorrect(response.correct);
-      const newTotalQuestions = (session?.total_questions ?? 0) + 1;
-      const newTotalCorrect =
-        (session?.total_correct ?? 0) + (response.correct ? 1 : 0);
-      setSession((prev) => ({
-        ...prev,
-        total_questions: newTotalQuestions,
-        total_correct: newTotalCorrect,
-      }));
-
-      // Check if this was the last item
-      if (newTotalQuestions >= maxItems) {
-        setReadyForNext(false);
-        return;
-      }
-
-      // Move to next item immediately
-      handleNext();
+      setIsCorrect(null);
+      // Move to next item in the queue
+      loadAndSetNextItem(dueItems);
     } catch (error) {
-      console.error("Failed to submit flashcard assessment:", error);
+      console.error("[ERROR] Failed to submit assessment:", error);
       toast.error("Failed to submit assessment");
     } finally {
       setFlashcardSubmitting(false);
@@ -173,7 +213,7 @@ const SpacedRepetitionReview = ({
     try {
       await reviewAPI.resumeSession(sessionId);
       setSessionState("active");
-      await loadNextItem();
+      await loadSession(); // Reload session to get new due items
     } catch (error) {
       console.error("Failed to resume session:", error);
       toast.error("Failed to resume session");
@@ -190,21 +230,15 @@ const SpacedRepetitionReview = ({
     }
   };
 
-  const handleNext = async () => {
-    setReadyForNext(false);
-    setItemIndex((prev) => prev + 1);
-    await loadNextItem();
+  // Next item handler
+  const handleNext = () => {
+    loadAndSetNextItem(dueItems);
   };
 
   const getProgressPercentage = () => {
     if (!session) return 0;
     const itemsAnswered = session.total_questions || 0;
     return (itemsAnswered / maxItems) * 100;
-  };
-
-  const getScorePercentage = () => {
-    if (!session || session.total_questions === 0) return 0;
-    return (session.total_correct / session.total_questions) * 100;
   };
 
   const getItemTypeIcon = () => {
@@ -286,6 +320,26 @@ const SpacedRepetitionReview = ({
         >
           Resume Session
         </button>
+      </div>
+    );
+  }
+
+  if (
+    session &&
+    sessionState === "active" &&
+    Array.isArray(session.due_items) &&
+    session.due_items.length === 0
+  ) {
+    return (
+      <div className="flex flex-col items-center text-center justify-center py-16">
+        <CheckCircleIcon className="w-16 h-16 text-green-400 mb-4" />
+        <h2 className="text-2xl font-semibold text-secondary-900 mb-2">
+          No items due for review!
+        </h2>
+        <p className="text-secondary-600 mb-6">
+          You have completed all your scheduled reviews. Check back later for
+          new items!
+        </p>
       </div>
     );
   }
@@ -419,18 +473,19 @@ const SpacedRepetitionReview = ({
               View Results
             </button>
           </motion.div>
-        ) : currentItem && currentItem.type === "flashcard" ? (
-          <FlashcardCard
-            card={currentItem.card}
-            loading={false}
-            submitting={flashcardSubmitting}
-            showAnswer={showFlashcardAnswer}
-            onShowAnswer={handleShowFlashcardAnswer}
-            onSelfAssessment={handleFlashcardSelfAssessment}
-            progress={{ current: itemIndex, total: maxItems }}
-          />
         ) : (
-          currentItem && (
+          currentItem &&
+          (currentItem.type === "flashcard" ? (
+            <FlashcardCard
+              card={currentItem.card}
+              loading={false}
+              submitting={flashcardSubmitting}
+              showAnswer={showFlashcardAnswer}
+              onShowAnswer={handleShowFlashcardAnswer}
+              onSelfAssessment={handleFlashcardSelfAssessment}
+              progress={{ current: itemIndex, total: maxItems }}
+            />
+          ) : (
             <motion.div
               key={itemIndex}
               initial={{ opacity: 0, y: 20 }}
@@ -441,9 +496,9 @@ const SpacedRepetitionReview = ({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    {getItemTypeIcon()}
+                    <ChartBarIcon className="w-5 h-5 text-primary-600" />
                     <span className="text-sm text-secondary-600">
-                      {getItemTypeLabel()} {itemIndex}/{maxItems}
+                      Question {itemIndex}/{maxItems}
                     </span>
                   </div>
                   {session?.current_topic && (
@@ -536,19 +591,19 @@ const SpacedRepetitionReview = ({
                   )}
                 </AnimatePresence>
 
-                {/* Next Item button appears only after feedback is shown and not at session end */}
-                {readyForNext && !isSessionComplete && (
+                {/* Next Item button appears only after feedback is shown */}
+                {readyForNext && (
                   <button
-                    onClick={handleNext}
+                    onClick={isSessionComplete ? handleEndSession : handleNext}
                     className="mt-4 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700"
                     disabled={loading}
                   >
-                    Next Item
+                    {isSessionComplete ? "See Results" : "Next Item"}
                   </button>
                 )}
               </div>
             </motion.div>
-          )
+          ))
         )}
       </AnimatePresence>
     </div>

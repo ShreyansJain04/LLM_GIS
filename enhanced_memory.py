@@ -94,9 +94,6 @@ class LearningPatternAnalyzer:
         """Analyze a learning session for patterns."""
         start_time = datetime.fromisoformat(session_data['started_at'])
         hour_of_day = start_time.hour
-        # Debugging prints
-        print('DEBUG: hour_of_day:', hour_of_day)
-        print('DEBUG: time_of_day_performance keys:', list(self.patterns['learning_patterns']['time_of_day_performance'].keys()))
         # Track time of day performance
         if 'final_score' in session_data:
             self.patterns['learning_patterns']['time_of_day_performance'][hour_of_day].append(

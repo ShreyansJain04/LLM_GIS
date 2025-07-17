@@ -861,6 +861,7 @@ async def start_spaced_review(request: ReviewSessionRequest):
             insights = enhanced_memory.get_insights()
             recommendations = insights.get('personalized_recommendations', {})
             spaced_schedule = recommendations.get('spaced_repetition_schedule', [])
+            print(f"Line 864 - /api/review/spaced: Spaced schedule: {spaced_schedule}\n")
             due_items_raw = [item for item in spaced_schedule if item.get('days_until_review', 0) <= 0]
             
         except Exception as e:
@@ -877,44 +878,43 @@ async def start_spaced_review(request: ReviewSessionRequest):
        
         # TODO The issue is due_items_raw is a list of similar item dicts of the only topic "gis coordinates"
         for item in due_items_raw:
-            print(f"Line 884 - /api/review/spaced: Item: {item}\n")
+            # print(f"Line 884 - /api/review/spaced: Item: {item}\n")
             topic = item["topic"]
             subtopic = item.get("subtopic", topic)
-            deck = FlashcardDeck(request.username, topic)
-            due_cards = deck.get_due_cards(limit=2)  # Limit to 2 cards per topic (matching main.py)
-            
-            
-            if due_cards:
-                # Use flashcard system (matching main.py)
-                for card in due_cards:
-                    flashcard = {
-                        "type": "flashcard",
-                        "topic": topic,
-                        "subtopic": subtopic,
-                        "card": { "id": f"{topic}_{card.get('created_at', 'unknown')}",
-                            "front": card['front'],
-                            "back": card['back'],
+            if item["source"] == "flashcard":
+                deck = FlashcardDeck(request.username, topic)
+                due_cards = deck.get_due_cards(limit=2)  # Limit to 2 cards per topic (matching main.py)
+                if due_cards:
+                    # Use flashcard system (matching main.py)
+                    for card in due_cards:
+                        flashcard = {
+                            "type": "flashcard",
                             "topic": topic,
-                            "subtopic": card.get('subtopic', topic),
-                            "difficulty_level": card.get('difficulty_level', 'medium'),
-                            "repetitions": card.get('repetitions', 0),
-                            "ease_factor": card.get('ease_factor', 2.5)}
-                    }
-                    # TODO: Band-aid fix for duplicate flashcards with same topic and subtopic
-                    if flashcard not in mixed_due_items:
-                        mixed_due_items.append(flashcard)
+                            "subtopic": subtopic,
+                            "card": { "id": f"{topic}_{card.get('created_at', 'unknown')}",
+                                "front": card['front'],
+                                "back": card['back'],
+                                "topic": topic,
+                                "subtopic": card.get('subtopic', topic), # TODO: This is the issue
+                                "difficulty_level": card.get('difficulty_level', 'medium'),
+                                "repetitions": card.get('repetitions', 0),
+                                "ease_factor": card.get('ease_factor', 2.5)}
+                        }
+                        # Only append if no existing item in mixed_due_items has the same card id
+                        card_id = flashcard["card"]["id"]
+                        if not any(item.get("card", {}).get("id") == card_id for item in mixed_due_items):
+                            mixed_due_items.append(flashcard)
             else:
                 # TODO: Using generate_question here might generate bug. Generate a question for this topic (matching main.py)
                 # TODO: Revert to previous loigic because calling next_question will generate a new question anyway
                 # question = generate_question(topic, [], difficulty="medium")
-               
-                
                 mixed_due_items.append({
                     "type": "question",
                     "topic": topic,
                     "subtopic": subtopic,
                 #    "question": None
                 })
+        print(f"Line 918 - /api/review/spaced: Mixed due items: {mixed_due_items}\n")
         session_state = {
             "session_id": session_id,
             "username": request.username,
@@ -1178,21 +1178,21 @@ async def submit_flashcard_answer(session_id: str, request: dict):
         if not due_cards:
             raise HTTPException(status_code=400, detail="No cards found for topic")
         
-        current_card = due_cards[0]
-        # print("Line 1186 - /api/review/session/{session_id}/flashcard/answer: Current card: ", current_card, "\n")
-       
+        current_card = due_cards[0]  
         
         # Update card scheduling
         deck.update_card_schedule(current_card, quality)
         deck.update_stats(quality >= 3)  # Consider 3+ as correct
-        # print("Line 1192 - /api/review/session/{session_id}/flashcard/answer: Session: ", session, "\n")
-        
+       
         # Update session stats
         if session["mode"] == "flashcards":
             session["cards_reviewed"] += 1
             if quality >= 3:
                 session["correct_answers"] += 1 # This is the total correct answers but session["total_correct"] gives error
-        
+        elif session["mode"] == "spaced":
+            session["total_questions"] += 1
+            if quality >= 3:
+                session["total_correct"] += 1
         # Record performance
         performance_entry = {
             'topic': topic,
@@ -1204,26 +1204,27 @@ async def submit_flashcard_answer(session_id: str, request: dict):
             'repetitions': current_card.get('repetitions', 0)
         }
         session["performance"].append(performance_entry)
-        
-        # TODO: Only work for flashcardReview. Remove the reviewed card from due cards -- this is the issue
        
         if session["mode"] == "flashcards":
+            # One topic has multiple cards
             session["topics_with_due"][topic].pop(0)
              # If no more cards in this topic, remove the topic
             if not session["topics_with_due"][topic]:
                 del session["topics_with_due"][topic]
         elif session["mode"] == "spaced":
+            # Due item is the card
+            print(f"Line 1213 - /api/review/session/{session_id}/flashcard/answer: Due items: {session['due_items']}\n")
+            # TODO: This only remove in-memory due items. Need to remove from the userInsights as well.
             session["due_items"].pop(0)
             if not session["due_items"]:
                 session["session_state"] = "completed"
-        # print("Line 1223 - /api/review/session/{session_id}/flashcard/answer: Due items: ", session.get("due_items", []), "\n")
+                
         # Check if session is complete
         total_remaining = 0
         if session["mode"] == "flashcards":
             total_remaining = sum(len(cards) for cards in session["topics_with_due"].values())
         elif session["mode"] == "spaced":
             total_remaining = len(session["due_items"])
-        # print(f"Total remaining: {total_remaining}")
         
         return {
             "quality": quality,
@@ -1325,7 +1326,7 @@ async def end_review_session(session_id: str):
                 mastery_level = 'beginner'
         
         # Record the session with detailed performance data
-        # TODO: This function from memory.py is not working for flashcards and spaced 
+        # TODO: This function from memory.py is not working for flashcards and spaced => Issue with display the correct due items
         if session["performance"] and session["mode"] != "flashcards" and session["mode"] != "spaced":
             record_learning_session(
                     username=session["username"],
@@ -1360,10 +1361,11 @@ async def get_next_question(session_id: str, topic: Optional[str] = None):
         # For spaced mode, serve from mixed due_items
         if session["mode"] == "spaced":
             due_items = session["due_items"]
-            idx = session["total_questions"]
-            if idx >= len(due_items):
-                raise HTTPException(status_code=400, detail="No more due items for review")
-            item = due_items[idx]
+            # idx = session["total_questions"]
+            # if idx >= len(due_items):
+            #     raise HTTPException(status_code=400, detail="No more due items for review")
+            item = due_items[0]
+            print(f"Line 1368 - /api/review/session/{session_id}/question: Item: {item}\n")
             session["current_topic"] = item["topic"]
             if item["type"] == "flashcard":
                 return {
@@ -1490,7 +1492,7 @@ async def get_next_question(session_id: str, topic: Optional[str] = None):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# This endpoint doesn't track repeated questions
+# TODO This endpoint doesn't track repeated questions
 @app.post("/api/review/session/{session_id}/answer")
 async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
     """Submit an answer for the current question or flashcard with adaptive difficulty adjustment."""
@@ -1498,13 +1500,15 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
         if session_id not in active_sessions:
             raise HTTPException(status_code=404, detail="Session not found")
         session = active_sessions[session_id]
+        print(f"Line 1499 - /api/review/session/{session_id}/answer: Session: {session}\n")
         # For spaced mode, handle flashcard or question
         if session["mode"] == "spaced":
             due_items = session["due_items"]
-            idx = session["total_questions"]
-            if idx >= len(due_items):
-                raise HTTPException(status_code=400, detail="No more due items for review")
-            item = due_items[idx]
+            # idx = session["total_questions"]
+            # if idx >= len(due_items):
+            #     raise HTTPException(status_code=400, detail="No more due items for review")
+            # item = due_items[idx]
+            item = due_items[0]
             session["total_questions"] += 1
             
             if item["type"] == "flashcard":

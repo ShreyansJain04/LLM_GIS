@@ -387,7 +387,7 @@ const Learn = () => {
     }
   };
 
-  // Clear chat <-- this is for chat instead of learn mode
+  // TODO: Clear chat <-- this is for chat instead of learn mode
   const clearChat = async () => {
     try {
       await chatAPI.clearChatHistory(user.username);
