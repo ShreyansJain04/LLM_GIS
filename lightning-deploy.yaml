@@ -1,0 +1,49 @@
+name: llm-gis-tutoring-system
+image:
+  build_context: .
+  dockerfile: Dockerfile
+
+compute:
+  cpu: 2
+  memory: 4Gi
+  gpu: 0
+
+env:
+  - name: PORT
+    value: "8000"
+  - name: PYTHONUNBUFFERED
+    value: "1"
+  - name: PYTHONDONTWRITEBYTECODE
+    value: "1"
+
+secrets:
+  - name: OPENAI_API_KEY
+    mount_path: /secrets/openai_api_key
+  - name: ANTHROPIC_API_KEY
+    mount_path: /secrets/anthropic_api_key
+  - name: GOOGLE_API_KEY
+    mount_path: /secrets/google_api_key
+
+port: 8000
+
+health_check:
+  path: /health
+  interval: 30s
+  timeout: 10s
+  retries: 3
+
+scaling:
+  min_replicas: 1
+  max_replicas: 3
+  target_cpu_utilization: 70
+
+volumes:
+  - name: user-data
+    mount_path: /app/user_data
+    size: 1Gi
+  - name: rag-cache
+    mount_path: /app/rag_cache
+    size: 2Gi
+  - name: docs
+    mount_path: /app/docs
+    size: 1Gi
