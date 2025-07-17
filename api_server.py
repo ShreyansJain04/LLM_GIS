@@ -194,11 +194,7 @@ async def get_user_profile(username: str):
         performance = get_performance_summary(username)
         weak_areas = get_weak_areas(username)
         recommended_topics = get_recommended_review_topics(username, limit=5)
-        # print(f"Active sessions: {active_sessions}\n")
-        # print(f"Profile: {profile}\n")
-        # print(f"Performance: {performance}\n")
-        # print(f"Weak areas: {weak_areas}\n")
-        # print(f"Recommended topics: {recommended_topics}\n")
+       
         return {
             "profile": profile,
             "performance": performance,
@@ -881,12 +877,12 @@ async def start_spaced_review(request: ReviewSessionRequest):
        
         # TODO The issue is due_items_raw is a list of similar item dicts of the only topic "gis coordinates"
         for item in due_items_raw:
-            
+            print(f"Line 884 - /api/review/spaced: Item: {item}\n")
             topic = item["topic"]
             subtopic = item.get("subtopic", topic)
             deck = FlashcardDeck(request.username, topic)
             due_cards = deck.get_due_cards(limit=2)  # Limit to 2 cards per topic (matching main.py)
-            # print(f"Line 889 - /api/review/spaced: Due cards: {due_cards} for topic: {topic}\n")
+            
             
             if due_cards:
                 # Use flashcard system (matching main.py)
@@ -911,7 +907,8 @@ async def start_spaced_review(request: ReviewSessionRequest):
                 # TODO: Using generate_question here might generate bug. Generate a question for this topic (matching main.py)
                 # TODO: Revert to previous loigic because calling next_question will generate a new question anyway
                 # question = generate_question(topic, [], difficulty="medium")
-                # print(f"Line 902 - /api/review/spaced: Generating question {question} for topic: {topic}\n")
+               
+                
                 mixed_due_items.append({
                     "type": "question",
                     "topic": topic,
@@ -1085,8 +1082,7 @@ async def get_flashcard_topics(username: str):
             # Get next review date (if any cards exist) -- Error here for now
             if stats['total_cards'] > 0:
                 upcoming_cards = deck.get_cards_due_within_days(30)  # Next 30 days
-                print("Upcoming cards: ", upcoming_cards, type(upcoming_cards), "\n")
-                print("Topics with due: ", topics_with_due[topic], type(topics_with_due[topic]), "\n")
+                
                 if upcoming_cards:
                     topics_with_due[topic]['next_review'] = upcoming_cards[0]['next_review']    
             
@@ -1183,13 +1179,13 @@ async def submit_flashcard_answer(session_id: str, request: dict):
             raise HTTPException(status_code=400, detail="No cards found for topic")
         
         current_card = due_cards[0]
-        print("Line 1186 - /api/review/session/{session_id}/flashcard/answer: Current card: ", current_card, "\n")
+        # print("Line 1186 - /api/review/session/{session_id}/flashcard/answer: Current card: ", current_card, "\n")
        
         
         # Update card scheduling
         deck.update_card_schedule(current_card, quality)
         deck.update_stats(quality >= 3)  # Consider 3+ as correct
-        print("Line 1192 - /api/review/session/{session_id}/flashcard/answer: Session: ", session, "\n")
+        # print("Line 1192 - /api/review/session/{session_id}/flashcard/answer: Session: ", session, "\n")
         
         # Update session stats
         if session["mode"] == "flashcards":
@@ -1220,14 +1216,14 @@ async def submit_flashcard_answer(session_id: str, request: dict):
             session["due_items"].pop(0)
             if not session["due_items"]:
                 session["session_state"] = "completed"
-        print("Line 1223 - /api/review/session/{session_id}/flashcard/answer: Due items: ", session.get("due_items", []), "\n")
+        # print("Line 1223 - /api/review/session/{session_id}/flashcard/answer: Due items: ", session.get("due_items", []), "\n")
         # Check if session is complete
         total_remaining = 0
         if session["mode"] == "flashcards":
             total_remaining = sum(len(cards) for cards in session["topics_with_due"].values())
         elif session["mode"] == "spaced":
             total_remaining = len(session["due_items"])
-        print(f"Total remaining: {total_remaining}")
+        # print(f"Total remaining: {total_remaining}")
         
         return {
             "quality": quality,
@@ -1249,7 +1245,7 @@ async def get_review_session(session_id: str):
             raise HTTPException(status_code=404, detail="Session not found")
         
         session = active_sessions[session_id]
-        print("Line 1230 - /api/review/session/{session_id}: Session: ", session, "\n")
+        # print("Line 1230 - /api/review/session/{session_id}: Session: ", session, "\n")
         return session
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -1295,20 +1291,31 @@ async def end_review_session(session_id: str):
         session["completed_at"] = datetime.now().isoformat()
         
         # Calculate final results
-        total_questions = session.get("total_questions") or session.get("total_cards", 0)
-        total_correct = session.get("total_correct") or session.get("correct_answers", 0)
+        # TODO: This is a band-aid fix for spaced review mode. Need to fix this from submit_flashcard_answer
+        total_questions = session.get("total_questions") or session.get("total_cards", 0) or len(session.get("performance", []))
+        total_correct = session.get("total_correct") or session.get("correct_answers", 0) or sum(1 for perf in session["performance"] if perf.get("correct", False))
         final_score = total_correct / total_questions if total_questions > 0 else 0
         
-        
+        # print(f"Line 1303 - /api/review/session/{session_id}: session: {session}\n")
         # Determine mastery level based on difficulty and consistency
         if session["mode"] == "spaced":
-            high_difficulty_correct = 0
-        elif session["mode"] != "flashcards":
-            high_difficulty_correct = sum(1 for perf in session["performance"] 
-                                        if perf['correct'] and perf['difficulty'] in ['medium', 'hard'])
+            high_difficulty_correct = sum(
+                1 for perf in session["performance"]
+                if (
+                    (perf.get("correct", False) and perf.get("difficulty", "medium") in ["medium", "hard"])
+                    or perf.get("quality", 0) >= 3
+                )
+            )
+        elif session["mode"] == "flashcards":
+            high_difficulty_correct = sum(
+                1 for perf in session["performance"]
+                if perf.get("quality", 0) >= 3
+            )
         else:
-            high_difficulty_correct = sum(1 for perf in session["performance"]
-                                          if perf["quality"] >= 3)
+            high_difficulty_correct = sum(
+                1 for perf in session["performance"]
+                if perf.get("correct", False) and perf.get("difficulty", "medium") in ["medium", "hard"]
+            )
         
         if final_score >= 0.8 and high_difficulty_correct >= 2:
                 mastery_level = 'mastered'
@@ -1318,14 +1325,15 @@ async def end_review_session(session_id: str):
                 mastery_level = 'beginner'
         
         # Record the session with detailed performance data
+        # TODO: This function from memory.py is not working for flashcards and spaced 
         if session["performance"] and session["mode"] != "flashcards" and session["mode"] != "spaced":
             record_learning_session(
-                username=session["username"],
-                topic=f"{session['mode'].title()} Review Session",
-                subtopics_performance=session["performance"],
-                final_score=final_score,
-                mastery_level=mastery_level
-            )
+                    username=session["username"],
+                    topic=f"{session['mode'].title()} Review Session",
+                    subtopics_performance=session["performance"],
+                    final_score=final_score,
+                    mastery_level=mastery_level
+                )
         
         # Remove from active sessions
         del active_sessions[session_id]
@@ -1498,6 +1506,7 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
                 raise HTTPException(status_code=400, detail="No more due items for review")
             item = due_items[idx]
             session["total_questions"] += 1
+            
             if item["type"] == "flashcard":
                 # Self-assessment answer is expected as an integer (0-5)
                 quality = None

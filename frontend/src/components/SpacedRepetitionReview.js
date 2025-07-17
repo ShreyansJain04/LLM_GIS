@@ -33,6 +33,7 @@ const SpacedRepetitionReview = ({
   const [itemIndex, setItemIndex] = useState(1); // Start at 1 for first item
   const [showFlashcardAnswer, setShowFlashcardAnswer] = useState(false);
   const [flashcardSubmitting, setFlashcardSubmitting] = useState(false);
+  // Remove finalScoreOverride state and related logic
 
   const maxItems = session?.max_questions || 10;
 
@@ -120,9 +121,6 @@ const SpacedRepetitionReview = ({
     if (!currentItem || !currentItem.card) return;
     setFlashcardSubmitting(true);
     try {
-      console.log("sessionId", sessionId);
-      console.log("currentItem card", currentItem.card);
-      console.log("currentItem card topic", currentItem.card.topic);
       // Call backend to update flashcard schedule
       const response = await reviewAPI.submitFlashcardAnswer(
         sessionId,
@@ -132,12 +130,21 @@ const SpacedRepetitionReview = ({
       );
       setShowFlashcardAnswer(false);
       setFeedback(null);
-      setIsCorrect(null);
+      setIsCorrect(response.correct);
+      const newTotalQuestions = (session?.total_questions ?? 0) + 1;
+      const newTotalCorrect =
+        (session?.total_correct ?? 0) + (response.correct ? 1 : 0);
       setSession((prev) => ({
         ...prev,
-        total_questions: response.total_questions,
-        total_correct: response.total_correct,
+        total_questions: newTotalQuestions,
+        total_correct: newTotalCorrect,
       }));
+
+      // Check if this was the last item
+      if (newTotalQuestions >= maxItems) {
+        setReadyForNext(false);
+        return;
+      }
 
       // Move to next item immediately
       handleNext();
@@ -177,7 +184,6 @@ const SpacedRepetitionReview = ({
     try {
       const result = await reviewAPI.endSession(sessionId);
       onEndSession?.(result);
-      console.log("result", result);
     } catch (error) {
       console.error("Failed to end session:", error);
       toast.error("Failed to end session");
@@ -215,6 +221,9 @@ const SpacedRepetitionReview = ({
     if (!currentItem) return "Loading...";
     return currentItem.type === "flashcard" ? "Flashcard" : "Question";
   };
+
+  // In the completion UI, use session.total_correct and session.total_questions directly
+  // Replace any use of displayTotalCorrect, displayTotalQuestions, displayScore with session.total_correct, session.total_questions, and their calculation
 
   if (loading && !session) {
     return (
@@ -343,7 +352,11 @@ const SpacedRepetitionReview = ({
             >
               {isSessionComplete
                 ? "Complete!"
-                : `${getScorePercentage().toFixed(1)}%`}
+                : `${(
+                    ((session?.total_correct || 0) /
+                      (session?.total_questions || 1)) *
+                    100
+                  ).toFixed(1)}%`}
             </span>
           </div>
         </div>
