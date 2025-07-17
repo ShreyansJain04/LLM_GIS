@@ -30,11 +30,71 @@
         "back": "\u2705 Correct! The application approach to GISs sees it primarily as a tool used to answer questions, support decision making, maintain an inventory of geographic data and information, and make maps. Although GIS can generate more complex problems and provide future pathways, these are not its primary purpose under this approach.",
         "subtopic": "GIS Basics",
         "created_at": "2025-07-16T19:52:04.192500",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T19:52:04.192500",
-        "interval": 0,
-        "ease_factor": 2.5,
-        "repetitions": 0,
+        "last_reviewed": "2025-07-16T23:48:19.364607",
+        "next_review": "2025-07-17T23:48:19.364607",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "What is the primary purpose of applying a Geographic Information System (GIS) in a project?",
+        "back": "\u2705 Correct! The primary purpose of a GIS, as mentioned in the context, is to answer questions, support decision making, maintain an inventory of geographic data and information, and, of course, make maps. While the other options are plausible, they are specific applications or functionalities of a GIS rather than its primary purpose.",
+        "subtopic": "GIS Basics",
+        "created_at": "2025-07-17T00:16:21.642287",
+        "last_reviewed": "2025-07-17T00:35:14.369810",
+        "next_review": "2025-07-18T00:35:14.369810",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "What are the capabilities of Geographic Information Systems (GIS) when used as a tool in a project?",
+        "back": "\u2705 Correct! As stated in the context, GIS is used as a tool to answer questions, support decision making, maintain an inventory of geographic data and information, and make maps. While these are the primary uses, it can also lead to the discovery of more intriguing questions and problems to be solved in the future.",
+        "subtopic": "GIS Basics",
+        "created_at": "2025-07-17T00:16:33.953414",
+        "last_reviewed": "2025-07-17T00:35:18.160849",
+        "next_review": "2025-07-18T00:35:18.160849",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "According to the context, which of the following best describes the role of a GIS in project work?",
+        "back": "\u2705 Correct! The context describes GIS as a tool primarily used after basic GIS work has been completed, for answering questions, supporting decision making, maintaining an inventory of geographic data, and creating maps. It also highlights that GIS often unearths more questions and problems to be solved in the future.",
+        "subtopic": "GIS Basics",
+        "created_at": "2025-07-17T00:58:20.879905",
+        "last_reviewed": "2025-07-17T01:17:42.140651",
+        "next_review": "2025-07-18T01:17:42.140651",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "Which of the following best describes the purpose and application of GIS according to the provided text?",
+        "back": "\u2705 Correct! The text indicates that GIS serves multiple purposes including answering questions, supporting decision making, maintaining an inventory of geographic data, and making maps. Although the other options mention aspects that GIS can handle, they are not comprehensive enough.",
+        "subtopic": "GIS Basics",
+        "created_at": "2025-07-17T01:28:29.798555",
+        "last_reviewed": "2025-07-17T01:29:34.756417",
+        "next_review": "2025-07-18T01:29:34.756417",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "What is an important aspect of GIS from an application approach perspective?",
+        "back": "\u2705 Correct! From the application approach, GIS is seen as a tool to answer questions, support decision making, and maintain an inventory of geographic data. While it is true that a GIS can be a computer program, a service, or used to present data as maps, these aspects are not the primary focus from an application approach.",
+        "subtopic": "GIS Basics",
+        "created_at": "2025-07-17T01:34:19.798882",
+        "last_reviewed": "2025-07-17T01:34:43.036010",
+        "next_review": "2025-07-18T01:34:43.036010",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
         "difficulty_level": "medium"
       }
     ],
@@ -50,6 +110,18 @@
         "ease_factor": 2.6,
         "repetitions": 1,
         "difficulty_level": "medium"
+      },
+      {
+        "front": "What is the significance of positive and negative values in the Cartesian Coordinate System?",
+        "back": "\u2705 Correct! In a Cartesian Coordinate System, the origin is the reference point for all coordinates. Any point to the right or above the origin is given a positive value, while any point to the left or below the origin is given a negative value.",
+        "subtopic": "Coordinate Systems",
+        "created_at": "2025-07-17T01:34:57.201121",
+        "last_reviewed": null,
+        "next_review": "2025-07-17T01:34:57.201121",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
       }
     ],
     "geocoding": [
@@ -58,11 +130,11 @@
         "back": "\u2705 Correct! The process of assigning latitude and longitude to specific geographic data such as street addresses, zip codes, and place names is called geocoding. Geotagging, on the other hand, is the process of adding geographic information to various types of content like text, photographs, video, and music. Geomapping and geotracking are not defined in the provided context.",
         "subtopic": "geocoding",
         "created_at": "2025-07-16T19:46:39.530362",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T19:46:39.530362",
-        "interval": 0,
-        "ease_factor": 2.5,
-        "repetitions": 0,
+        "last_reviewed": "2025-07-16T23:59:02.589329",
+        "next_review": "2025-07-17T23:59:02.589329",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
         "difficulty_level": "medium"
       },
       {
@@ -70,11 +142,11 @@
         "back": "\u2705 Correct! Geocoding refers to the process of assigning geographical coordinates (i.e., latitude and longitude) to specific geographic data such as street addresses, zip codes, and place names. This makes it possible to locate these data points on a map or use them for spatial analysis.",
         "subtopic": "geocoding",
         "created_at": "2025-07-16T19:46:57.817817",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T19:46:57.817817",
-        "interval": 0,
+        "last_reviewed": "2025-07-17T00:02:26.758043",
+        "next_review": "2025-07-18T00:02:26.758043",
+        "interval": 1,
         "ease_factor": 2.5,
-        "repetitions": 0,
+        "repetitions": 1,
         "difficulty_level": "medium"
       },
       {
@@ -82,11 +154,11 @@
         "back": "\u2705 Correct! Geocoding is the process of converting addresses into geographic coordinates (like latitude and longitude), which you can use to place markers on a map, or position the map. So, the right answer is to assign latitude and longitude to specific geographic data. The other options describe different processes related to geographic data but they are not what geocoding is primarily used for.",
         "subtopic": "geocoding",
         "created_at": "2025-07-16T19:49:23.950384",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T19:49:23.950384",
-        "interval": 0,
-        "ease_factor": 2.5,
-        "repetitions": 0,
+        "last_reviewed": "2025-07-17T00:36:22.842666",
+        "next_review": "2025-07-18T00:36:22.842666",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
         "difficulty_level": "medium"
       },
       {
@@ -94,11 +166,11 @@
         "back": "\u2705 Correct! According to the provided context, geocoding refers to the process of assigning latitude and longitude to specific geographic data such as street addresses, zip codes, etc., thus mapping them to specific locations on the Earth's surface.",
         "subtopic": "geocoding",
         "created_at": "2025-07-16T19:50:58.871911",
-        "last_reviewed": null,
-        "next_review": "2025-07-16T19:50:58.871911",
-        "interval": 0,
-        "ease_factor": 2.5,
-        "repetitions": 0,
+        "last_reviewed": "2025-07-17T00:36:29.125894",
+        "next_review": "2025-07-18T00:36:29.125894",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
         "difficulty_level": "medium"
       },
       {
@@ -106,8 +178,20 @@
         "back": "\u2705 Correct! Geocoding is the process of converting addresses into geographic coordinates (latitude and longitude), which can be used to place markers on a map or position the map. It does not involve adding multimedia content to geographic information, creating cadastral maps, or managing geospatial data in general.",
         "subtopic": "geocoding",
         "created_at": "2025-07-16T19:51:21.711934",
+        "last_reviewed": "2025-07-17T00:36:36.269711",
+        "next_review": "2025-07-18T00:36:36.269711",
+        "interval": 1,
+        "ease_factor": 2.6,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "What is the main purpose of geocoding in the context of geographic data?",
+        "back": "\u2705 Correct! According to the context, geocoding is the process of assigning latitude and longitude to specific addresses, zip codes, place names, and other geographic data. This allows for easy identification and retrieval of specific locations and addresses around the world.",
+        "subtopic": "geocoding",
+        "created_at": "2025-07-17T01:35:10.340498",
         "last_reviewed": null,
-        "next_review": "2025-07-16T19:51:21.711934",
+        "next_review": "2025-07-17T01:35:10.340498",
         "interval": 0,
         "ease_factor": 2.5,
         "repetitions": 0,
@@ -116,8 +200,8 @@
     ]
   },
   "stats": {
-    "cards_studied": 4,
-    "correct_answers": 3,
+    "cards_studied": 16,
+    "correct_answers": 14,
     "study_sessions": 0
   }
 }

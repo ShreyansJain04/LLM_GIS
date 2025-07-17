@@ -75,6 +75,9 @@ const FlashcardReview = ({ sessionId, onEndSession, onPauseSession }) => {
 
     setSubmitting(true);
     try {
+      console.log("sessionId", sessionId);
+      console.log("currentCard card", currentCard.card);
+      console.log("currentCard card topic", currentCard.card.topic);
       const result = await reviewAPI.submitFlashcardAnswer(
         sessionId,
         quality,

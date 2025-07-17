@@ -122,7 +122,7 @@ const SpacedRepetitionReview = ({
     try {
       console.log("sessionId", sessionId);
       console.log("currentItem card", currentItem.card);
-      console.log("quality", quality, typeof quality);
+      console.log("currentItem card topic", currentItem.card.topic);
       // Call backend to update flashcard schedule
       const response = await reviewAPI.submitFlashcardAnswer(
         sessionId,

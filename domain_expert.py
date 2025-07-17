@@ -174,7 +174,7 @@ def generate_question(topic: str, previous_questions: Optional[List[Union[str, D
     """
     if previous_questions is None:
         previous_questions = []
-    print("Previous questions", previous_questions)
+   
     # Extract question texts from previous_questions (handle both strings and dicts)
     previous_texts = []
     for q in previous_questions:
