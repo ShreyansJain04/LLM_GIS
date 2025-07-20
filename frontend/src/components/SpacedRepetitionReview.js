@@ -36,45 +36,41 @@ const SpacedRepetitionReview = ({
 
   const maxItems = session?.max_questions || 10;
 
-  // Simplified: always pop the first due item, and for questions call getNextQuestion
-  const loadAndSetNextItem = async (items) => {
-    console.log("[DEBUG] dueItems before processing:", items);
-    if (!items || items.length === 0) {
-      setCurrentItem(null);
-      // Optionally call handleEndSession() or show a completion message here
-      handleEndSession();
-      return;
-    }
-    const [next, ...rest] = items;
-    setDueItems(rest);
-    setItemIndex((prev) => prev + 1);
+  // Get next item from backend - backend now manages the due_items list
+  const loadAndSetNextItem = async () => {
+    console.log("[DEBUG] Getting next item from backend");
     setReadyForNext(false);
     setAnswer("");
     setSelectedOption(null);
     setShowFlashcardAnswer(false);
     setFeedback(null);
     setIsCorrect(false);
-    if (next.type === "flashcard") {
-      setCurrentItem(next);
-    } else if (next.type === "question") {
-      setLoading(true);
-      try {
-        console.log(
-          "[DEBUG] Calling getNextQuestion with sessionId:",
-          sessionId
-        );
-        const questionData = await reviewAPI.getNextQuestion(sessionId);
-        console.log("[DEBUG] getNextQuestion response:", questionData);
+    
+    setLoading(true);
+    try {
+      console.log("[DEBUG] Calling getNextQuestion with sessionId:", sessionId);
+      const questionData = await reviewAPI.getNextQuestion(sessionId);
+      console.log("[DEBUG] getNextQuestion response:", questionData);
+      
+      if (questionData) {
         setCurrentItem(questionData);
-      } catch (error) {
-        console.error("[ERROR] Failed to load next question:", error);
-        toast.error("Failed to load next question");
-      } finally {
-        setLoading(false);
+        setItemIndex((prev) => prev + 1);
+      } else {
+        // No more items
+        setCurrentItem(null);
+        handleEndSession();
       }
-    } else {
-      // Unknown type, just skip
-      setCurrentItem(null);
+    } catch (error) {
+      console.error("[ERROR] Failed to load next question:", error);
+      if (error.response?.status === 400 && error.response?.data?.detail?.includes("No more due items")) {
+        // Session complete
+        setCurrentItem(null);
+        handleEndSession();
+      } else {
+        toast.error("Failed to load next question");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,8 +78,8 @@ const SpacedRepetitionReview = ({
   useEffect(() => {
     const init = async () => {
       await loadSession();
-      if (sessionState === "active" && dueItems.length > 0) {
-        await loadAndSetNextItem(dueItems);
+      if (sessionState === "active") {
+        await loadAndSetNextItem();
       }
     };
     init();
@@ -97,13 +93,9 @@ const SpacedRepetitionReview = ({
       console.log("[DEBUG] getSession response:", sessionData);
       setSession(sessionData);
       setSessionState(sessionData.session_state);
-      if (
-        sessionData.session_state === "active" &&
-        sessionData.due_items &&
-        sessionData.due_items.length > 0
-      ) {
-        setDueItems(sessionData.due_items);
-        setCurrentItem(sessionData.due_items[0]);
+      if (sessionData.session_state === "active") {
+        // Backend will provide items one by one, so we don't need to set currentItem here
+        // The loadAndSetNextItem will be called after this to get the first item
       } else if (
         sessionData.session_state === "active" &&
         (!sessionData.due_items || sessionData.due_items.length === 0)
@@ -154,7 +146,13 @@ const SpacedRepetitionReview = ({
           consecutive_wrong: response.consecutive_wrong,
           difficulty: response.new_difficulty,
         }));
-        setReadyForNext(true);
+        
+        // Check if session is complete
+        if (response.session_complete) {
+          handleEndSession();
+        } else {
+          setReadyForNext(true);
+        }
       } else {
         toast.error("Failed to submit answer. Please try again.");
       }
@@ -186,8 +184,21 @@ const SpacedRepetitionReview = ({
       setShowFlashcardAnswer(false);
       setFeedback(null);
       setIsCorrect(null);
-      // Move to next item in the queue
-      loadAndSetNextItem(dueItems);
+      
+      // Update session data
+      setSession((prev) => ({
+        ...prev,
+        total_questions: response.total_questions,
+        total_correct: response.total_correct,
+      }));
+      
+      // Check if session is complete
+      if (response.session_complete) {
+        handleEndSession();
+      } else {
+        // Move to next item
+        loadAndSetNextItem();
+      }
     } catch (error) {
       console.error("[ERROR] Failed to submit assessment:", error);
       toast.error("Failed to submit assessment");
@@ -232,13 +243,14 @@ const SpacedRepetitionReview = ({
 
   // Next item handler
   const handleNext = () => {
-    loadAndSetNextItem(dueItems);
+    loadAndSetNextItem();
   };
 
   const getProgressPercentage = () => {
     if (!session) return 0;
     const itemsAnswered = session.total_questions || 0;
-    return (itemsAnswered / maxItems) * 100;
+    const totalItems = session.max_questions || maxItems;
+    return (itemsAnswered / totalItems) * 100;
   };
 
   const getItemTypeIcon = () => {
@@ -327,8 +339,7 @@ const SpacedRepetitionReview = ({
   if (
     session &&
     sessionState === "active" &&
-    Array.isArray(session.due_items) &&
-    session.due_items.length === 0
+    !currentItem
   ) {
     return (
       <div className="flex flex-col items-center text-center justify-center py-16">
@@ -344,7 +355,7 @@ const SpacedRepetitionReview = ({
     );
   }
 
-  const isSessionComplete = session && session.total_questions >= maxItems;
+  const isSessionComplete = session && session.total_questions >= (session.max_questions || maxItems);
 
   return (
     <div className="space-y-6">
@@ -384,7 +395,7 @@ const SpacedRepetitionReview = ({
           <div className="flex justify-between text-sm text-secondary-600 mb-1">
             <span>Progress</span>
             <span>
-              {itemIndex}/{maxItems} items
+              {session?.total_questions || 0}/{session?.max_questions || maxItems} items
             </span>
           </div>
           <div className="w-full bg-secondary-200 rounded-full h-2">
@@ -397,7 +408,7 @@ const SpacedRepetitionReview = ({
           </div>
           <div className="flex justify-between text-sm mt-2">
             <span className="text-secondary-600">
-              Score: {session?.total_correct || 0}
+              Score: {session?.total_correct || 0}/{session?.total_questions || 0}
             </span>
             <span
               className={`font-medium ${

@@ -870,8 +870,8 @@ async def start_spaced_review(request: ReviewSessionRequest):
         if not due_items_raw:
             # Fallback to default topics
             due_items_raw = [
-                {"topic": "GIS Basics", "subtopic": "Fundamentals", "days_until_review": 0, "priority": "high"},
-                {"topic": "Coordinate Systems", "subtopic": "Projections", "days_until_review": 0, "priority": "medium"}
+                {"topic": "GIS Basics", "subtopic": "Fundamentals", "days_until_review": 0, "priority": "high", "source": "fallback"},
+                {"topic": "Coordinate Systems", "subtopic": "Projections", "days_until_review": 0, "priority": "medium", "source": "fallback"}
             ]
         # Build mixed due_items list - matching main.py logic
         mixed_due_items = []
@@ -905,14 +905,12 @@ async def start_spaced_review(request: ReviewSessionRequest):
                         if not any(item.get("card", {}).get("id") == card_id for item in mixed_due_items):
                             mixed_due_items.append(flashcard)
             else:
-                # TODO: Using generate_question here might generate bug. Generate a question for this topic (matching main.py)
-                # TODO: Revert to previous loigic because calling next_question will generate a new question anyway
-                # question = generate_question(topic, [], difficulty="medium")
+                # For non-flashcard items, add as question type
+                # The question will be generated when requested
                 mixed_due_items.append({
                     "type": "question",
                     "topic": topic,
                     "subtopic": subtopic,
-                #    "question": None
                 })
         print(f"Line 918 - /api/review/spaced: Mixed due items: {mixed_due_items}\n")
         session_state = {
@@ -1361,10 +1359,17 @@ async def get_next_question(session_id: str, topic: Optional[str] = None):
         # For spaced mode, serve from mixed due_items
         if session["mode"] == "spaced":
             due_items = session["due_items"]
-            # idx = session["total_questions"]
-            # if idx >= len(due_items):
-            #     raise HTTPException(status_code=400, detail="No more due items for review")
-            item = due_items[0]
+            if not due_items:
+                # Check if session is complete
+                if session["total_questions"] >= session["max_questions"]:
+                    session["session_state"] = "completed"
+                    raise HTTPException(status_code=400, detail="Session completed - all items reviewed")
+                else:
+                    raise HTTPException(status_code=400, detail="No more due items for review")
+            
+            # Get the next item and remove it from the list
+            item = due_items.pop(0)
+            session["due_items"] = due_items  # Update the session with remaining items
             print(f"Line 1368 - /api/review/session/{session_id}/question: Item: {item}\n")
             session["current_topic"] = item["topic"]
             if item["type"] == "flashcard":
@@ -1503,15 +1508,20 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
         print(f"Line 1499 - /api/review/session/{session_id}/answer: Session: {session}\n")
         # For spaced mode, handle flashcard or question
         if session["mode"] == "spaced":
-            due_items = session["due_items"]
-            # idx = session["total_questions"]
-            # if idx >= len(due_items):
-            #     raise HTTPException(status_code=400, detail="No more due items for review")
-            # item = due_items[idx]
-            item = due_items[0]
+            # The item was already consumed in get_next_question, so we need to get it from current_topic
+            # and the question that was generated
             session["total_questions"] += 1
             
-            if item["type"] == "flashcard":
+            # Get the current question from asked_questions (last one added)
+            current_question = None
+            if session["asked_questions"]:
+                current_question = session["asked_questions"][-1]
+            
+            if not current_question:
+                raise HTTPException(status_code=400, detail="No question to answer in spaced mode")
+            
+            # Check if this is a flashcard or question based on the current_question type
+            if isinstance(current_question, dict) and current_question.get("type") == "flashcard":
                 # Self-assessment answer is expected as an integer (0-5)
                 quality = None
                 try:
@@ -1521,11 +1531,10 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
                 if quality is None or quality < 0 or quality > 5:
                     raise HTTPException(status_code=400, detail="Invalid quality rating (0-5) for flashcard")
                 from flashcards import FlashcardDeck
-                deck = FlashcardDeck(session["username"], item["topic"])
+                deck = FlashcardDeck(session["username"], session["current_topic"])
                 
-                # Use the card data from the session item instead of searching
-                # This avoids the 404 error when card is no longer in due cards
-                card_data = item["card"]
+                # Use the card data from the current question
+                card_data = current_question["card"]
                 
                 # Create a card object that matches what the flashcard system expects
                 card = {
@@ -1546,7 +1555,7 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
                 if quality >= 3:
                     session["total_correct"] += 1
                 performance_entry = {
-                    'topic': item["topic"],
+                    'topic': session["current_topic"],
                     'card_front': card['front'],
                     'quality': quality,
                     'correct': quality >= 3,
@@ -1556,16 +1565,22 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
                     'type': 'flashcard'
                 }
                 session["performance"].append(performance_entry)
+                
+                # Check if session is complete
+                session_complete = session["total_questions"] >= session["max_questions"]
+                if session_complete:
+                    session["session_state"] = "completed"
+                
                 return {
                     "type": "flashcard",
                     "quality": quality,
                     "correct": quality >= 3,
                     "total_questions": session["total_questions"],
                     "total_correct": session["total_correct"],
-                    "session_complete": session["total_questions"] >= session["max_questions"],
+                    "session_complete": session_complete,
                     "accuracy": session["total_correct"] / session["total_questions"] if session["total_questions"] > 0 else 0
                 }
-            else:  # question
+            else:  # question type
                 # Handle question_id - it could be a string or a question object
                 if isinstance(request.question_id, dict):
                     question_dict = request.question_id
@@ -1613,6 +1628,11 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
                         )
                     except ImportError:
                         pass
+                # Check if session is complete
+                session_complete = session["total_questions"] >= session["max_questions"]
+                if session_complete:
+                    session["session_state"] = "completed"
+                
                 return {
                     "type": "question",
                     "correct": correct,
@@ -1623,7 +1643,8 @@ async def submit_review_answer(session_id: str, request: ReviewAnswerRequest):
                     "total_questions": session.get("total_questions", 0),
                     "total_correct": session.get("total_correct", 0),
                     "question_number": session.get("current_round", 1),
-                    "max_questions": session.get("max_questions", 7)
+                    "max_questions": session.get("max_questions", 7),
+                    "session_complete": session_complete
                 }
         # For adaptive mode, handle question
         elif session["mode"] == "adaptive":
