@@ -35,6 +35,14 @@ export const userAPI = {
     const response = await api.get(`/api/users/${username}/insights`);
     return response.data;
   },
+
+  startReviewSession: async (username, mode) => {
+    const response = await api.post("/api/review/session/start", {
+      username,
+      mode,
+    });
+    return response.data;
+  },
 };
 
 // Learning Content API
@@ -67,7 +75,7 @@ export const contentAPI = {
     topic,
     previousQuestions = [],
     difficulty = "medium",
-    questionType = "conceptual"
+    questionType = "objective"
   ) => {
     const response = await api.post("/api/content/question", {
       topic,
@@ -111,28 +119,26 @@ export const learningAPI = {
     return response.data;
   },
 
-  recordSession: async (sessionData) => {
-    const response = await api.post(
-      "/api/learning/record-session",
-      sessionData
-    );
+  startLearningSession: async (username, topic) => {
+    const response = await api.post("/api/learning/session/start", {
+      username,
+      topic,
+    });
     return response.data;
   },
 
-  startInteractiveSession: async (username, topic) => {
-    const response = await api.post(
-      `/api/sessions/${username}/start/${encodeURIComponent(topic)}`
-    );
+  getLearningSession: async (sessionId) => {
+    const response = await api.get(`/api/learning/session/${sessionId}`);
     return response.data;
   },
 
-  getSessionStatus: async (sessionId) => {
-    const response = await api.get(`/api/sessions/${sessionId}/status`);
+  updateLearningSession: async (sessionId, data) => {
+    const response = await api.put(`/api/learning/session/${sessionId}`, data);
     return response.data;
   },
 
-  endSession: async (sessionId) => {
-    const response = await api.delete(`/api/sessions/${sessionId}`);
+  endLearningSession: async (sessionId) => {
+    const response = await api.delete(`/api/learning/session/${sessionId}`);
     return response.data;
   },
 };
@@ -220,8 +226,130 @@ export const chatAPI = {
     return response.data;
   },
 
-  getChatSuggestions: async (username) => {
+  getSuggestions: async (username) => {
     const response = await api.get(`/api/chat/suggestions/${username}`);
+    return response.data;
+  },
+};
+
+// Review Session API
+export const reviewAPI = {
+  startSession: async (username, mode, topics = [], adaptive = false) => {
+    const response = await api.post("/api/review/session/start", {
+      username,
+      mode,
+      topics,
+      adaptive,
+    });
+    return response.data;
+  },
+
+  startAdaptiveReview: async (username) => {
+    const response = await api.post("/api/review/adaptive", {
+      username,
+      mode: "adaptive",
+    });
+    return response.data;
+  },
+
+  startIntensiveReview: async (username, topics = []) => {
+    const response = await api.post("/api/review/intensive", {
+      username,
+      mode: "intensive",
+      topics,
+    });
+    return response.data;
+  },
+
+  startSpacedReview: async (username) => {
+    const response = await api.post("/api/review/spaced", {
+      username,
+      mode: "spaced",
+    });
+    return response.data;
+  },
+
+  startQuickReview: async (username) => {
+    const response = await api.post("/api/review/quick", {
+      username,
+      mode: "quick",
+    });
+    return response.data;
+  },
+
+  startFlashcardReview: async (username, topics = []) => {
+    const response = await api.post("/api/review/flashcards", {
+      username,
+      mode: "flashcards",
+      topics,
+    });
+    return response.data;
+  },
+
+  getFlashcardTopics: async (username) => {
+    const response = await api.get(`/api/review/flashcards/topics/${username}`);
+    return response.data;
+  },
+
+  getNextFlashcard: async (sessionId, topic = null) => {
+    const response = await api.post(
+      `/api/review/session/${sessionId}/flashcard`,
+      {
+        topic,
+      }
+    );
+    return response.data;
+  },
+
+  submitFlashcardAnswer: async (sessionId, quality, topic, cardId) => {
+    const response = await api.post(
+      `/api/review/session/${sessionId}/flashcard/answer`,
+      {
+        session_id: sessionId,
+        quality,
+        topic,
+        card_id: cardId,
+      }
+    );
+    return response.data;
+  },
+
+  getSession: async (sessionId) => {
+    const response = await api.get(`/api/review/session/${sessionId}`);
+    return response.data;
+  },
+
+  pauseSession: async (sessionId) => {
+    const response = await api.put(`/api/review/session/${sessionId}/pause`);
+    return response.data;
+  },
+
+  resumeSession: async (sessionId) => {
+    const response = await api.put(`/api/review/session/${sessionId}/resume`);
+    return response.data;
+  },
+
+  endSession: async (sessionId) => {
+    const response = await api.delete(`/api/review/session/${sessionId}`);
+    return response.data;
+  },
+
+  getNextQuestion: async (sessionId, topic = null) => {
+    const response = await api.post(
+      `/api/review/session/${sessionId}/question`,
+      {
+        topic,
+      }
+    );
+    return response.data;
+  },
+
+  submitAnswer: async (sessionId, questionId, answer, timeSpent = null) => {
+    const response = await api.post(`/api/review/session/${sessionId}/answer`, {
+      question_id: questionId,
+      answer,
+      time_spent: timeSpent,
+    });
     return response.data;
   },
 };

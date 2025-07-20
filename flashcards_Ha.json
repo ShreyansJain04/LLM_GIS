@@ -1,0 +1,83 @@
+{
+  "decks": {
+    "GIS coordinates": [
+      {
+        "front": "In the context of GIS coordinates, what is the significance of the datum?",
+        "back": "\u2705 Correct! The datum provides a clearly defined surface where the origin of the coordinates lie. Without a datum, the coordinates would lack a reference framework, making it difficult to understand their true position and relationship with one another.",
+        "subtopic": "GIS coordinates",
+        "created_at": "2025-07-17T06:26:51.808370",
+        "last_reviewed": "2025-07-17T06:37:21.074757",
+        "next_review": "2025-07-18T06:37:21.074757",
+        "interval": 1,
+        "ease_factor": 2.36,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "In the context of GIS coordinates, what is the significance of a datum?",
+        "back": "\u2705 Correct! A datum in GIS coordinates serves as the foundation, providing a clearly defined surface and origin for the coordinates. Without a datum, coordinates lack a framework for arrangement, analysis, and movement.",
+        "subtopic": "GIS coordinates",
+        "created_at": "2025-07-17T06:42:59.269051",
+        "last_reviewed": "2025-07-17T07:36:24.425276",
+        "next_review": "2025-07-17T07:36:24.425276",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "In the context of GIS coordinates, what does a positive x-coordinate indicate according to the CTRS system?",
+        "back": "\u2705 Correct! In the right-handed three-dimensional coordinate system known as CTRS, the x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude, covering both the western and eastern hemispheres.",
+        "subtopic": "GIS coordinates",
+        "created_at": "2025-07-17T06:43:12.707112",
+        "last_reviewed": "2025-07-17T07:30:02.663963",
+        "next_review": "2025-07-17T07:30:02.663963",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "In a GIS coordinate system, what does the radius vector represent in the arrangement of polar coordinates?",
+        "back": "\u2705 Correct! According to the provided context, the radius vector in polar coordinates always points out from the origin, indicating the distance from the origin. It does not represent the angle, rotation or longitude.",
+        "subtopic": "GIS coordinates",
+        "created_at": "2025-07-17T06:43:45.753917",
+        "last_reviewed": "2025-07-17T07:36:26.502315",
+        "next_review": "2025-07-17T07:36:26.502315",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "In a GIS system, what is the significance of the datum?",
+        "back": "\u2705 Correct! According to the context, without a datum, coordinates are like checkers without a checkerboard, meaning they need a clearly defined surface to have an origin. This surface is the datum.",
+        "subtopic": "GIS coordinates",
+        "created_at": "2025-07-17T06:44:06.045193",
+        "last_reviewed": "2025-07-17T07:36:29.401709",
+        "next_review": "2025-07-17T07:36:29.401709",
+        "interval": 0,
+        "ease_factor": 2.5,
+        "repetitions": 0,
+        "difficulty_level": "medium"
+      },
+      {
+        "front": "In GIS coordinates, how is the x-coordinate determined in the right-handed three-dimensional coordinate system known as CTRS?",
+        "back": "\u2705 Correct! As per the given context, in the CTRS system, the x-coordinate is positive from the zero meridian to 90\u00b0 W longitude and from the zero meridian to 90\u00b0 E longitude. The other options are either reversed or not according to the provided context.",
+        "subtopic": "GIS coordinates",
+        "created_at": "2025-07-17T06:44:24.566714",
+        "last_reviewed": "2025-07-17T07:17:05.228521",
+        "next_review": "2025-07-18T07:17:05.228521",
+        "interval": 1,
+        "ease_factor": 2.36,
+        "repetitions": 1,
+        "difficulty_level": "medium"
+      }
+    ]
+  },
+  "stats": {
+    "cards_studied": 44,
+    "correct_answers": 2,
+    "study_sessions": 0
+  }
+}

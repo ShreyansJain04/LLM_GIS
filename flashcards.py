@@ -1,6 +1,6 @@
 """Flashcard system with spaced repetition."""
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 import json
 from pathlib import Path
 
@@ -17,7 +17,17 @@ class FlashcardDeck:
         """Load existing deck or create new one."""
         if self.deck_file.exists():
             with self.deck_file.open('r') as f:
-                return json.load(f)
+                try:
+                    return json.load(f)
+                except json.JSONDecodeError:
+                    return {
+                        'decks': {},
+                        'stats': {
+                            'cards_studied': 0,
+                            'correct_answers': 0,
+                            'study_sessions': 0
+                        }
+                    }
         return {
             'decks': {},
             'stats': {
@@ -32,14 +42,23 @@ class FlashcardDeck:
         with self.deck_file.open('w') as f:
             json.dump(self.deck, f, indent=2)
     
-    def add_card(self, front: str, back: str, subtopic: str = None) -> Dict:
+    def add_card(self, front: str, back: str, subtopic: Optional[str] = None) -> Dict:
         """Add a new flashcard to the deck."""
         if self.topic not in self.deck['decks']:
             self.deck['decks'][self.topic] = []
             
         # Check for duplicates
+        print("DEBUG: Adding card", front, type(front), "\n", back, type(back), "\n", subtopic, type(subtopic))
         for existing_card in self.deck['decks'][self.topic]:
-            if existing_card['front'].lower().strip() == front.lower().strip():
+            print("DEBUG: Existing card", existing_card['front'], type(existing_card['front']), "\n", existing_card['back'], type(existing_card['back']), "\n", existing_card['subtopic'], type(existing_card['subtopic']))
+            # Handle both string and dict formats for front
+            existing_front = existing_card['front']
+            if isinstance(existing_front, dict):
+                existing_front_text = existing_front.get('text', '')
+            else:
+                existing_front_text = str(existing_front)
+                
+            if existing_front_text.lower().strip() == front.lower().strip():
                 return existing_card  # Don't add duplicate
             
         card = {
@@ -161,7 +180,7 @@ def create_flashcards_from_qa(username: str, topic: str, qa_pairs: List[Dict]) -
         deck.add_card(
             front=qa['question'],
             back=qa['answer'],
-            subtopic=qa.get('subtopic')
+            subtopic=qa.get('subtopic') or None
         )
     
     return deck
@@ -190,13 +209,13 @@ def get_all_due_cards_for_user(username: str) -> List[Dict]:
     flashcards_file = Path(f'flashcards_{username}.json')
     if not flashcards_file.exists():
         return []
-    
     with flashcards_file.open('r') as f:
-        data = json.load(f)
-    
+        try:
+            data = json.load(f)
+        except json.JSONDecodeError:
+            data = {}
     all_due_cards = []
     now = datetime.now()
-    
     for topic, cards in data.get('decks', {}).items():
         for card in cards:
             next_review = datetime.fromisoformat(card['next_review'])
@@ -205,7 +224,6 @@ def get_all_due_cards_for_user(username: str) -> List[Dict]:
                 card_info['topic'] = topic
                 card_info['days_overdue'] = (now - next_review).days
                 all_due_cards.append(card_info)
-    
     # Sort by most overdue first
     all_due_cards.sort(key=lambda x: x['days_overdue'], reverse=True)
     return all_due_cards
@@ -215,14 +233,14 @@ def get_spaced_repetition_schedule_for_user(username: str, days_ahead: int = 7) 
     flashcards_file = Path(f'flashcards_{username}.json')
     if not flashcards_file.exists():
         return []
-    
     with flashcards_file.open('r') as f:
-        data = json.load(f)
-    
+        try:
+            data = json.load(f)
+        except json.JSONDecodeError:
+            data = {}
     schedule = []
     now = datetime.now()
     cutoff = now + timedelta(days=days_ahead)
-    
     for topic, cards in data.get('decks', {}).items():
         for card in cards:
             next_review = datetime.fromisoformat(card['next_review'])
@@ -238,7 +256,6 @@ def get_spaced_repetition_schedule_for_user(username: str, days_ahead: int = 7) 
                     'ease_factor': card.get('ease_factor', 2.5),
                     'repetitions': card.get('repetitions', 0)
                 })
-    
     # Sort by review date (overdue first)
     schedule.sort(key=lambda x: x['days_until_review'])
     return schedule 

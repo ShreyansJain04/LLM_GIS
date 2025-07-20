@@ -1,0 +1,17 @@
+# Tell Netlify to run your build from the repo root:
+[build]
+  # Run your React build in the frontend folder
+  command = "cd frontend && CI=false DISABLE_ESLINT_PLUGIN=true npm run build"
+  # Publish the built files from frontend/build
+  publish = "frontend/build"
+
+  # Keep your Node version
+  [build.environment]
+    NODE_VERSION = "20"
+
+# Proxy API calls to your ngrok backend:
+[[redirects]]
+  from   = "/api/*"
+  to     = "https://c0275f2199d2.ngrok-free.app/:splat"
+  status = 200
+  force  = true

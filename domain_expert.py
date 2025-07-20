@@ -1,7 +1,7 @@
 """Enhanced Domain Expert with Advanced RAG and Multi-LLM Support."""
 import os
 from pathlib import Path
-from typing import Tuple, List, Optional, Dict, Any
+from typing import Tuple, List, Optional, Dict, Any, Union
 
 from advanced_rag import AdvancedRAGSystem
 from llm_providers import llm_manager
@@ -20,7 +20,7 @@ rag_system = AdvancedRAGSystem(
 def query_domain_expert(
     prompt: str, 
     context: str = "", 
-    citations: List[str] = None,
+    citations: Optional[List[str]] = None,
     provider: Optional[str] = None,
     temperature: float = 0.7
 ) -> str:
@@ -160,12 +160,12 @@ def generate_example(topic: str, difficulty: str = "medium") -> str:
     return query_domain_expert(prompt, context, citations)
 
 
-def generate_question(topic: str, previous_questions: List[str] = None, difficulty: str = "medium", question_type: str = "objective") -> Dict:
+def generate_question(topic: str, previous_questions: Optional[List[Union[str, Dict]]] = None, difficulty: str = "medium", question_type: str = "objective") -> Dict:
     """Generate a question for a given topic.
     
     Args:
         topic: The topic to generate a question for
-        previous_questions: List of previously asked questions to avoid repetition
+        previous_questions: List of previously asked questions (strings or dicts) to avoid repetition
         difficulty: Difficulty level ("easy", "medium", "hard")
         question_type: Type of question ("objective", "analytical", "synthesis")
         
@@ -174,6 +174,18 @@ def generate_question(topic: str, previous_questions: List[str] = None, difficul
     """
     if previous_questions is None:
         previous_questions = []
+   
+    # Extract question texts from previous_questions (handle both strings and dicts)
+    previous_texts = []
+    for q in previous_questions:
+        if isinstance(q, dict):
+            # Extract text from question dictionary
+            if 'text' in q:
+                previous_texts.append(q['text'])
+            elif 'question' in q:
+                previous_texts.append(q['question'])
+        elif isinstance(q, str):
+            previous_texts.append(q)
     
     # Get context for the topic
     context = _retrieve_context(topic)
@@ -197,8 +209,8 @@ def generate_question(topic: str, previous_questions: List[str] = None, difficul
             "EXPLANATION: <brief explanation of why the correct answer is right>"
         )
         
-        if previous_questions:
-            prompt += "\nAvoid these previous questions:\n" + "\n".join(previous_questions)
+        if previous_texts:
+            prompt += "\nAvoid these previous questions:\n" + "\n".join(previous_texts)
         
         # Get response from LLM
         response = query_domain_expert(prompt, context)
@@ -250,8 +262,8 @@ def generate_question(topic: str, previous_questions: List[str] = None, difficul
             f"Create a {question_type} question about '{topic}' that requires {difficulty} level understanding.\n"
             "The question should encourage critical thinking and detailed explanation."
         )
-        if previous_questions:
-            prompt += "\nAvoid these previous questions:\n" + "\n".join(previous_questions)
+        if previous_texts:
+            prompt += "\nAvoid these previous questions:\n" + "\n".join(previous_texts)
         
         question_text = query_domain_expert(prompt, context)
         return {
@@ -271,6 +283,13 @@ def check_answer(question: Dict, answer: str) -> Tuple[bool, str]:
     Returns:
         Tuple of (is_correct, feedback)
     """
+    
+    # print(f"check_answer received question: {question}")
+    # print(f"check_answer received answer: {answer}")
+    # print(f"Question type: {question.get('type')}")
+    # print(f"Question options: {question.get('options', [])}")
+    # print(f"Question correct_option: {question.get('correct_option')}")
+    
     if question.get("type") == "objective":
         try:
             selected_option = int(answer)

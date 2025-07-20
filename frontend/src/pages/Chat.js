@@ -1,161 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import ReactMarkdown from "react-markdown";
+import { motion } from "framer-motion";
 import {
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon,
   CommandLineIcon,
-  LightBulbIcon,
   TrashIcon,
-  BookOpenIcon,
   QuestionMarkCircleIcon,
   SparklesIcon,
-  ExclamationTriangleIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  ClockIcon,
 } from "@heroicons/react/24/outline";
 import { useUser } from "../contexts/UserContext";
 import { chatAPI } from "../services/api";
 import toast from "react-hot-toast";
-
-const MessageBubble = ({ message, isUser, citations, timestamp }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}
-  >
-    <div className={`max-w-3xl ${isUser ? "order-2" : "order-1"}`}>
-      <div
-        className={`px-4 py-3 rounded-2xl ${
-          isUser
-            ? "bg-primary-600 text-white rounded-br-sm"
-            : "bg-white border border-secondary-200 text-secondary-900 rounded-bl-sm"
-        }`}
-      >
-        <div className="prose prose-sm max-w-none">
-          {isUser ? (
-            <p className="text-white mb-0">{message}</p>
-          ) : (
-            <ReactMarkdown
-              components={{
-                p: ({ children }) => (
-                  <p className="mb-2 last:mb-0">{children}</p>
-                ),
-                ul: ({ children }) => <ul className="ml-4 mb-2">{children}</ul>,
-                ol: ({ children }) => <ol className="ml-4 mb-2">{children}</ol>,
-                li: ({ children }) => <li className="mb-1">{children}</li>,
-                code: ({ children }) => (
-                  <code className="bg-secondary-100 px-1 py-0.5 rounded text-xs">
-                    {children}
-                  </code>
-                ),
-              }}
-            >
-              {message}
-            </ReactMarkdown>
-          )}
-        </div>
-
-        {/* Citations */}
-        {citations && citations.length > 0 && (
-          <div className="mt-3 pt-2 border-t border-secondary-200">
-            <p className="text-xs text-secondary-500 mb-1">Sources:</p>
-            <div className="space-y-1">
-              {citations.map((citation, index) => (
-                <div
-                  key={index}
-                  className="text-xs text-secondary-600 bg-secondary-50 px-2 py-1 rounded"
-                >
-                  📄 {citation}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Timestamp */}
-      <div
-        className={`text-xs text-secondary-500 mt-1 ${
-          isUser ? "text-right" : "text-left"
-        }`}
-      >
-        {new Date(timestamp).toLocaleTimeString()}
-      </div>
-    </div>
-  </motion.div>
-);
-
-const SuggestionChip = ({ suggestion, onClick }) => (
-  <motion.button
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    onClick={() => onClick(suggestion)}
-    className="px-3 py-2 bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-full text-sm border border-primary-200 transition-colors duration-200"
-  >
-    {suggestion}
-  </motion.button>
-);
-
-const CommandHelp = ({ isVisible, onClose }) => (
-  <AnimatePresence>
-    {isVisible && (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-secondary-200 rounded-lg shadow-lg p-4 z-10"
-      >
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium text-secondary-900">Quick Commands</h3>
-          <button
-            onClick={onClose}
-            className="text-secondary-400 hover:text-secondary-600"
-          >
-            <XCircleIcon className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <div className="space-y-1">
-            <div>
-              <code className="text-primary-600">!help</code> - Show all
-              commands
-            </div>
-            <div>
-              <code className="text-primary-600">!explain topic</code> - Get
-              explanation
-            </div>
-            <div>
-              <code className="text-primary-600">!example topic</code> - Get
-              example
-            </div>
-            <div>
-              <code className="text-primary-600">!question topic</code> -
-              Practice question
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div>
-              <code className="text-primary-600">!quiz topic</code> - Start quiz
-            </div>
-            <div>
-              <code className="text-primary-600">!sources</code> - Show
-              documents
-            </div>
-            <div>
-              <code className="text-primary-600">!progress</code> - View
-              progress
-            </div>
-            <div>
-              <code className="text-primary-600">!hint</code> - Get hint
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+import MessageBubble from "../components/MessageBubble";
+import SuggestionChip from "../components/SuggestionChip";
+import CommandHelp from "../components/CommandHelp";
 
 const Chat = () => {
   const { user } = useUser();
@@ -197,8 +55,8 @@ const Chat = () => {
 
   const loadSuggestions = async () => {
     try {
-      const suggestionsData = await chatAPI.getChatSuggestions(user.username);
-      setSuggestions(suggestionsData.suggestions || []);
+      const suggestionsData = await chatAPI.getSuggestions(user.username);
+      setSuggestions(suggestionsData.suggestions.slice(0, 3) || []);
     } catch (error) {
       console.error("Failed to load suggestions:", error);
     }
@@ -297,33 +155,33 @@ const Chat = () => {
     }
   };
 
-  const handleQuizAnswer = async (answer) => {
-    if (!currentQuizQuestion || !currentQuizTopic) return;
+  // const handleQuizAnswer = async (answer) => {
+  //   if (!currentQuizQuestion || !currentQuizTopic) return;
 
-    setIsLoading(true);
-    try {
-      const result = await chatAPI.submitQuizAnswer(
-        user.username,
-        currentQuizTopic,
-        answer
-      );
+  //   setIsLoading(true);
+  //   try {
+  //     const result = await chatAPI.submitQuizAnswer(
+  //       user.username,
+  //       currentQuizTopic,
+  //       answer
+  //     );
 
-      const assistantMessage = {
-        type: "assistant",
-        message: result.feedback,
-        timestamp: new Date().toISOString(),
-      };
+  //     const assistantMessage = {
+  //       type: "assistant",
+  //       message: result.feedback,
+  //       timestamp: new Date().toISOString(),
+  //     };
 
-      setMessages((prev) => [...prev, assistantMessage]);
-      setCurrentQuizQuestion(null);
-      setCurrentQuizTopic(null);
-    } catch (error) {
-      console.error("Failed to submit quiz answer:", error);
-      toast.error("Failed to submit answer");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     setMessages((prev) => [...prev, assistantMessage]);
+  //     setCurrentQuizQuestion(null);
+  //     setCurrentQuizTopic(null);
+  //   } catch (error) {
+  //     console.error("Failed to submit quiz answer:", error);
+  //     toast.error("Failed to submit answer");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {

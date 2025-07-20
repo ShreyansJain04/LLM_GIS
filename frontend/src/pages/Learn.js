@@ -1,162 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import ReactMarkdown from "react-markdown";
+import { motion } from "framer-motion";
 import {
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon,
   CommandLineIcon,
-  TrashIcon, 
+  TrashIcon,
   QuestionMarkCircleIcon,
   SparklesIcon,
-  XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { useUser } from "../contexts/UserContext";
 import toast from "react-hot-toast";
 import { learningAPI, contentAPI, chatAPI } from "../services/api";
-
-
-const MessageBubble = ({ message, isUser, citations, timestamp }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    className={`flex ${isUser ? "justify-end" : "justify-start"} mb-4`}
-  >
-    <div className={`max-w-3xl ${isUser ? "order-2" : "order-1"}`}>
-      <div
-        className={`px-4 py-3 rounded-2xl ${
-          isUser
-            ? "bg-primary-600 text-white rounded-br-sm"
-            : "bg-white border border-secondary-200 text-secondary-900 rounded-bl-sm"
-        }`}
-      >
-        <div className="prose prose-sm max-w-none">
-          {isUser ? (
-            <p className="text-white mb-0">{message}</p>
-          ) : (
-            <ReactMarkdown
-              components={{
-                p: ({ children }) => (
-                  <p className="mb-2 last:mb-0">{children}</p>
-                ),
-                ul: ({ children }) => <ul className="ml-4 mb-2">{children}</ul>,
-                ol: ({ children }) => <ol className="ml-4 mb-2">{children}</ol>,
-                li: ({ children }) => <li className="mb-1">{children}</li>,
-                code: ({ children }) => (
-                  <code className="bg-secondary-100 px-1 py-0.5 rounded text-xs">
-                    {children}
-                  </code>
-                ),
-              }}
-            >
-              {message}
-            </ReactMarkdown>
-          )}
-        </div>
-
-
-        {/* Citations */}
-        {citations && citations.length > 0 && (
-          <div className="mt-3 pt-2 border-t border-secondary-200">
-            <p className="text-xs text-secondary-500 mb-1">Sources:</p>
-            <div className="space-y-1">
-              {citations.map((citation, index) => (
-                <div
-                  key={index}
-                  className="text-xs text-secondary-600 bg-secondary-50 px-2 py-1 rounded"
-                >
-                  📄 {citation}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-
-      {/* Timestamp */}
-      <div
-        className={`text-xs text-secondary-500 mt-1 ${
-          isUser ? "text-right" : "text-left"
-        }`}
-      >
-        {new Date(timestamp).toLocaleTimeString()}
-      </div>
-    </div>
-  </motion.div>
-);
-
-
-const SuggestionChip = ({ suggestion, onClick }) => (
-  <motion.button
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    onClick={() => onClick(suggestion)}
-    className="px-3 py-2 bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-full text-sm border border-primary-200 transition-colors duration-200"
-  >
-    {suggestion}
-  </motion.button>
-);
-
-
-const CommandHelp = ({ isVisible, onClose }) => (
-  <AnimatePresence>
-    {isVisible && (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-secondary-200 rounded-lg shadow-lg p-4 z-10"
-      >
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium text-secondary-900">Quick Commands</h3>
-          <button
-            onClick={onClose}
-            className="text-secondary-400 hover:text-secondary-600"
-          >
-            <XCircleIcon className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <div className="space-y-1">
-            <div>
-              <code className="text-primary-600">!help</code> - Show all
-              commands
-            </div>
-            <div>
-              <code className="text-primary-600">!explain topic</code> - Get
-              explanation
-            </div>
-            <div>
-              <code className="text-primary-600">!example topic</code> - Get
-              example
-            </div>
-            <div>
-              <code className="text-primary-600">!question topic</code> -
-              Practice question
-            </div>
-          </div>
-          <div className="space-y-1">
-            <div>
-              <code className="text-primary-600">!quiz topic</code> - Start quiz
-            </div>
-            <div>
-              <code className="text-primary-600">!sources</code> - Show
-              documents
-            </div>
-            <div>
-              <code className="text-primary-600">!progress</code> - View
-              progress
-            </div>
-            <div>
-              <code className="text-primary-600">!hint</code> - Get hint
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
-
+import MessageBubble from "../components/MessageBubble";
+import SuggestionChip from "../components/SuggestionChip";
+import CommandHelp from "../components/CommandHelp";
 
 const Learn = () => {
   const { user } = useUser();
@@ -165,7 +22,6 @@ const Learn = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [sessionState, setSessionState] = useState("input");
   const [messages, setMessages] = useState([]);
-  const [messageQueue, setMessageQueue] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
@@ -174,196 +30,249 @@ const Learn = () => {
   const [currentQuizTopic, setCurrentQuizTopic] = useState(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
-  const [loadingContent, setLoadingContent] = useState({
-    explanation: false,
-    example: false,
-    question: false,
-    answer: false,
+  const [sessionId, setSessionId] = useState(null);
+
+  // Combined question state
+  const [questionState, setQuestionState] = useState({
+    text: "",
+    options: [],
+    type: null,
   });
 
-
-  // Content states
-  const [explanation, setExplanation] = useState("");
-  const [example, setExample] = useState("");
-  const [question, setQuestion] = useState("");
-  const [feedback, setFeedback] = useState("");
-  const [isCorrect, setIsCorrect] = useState(false);
-
+  // Separate state for selected option
+  const [selectedOption, setSelectedOption] = useState("");
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
 
   // Helper to add a message to chat
   const addMessage = (msg) => {
     setMessages((prev) => [
       ...prev,
+      { ...msg, timestamp: new Date().toISOString() },
+    ]);
+  };
+
+  // Helper to add a message with continue button
+  const addMessageWithContinue = (msg, continueAction) => {
+    setMessages((prev) => [
+      ...prev,
       {
         ...msg,
         timestamp: new Date().toISOString(),
+        showContinueButton: msg.showContinueButton !== false, // Default to true unless explicitly false
+        onContinue: continueAction,
+        continueClicked: false,
       },
     ]);
   };
 
-
-  // Helper to queue messages
-  const queueMessages = (msgs) => {
-    setMessageQueue((prev) => [...prev, ...msgs]);
+  // Helper to handle continue button click
+  const handleContinueClick = (messageIndex, continueAction) => {
+    setMessages((prev) =>
+      prev.map((msg, index) =>
+        index === messageIndex ? { ...msg, continueClicked: true } : msg
+      )
+    );
+    continueAction();
   };
 
+  // Simple function to add messages sequentially with delays
+  const addMessagesSequentially = async (messages) => {
+    for (const msg of messages) {
+      if (msg.pauseAfter === "name") {
+        addMessage(msg);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } else if (
+        msg.pauseAfter === "explanation" ||
+        msg.pauseAfter === "example"
+      ) {
+        // Set appropriate session state and turn off loading
+        if (msg.pauseAfter === "explanation") {
+          setSessionState("waitingForUserAfterExplanation");
+          setIsLoading(false);
+        } else if (msg.pauseAfter === "example") {
+          setSessionState("waitingForUserAfterExample");
+        }
 
-  // When messageQueue changes, if not empty and sessionState is 'revealing', pop and show next message
-  useEffect(() => {
-    if (messageQueue.length > 0 && sessionState === "revealing") {
-      const [nextMsg, ...rest] = messageQueue;
-      addMessage(nextMsg);
-      setMessageQueue(rest);
-      // Only auto-reveal the subtopic name, then pause for user after each step
-      if (nextMsg.auto && nextMsg.pauseAfter === "name") {
-        setTimeout(() => {
-          setSessionState("waitingForUserAfterName");
-        }, Math.floor(500 + Math.random() * 500));
-      } else if (nextMsg.pauseAfter === "explanation") {
-        setIsLoading(false);
-        setSessionState("waitingForUserAfterExplanation");
-      } else if (nextMsg.pauseAfter === "example") {
-        setSessionState("waitingForUserAfterExample");
-      } else if (nextMsg.pauseAfter === "question") {
+        addMessageWithContinue(msg, () => {
+          // Continue to next message after user clicks continue
+          setTimeout(() => {
+            const nextIndex = messages.indexOf(msg) + 1;
+            if (nextIndex < messages.length) {
+              addMessagesSequentially(messages.slice(nextIndex));
+            }
+          }, 100);
+        });
+        break; // Stop here and wait for user to continue
+      } else if (msg.pauseAfter === "question") {
+        addMessage(msg);
         setSessionState("awaitingAnswer");
-        setQuestion(nextMsg.questionText);
+        setQuestionState({
+          text: msg.questionText,
+          options: msg.options || [],
+          type: msg.questionType || "objective",
+          correct_option: msg.correct_option || 0,
+          explanation: msg.explanation || "",
+        });
+        break; // Stop here and wait for user to answer
+      } else {
+        addMessage(msg);
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
     }
-  }, [messageQueue, sessionState]);
+  };
 
-
-  // Start learning session when topic is submitted
+  // Start learning session
   const startLearningSession = async (topicText) => {
     setIsLoading(true);
-    setMessages([]);
     setPlan(null);
     setCurrentStep(0);
     setSessionState("revealing");
+    setQuestionState({ text: "", options: [], type: null });
+    setSelectedOption("");
+    setSessionId(null);
+
     try {
-      queueMessages([
-        {
-          type: "assistant",
-          message: `Creating a learning plan for: **${topicText}** ...`,
-        },
-      ]);
-      const learningPlan = await learningAPI.getLearningPlan(
+      // Add initial message
+      addMessage({
+        type: "assistant",
+        message: `Creating a learning plan for: **${topicText}** ...`,
+      });
+
+      const result = await learningAPI.startLearningSession(
         user.username,
         topicText
       );
-      setPlan(learningPlan);
+      setSessionId(result.session_id);
+      setPlan(result.plan);
+
       addMessage({
         type: "assistant",
         message: `✅ Learning plan created! ${
-          learningPlan.subtopics?.length || 0
+          result.plan.subtopics?.length || 0
         } subtopics to cover.`,
       });
-      setCurrentStep(0);
-      // Immediately auto-reveal the first subtopic
-      if (learningPlan.subtopics?.length > 0) {
-        await buildSubtopicQueue(learningPlan.subtopics[0], 0, true); // true = auto-reveal
+
+      if (result.plan.subtopics?.length > 0) {
+        await buildSubtopicMessages(result.plan.subtopics[0], 0, true);
       }
     } catch (error) {
-      queueMessages([
-        { type: "assistant", message: `Failed to create learning plan.` },
-      ]);
+      addMessage({
+        type: "assistant",
+        message: `Failed to create learning plan.`,
+      });
       setSessionState("input");
     } finally {
       setIsLoading(false);
     }
   };
 
-
-  // buildSubtopicQueue: only auto-reveal subtopic name and explanation, then pause for user before example, then pause for user before question, then pause for user before feedback
-  const buildSubtopicQueue = async (
+  // Build subtopic messages
+  const buildSubtopicMessages = async (
     subtopic,
     stepIdx,
     autoRevealFirst = false
   ) => {
-    const queue = [];
-    queue.push({
-      type: "assistant",
-      message: `**Subtopic ${stepIdx + 1}: ${subtopic.name}**`,
-      auto: true,
-      pauseAfter: "name",
-    });
+    const messages = [
+      {
+        type: "assistant",
+        message: `**Subtopic ${stepIdx + 1}: ${subtopic.name}**`,
+        auto: true,
+        pauseAfter: "name",
+      },
+    ];
+
+    // Add explanation
     try {
       const explainData = await contentAPI.explainConcept(
         subtopic.name,
         "standard"
       );
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `**Explanation:**\n${explainData.explanation}`,
         pauseAfter: "explanation",
+        showContinueButton: true,
       });
     } catch {
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `Failed to load explanation for ${subtopic.name}.`,
         pauseAfter: "explanation",
+        showContinueButton: true,
       });
     }
+
+    // Add example
     try {
       const exampleData = await contentAPI.generateExample(
         subtopic.name,
         "medium"
       );
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `**Example:**\n${exampleData.example}`,
         pauseAfter: "example",
+        showContinueButton: true,
       });
     } catch {
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `Failed to load example for ${subtopic.name}.`,
         pauseAfter: "example",
+        showContinueButton: true,
       });
     }
+
+    // Add question
     try {
       const questionData = await contentAPI.generateQuestion(
         subtopic.name,
         [],
         "medium",
-        "analytical"
+        "objective"
       );
-      queue.push({
+      messages.push({
         type: "assistant",
-        message: `**Question:**\n${questionData.question}`,
+        message: `**Question:**\n${questionData.question.text}`,
         pauseAfter: "question",
         isQuestion: true,
-        questionText: questionData.question,
+        questionText: questionData.question.text,
+        options: questionData.question.options || [],
+        showOptions: true,
+        questionType: questionData.question.type || "objective",
+        correct_option: questionData.question.correct_option || 0,
+        explanation: questionData.question.explanation || "",
+        questionObj: questionData.question,
       });
     } catch {
-      queue.push({
+      messages.push({
         type: "assistant",
         message: `Failed to load question for ${subtopic.name}.`,
         pauseAfter: "question",
         isQuestion: true,
         questionText: "",
+        options: [],
       });
     }
-    setMessageQueue(queue); // Replace queue for new subtopic
-    setSessionState("revealing"); // Always start with auto-reveal of name
+
+    // Start processing messages sequentially
+    addMessagesSequentially(messages);
   };
 
-
-  // Handle user input (answer, !command, or Enter to reveal next)
+  // Handle user input
   const handleSendMessage = async (messageText = inputMessage) => {
     if (isLoading) return;
+
+    // Handle commands (always allow commands)
     if (messageText.trim().startsWith("!")) {
-      // Handle command
       addMessage({ type: "user", message: messageText });
       setInputMessage("");
       setIsLoading(true);
@@ -374,86 +283,69 @@ const Learn = () => {
       }
       return;
     }
+
+    // Handle different session states
     if (sessionState === "input" && messageText.trim()) {
-      // User is submitting a topic
       setTopic(messageText.trim());
       addMessage({ type: "user", message: messageText.trim() });
       setInputMessage("");
       await startLearningSession(messageText.trim());
       return;
     }
+
     if (sessionState === "awaitingAnswer" && messageText.trim()) {
       // User is answering the question
       addMessage({ type: "user", message: messageText.trim() });
+
       setInputMessage("");
       await handleAnswer(messageText.trim());
       return;
     }
-    if (sessionState === "waitingForUserAfterName" && !messageText.trim()) {
-      setSessionState("revealing"); // Reveal explanation
-      return;
-    }
+
+    // Handle continue button clicks for explanation/example/feedback messages
     if (
-      sessionState === "waitingForUserAfterExplanation" &&
-      !messageText.trim()
+      sessionState === "waitingForUserAfterExplanation" ||
+      sessionState === "waitingForUserAfterExample" ||
+      sessionState === "waitingForUserAfterFeedback"
     ) {
-      setSessionState("revealing"); // Reveal example
-      return;
-    }
-    if (sessionState === "waitingForUserAfterExample" && !messageText.trim()) {
-      setSessionState("revealing"); // Reveal question
-      return;
-    }
-    if (sessionState === "waitingForUserAfterFeedback" && !messageText.trim()) {
-      // Move to next subtopic
-      if (plan && currentStep < plan.subtopics.length - 1) {
-        const nextStep = currentStep + 1;
-        // Notify user that AI is preparing the next subtopic and disable input
-        addMessage({
-          type: "assistant",
-          message: `⏳ AI is preparing subtopic ${nextStep + 1}...`,
-        });
-        setSessionState("preparingSubtopic");
-        setIsLoading(true);
-        await buildSubtopicQueue(plan.subtopics[nextStep], nextStep, false);
-        setCurrentStep(nextStep);
-        // Input will be re-enabled after explanation is displayed (see useEffect below)
+      // User pressed enter to continue - this should trigger the continue button
+      if (messageText.trim() === "") {
+        // Find the last message with a continue button and trigger it
+        const lastMessageWithContinue = messages
+          .slice()
+          .reverse()
+          .find((msg) => msg.showContinueButton && !msg.continueClicked);
+
+        if (lastMessageWithContinue) {
+          const messageIndex = messages.findIndex(
+            (msg) => msg === lastMessageWithContinue
+          );
+          handleContinueClick(messageIndex, lastMessageWithContinue.onContinue);
+        }
       } else {
-        queueMessages([
-          {
-            type: "assistant",
-            message: `🎉 **Learning session completed!** You can now ask more questions or use ! commands.`,
-          },
-        ]);
-        setSessionState("completed");
+        // User tried to send a regular message - show error
+        toast.error(
+          "Please click 'Continue' or press Enter to proceed, or use commands (type ! for help)"
+        );
       }
       return;
     }
-    // Otherwise, treat as a normal chat message
-    // if (messageText.trim()) {
-    //   addMessage({ type: "user", message: messageText.trim() });
-    //   setInputMessage("");
-    //   setIsLoading(true);
-    //   try {
-    //     const response = await chatAPI.sendMessage(
-    //       user.username,
-    //       messageText.trim()
-    //     );
-    //     addMessage({
-    //       type: "assistant",
-    //       message: response.response,
-    //       citations: response.citations,
-    //     });
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // }
+
+    // Handle invalid input during question
+    if (sessionState === "awaitingAnswer" && messageText.trim()) {
+      setInputMessage("");
+      const errorMsg =
+        questionState.type === "objective"
+          ? "Please select an option from the question above or use a command (type ! for help)"
+          : "Please answer the question above or use a command (type ! for help)";
+      toast.error(errorMsg);
+      return;
+    }
   };
 
-
+  // Handle commands
   const handleCommand = async (command) => {
     const [cmd, ...args] = command.slice(1).split(" ");
-
 
     try {
       switch (cmd.toLowerCase()) {
@@ -467,27 +359,23 @@ const Learn = () => {
               user.username,
               `Please explain ${topic}`
             );
-            const assistantMessage = {
+            addMessage({
               type: "assistant",
               message: explainResponse.response,
               citations: explainResponse.citations,
-              timestamp: new Date().toISOString(),
-            };
-            setMessages((prev) => [...prev, assistantMessage]);
+            });
           }
           break;
         case "quiz":
           if (args.length > 0) {
             const topic = args.join(" ");
             const quizResponse = await contentAPI.generateQuestion(topic);
-            setCurrentQuizQuestion(quizResponse.question);
+            setCurrentQuizQuestion(quizResponse.text);
             setCurrentQuizTopic(topic);
-            const assistantMessage = {
+            addMessage({
               type: "assistant",
-              message: `Quiz started for "${topic}":\n\n${quizResponse.question}`,
-              timestamp: new Date().toISOString(),
-            };
-            setMessages((prev) => [...prev, assistantMessage]);
+              message: `Quiz started for "${topic}":\n\n${quizResponse.text}`,
+            });
           }
           break;
         default:
@@ -499,30 +387,7 @@ const Learn = () => {
     }
   };
 
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (inputMessage.trim() && !isLoading) {
-        handleSendMessage();
-      } else if (
-        !inputMessage.trim() &&
-        [
-          "waitingForUserAfterName",
-          "waitingForUserAfterExplanation",
-          "waitingForUserAfterExample",
-          "waitingForUserAfterQuestion",
-          "waitingForUserAfterFeedback",
-          "waitingForUser",
-          "revealing",
-        ].includes(sessionState)
-      ) {
-        handleSendMessage("");
-      }
-    }
-  };
-
-
+  // TODO: Clear chat <-- this is for chat instead of learn mode
   const clearChat = async () => {
     try {
       await chatAPI.clearChatHistory(user.username);
@@ -536,22 +401,119 @@ const Learn = () => {
     }
   };
 
-
-  const handleSuggestionClick = (suggestion) => {
-    handleSendMessage(suggestion);
-  };
-
-
-  // In handleAnswer, after feedback, set sessionState to waitingForUserAfterFeedback
+  // Handle answer submission
   const handleAnswer = async (answer) => {
     setIsLoading(true);
     setSessionState("checkingAnswer");
+
     try {
-      const result = await contentAPI.checkAnswer(question, answer);
-      addMessage({
-        type: "assistant",
-        message: `**Feedback:** ${result.feedback}`,
-      });
+      let answerToSend;
+      if (
+        questionState.options.length > 0 &&
+        typeof parseInt(answer) === "number" &&
+        parseInt(answer) >= 0 &&
+        parseInt(answer) < questionState.options.length
+      ) {
+        answerToSend = answer;
+      } else {
+        answerToSend = answer;
+      }
+      const cleanQuestion = {
+        text: questionState.text,
+        type: questionState.type,
+        options: questionState.options || [],
+        correct_option: parseInt(questionState.correct_option) || 0,
+        explanation: questionState.explanation || "",
+      };
+      if (!cleanQuestion.text) {
+        addMessage({
+          type: "assistant",
+          message: "Error: Question text is missing.",
+        });
+        return;
+      }
+      if (!cleanQuestion.type) {
+        addMessage({
+          type: "assistant",
+          message: "Error: Question type is missing.",
+        });
+        return;
+      }
+      const result = await contentAPI.checkAnswer(cleanQuestion, answerToSend);
+      // Build performance entry
+      const performanceEntry = {
+        subtopic: plan?.subtopics?.[currentStep]?.name || topic,
+        question: cleanQuestion.text,
+        answer: answerToSend,
+        correct: result.correct,
+        question_type: cleanQuestion.type,
+        difficulty: "medium",
+        timestamp: new Date().toISOString(),
+        options: cleanQuestion.options,
+        correct_option: cleanQuestion.correct_option,
+        selected_option: parseInt(answerToSend),
+        explanation: cleanQuestion.explanation,
+      };
+      // Update session incrementally
+      if (sessionId) {
+        await learningAPI.updateLearningSession(sessionId, {
+          question: cleanQuestion,
+          correct: result.correct,
+          performance_entry: performanceEntry,
+          subtopic: plan?.subtopics?.[currentStep]?.name || topic,
+          current_subtopic_index: currentStep,
+        });
+      }
+      addMessageWithContinue(
+        {
+          type: "assistant",
+          message: `**Feedback:** ${result.feedback}`,
+          showContinueButton: true,
+        },
+        async () => {
+          if (plan && currentStep < plan.subtopics.length - 1) {
+            const nextStep = currentStep + 1;
+            addMessage({
+              type: "assistant",
+              message: `⏳ AI is preparing subtopic ${nextStep + 1}...`,
+            });
+            setSessionState("preparingSubtopic");
+            setIsLoading(true);
+            await buildSubtopicMessages(
+              plan.subtopics[nextStep],
+              nextStep,
+              false
+            );
+            setCurrentStep(nextStep);
+            setQuestionState({
+              text: "",
+              options: [],
+              type: null,
+            });
+            setSelectedOption("");
+          } else {
+            addMessage({
+              type: "assistant",
+              message: `🎉 **Learning session completed!** You can now ask more questions or use ! commands.`,
+            });
+            setSessionState("completed");
+            setQuestionState({
+              text: "",
+              options: [],
+              type: null,
+            });
+            setSelectedOption("");
+            // End and record session
+            if (sessionId) {
+              try {
+                await learningAPI.endLearningSession(sessionId);
+              } catch (err) {
+                console.error("Failed to end session", err);
+              }
+            }
+          }
+        }
+      );
       setSessionState("waitingForUserAfterFeedback");
     } catch (error) {
       addMessage({ type: "assistant", message: `Failed to check answer.` });
@@ -561,6 +523,52 @@ const Learn = () => {
     }
   };
 
+  // Utility functions
+  const isSpecialCommand = (message) => message.trim().startsWith("!");
+
+  const shouldDisableSubmit = () => {
+    if (isLoading) return true;
+
+    // Allow empty input for continue actions
+    if (
+      sessionState === "waitingForUserAfterExplanation" ||
+      sessionState === "waitingForUserAfterExample" ||
+      sessionState === "waitingForUserAfterFeedback"
+    ) {
+      return false; // Allow empty input to trigger continue
+    }
+
+    if (!inputMessage.trim()) return true;
+
+    if (
+      sessionState === "awaitingAnswer" &&
+      questionState.type === "objective"
+    ) {
+      // For objective questions, only allow special commands
+      return !isSpecialCommand(inputMessage);
+    }
+    return false;
+  };
+
+  const getPlaceholder = () => {
+    if (
+      sessionState === "awaitingAnswer" &&
+      questionState.type === "objective"
+    ) {
+      return "Select an option above or use commands (type ! for help)...";
+    }
+    if (sessionState === "awaitingAnswer") {
+      return "Type your answer or use commands (type ! for help)...";
+    }
+    if (
+      sessionState === "waitingForUserAfterExplanation" ||
+      sessionState === "waitingForUserAfterExample" ||
+      sessionState === "waitingForUserAfterFeedback"
+    ) {
+      return "Press Enter to continue, or use commands (type ! for help)...";
+    }
+    return "Ask a question, request help, or type ! for commands...";
+  };
 
   return (
     <div className="flex flex-col h-screen bg-secondary-50">
@@ -582,7 +590,6 @@ const Learn = () => {
             </div>
           </div>
 
-
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setShowCommandHelp(!showCommandHelp)}
@@ -602,7 +609,6 @@ const Learn = () => {
           </div>
         </div>
 
-
         {/* Current Quiz Indicator */}
         {currentQuizQuestion && (
           <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -618,7 +624,6 @@ const Learn = () => {
           </div>
         )}
       </div>
-
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-6 py-8">
@@ -650,7 +655,7 @@ const Learn = () => {
                     <SuggestionChip
                       key={index}
                       suggestion={suggestion}
-                      onClick={handleSuggestionClick}
+                      onClick={(suggestion) => handleSendMessage(suggestion)}
                     />
                   ))}
                 </div>
@@ -666,6 +671,22 @@ const Learn = () => {
                 isUser={message.type === "user"}
                 citations={message.citations}
                 timestamp={message.timestamp}
+                showContinueButton={message.showContinueButton}
+                onContinue={
+                  message.onContinue
+                    ? () => handleContinueClick(index, message.onContinue)
+                    : undefined
+                }
+                continueClicked={message.continueClicked}
+                showOptions={message.showOptions}
+                options={message.options}
+                selectedOptionIndex={selectedOption}
+                onOptionSelect={(selectedOptionIndex) => {
+                  console.log("Selected option index:", selectedOptionIndex);
+                  setSelectedOption(selectedOptionIndex.toString()); // Save as string
+                  // Submit immediately when option is selected
+                  handleAnswer(selectedOptionIndex.toString());
+                }}
               />
             ))}
             {/* Loading indicator */}
@@ -700,51 +721,54 @@ const Learn = () => {
         )}
       </div>
 
-
       {/* Input Area */}
       <div className="bg-white border-t border-secondary-200 p-4 relative">
         <CommandHelp
           isVisible={showCommandHelp}
           onClose={() => setShowCommandHelp(false)}
         />
-
-
         <div className="flex items-end space-x-3">
           <div className="flex-1 relative">
+            {/* Helper text for objective questions */}
+            {sessionState === "awaitingAnswer" &&
+              questionState.type === "objective" && (
+                <div className="text-xs text-secondary-500 mb-2 px-1">
+                  💡 For objective questions, please select an option above or
+                  use commands (type ! for help)
+                </div>
+              )}
+            {/* Single textarea for all states - MCQ options are handled in message bubbles */}
             <textarea
               ref={inputRef}
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={
-                currentQuizQuestion
-                  ? "Type your answer to the quiz question..."
-                  : "Ask a question, request help, or type ! for commands..."
-              }
+              onKeyPress={(e) => {
+                if (e.key === "Enter" && !isLoading) {
+                  // Allow Enter for continue actions even with empty input
+                  if (
+                    inputMessage.trim() ||
+                    sessionState === "waitingForUserAfterExplanation" ||
+                    sessionState === "waitingForUserAfterExample"
+                  ) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }
+              }}
+              placeholder={getPlaceholder()}
               className="w-full resize-none px-4 py-3 pr-12 border border-secondary-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 max-h-32"
               rows={1}
-              disabled={
-                (isLoading && !plan) ||
-                (sessionState === "revealing" && !plan) ||
-                sessionState === "planning" ||
-                sessionState === "preparingSubtopic"
-              }
             />
+            {/* Submit button */}
             <button
               onClick={() => handleSendMessage()}
-              disabled={
-                (isLoading && !plan) ||
-                (sessionState === "revealing" && !plan) ||
-                sessionState === "planning" ||
-                sessionState === "preparingSubtopic"
-              }
+              disabled={shouldDisableSubmit()}
               className="absolute right-2 bottom-2 p-2 bg-primary-600 hover:bg-primary-700 disabled:bg-secondary-300 disabled:cursor-not-allowed text-white rounded-full transition-colors duration-200"
             >
               <PaperAirplaneIcon className="w-4 h-4" />
             </button>
           </div>
         </div>
-
 
         {/* Quick suggestions */}
         {suggestions.length > 0 && messages.length > 0 && (
@@ -756,7 +780,7 @@ const Learn = () => {
               <SuggestionChip
                 key={index}
                 suggestion={suggestion}
-                onClick={handleSuggestionClick}
+                onClick={(suggestion) => handleSendMessage(suggestion)}
               />
             ))}
           </div>
@@ -766,10 +790,4 @@ const Learn = () => {
   );
 };
 
-
 export default Learn;
-
-
-
-
-

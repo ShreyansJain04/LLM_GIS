@@ -1,8 +1,236 @@
 {
-  "weak_areas": [],
-  "topic_mastery": {},
-  "history": [],
+  "weak_areas": [
+    "GIS coordinates - Introduction to GIS coordinates",
+    "GIS coordinates",
+    "GIS coordinates - Types of GIS coordinates",
+    "GIS coordinates - Practical application of GIS coordinates"
+  ],
+  "topic_mastery": {
+    "GIS coordinates": "beginner"
+  },
+  "history": [
+    {
+      "date": "2025-07-17T06:26:20.824470",
+      "topic": "GIS coordinates",
+      "subtopics_performance": [
+        {
+          "subtopic": "Introduction to GIS coordinates",
+          "question": "In the context of Geographic Information System (GIS), what is the method of transforming a geographic coordinate from its original Terrestrial Reference Frame (TRF) to a target TRF?",
+          "answer": "3",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-17T10:24:51.362Z",
+          "options": [
+            "By using the azimuths of the geodetic and grid coordinates.",
+            "By directly assigning the coordinate of the target TRF to the original TRF.",
+            "By finding the necessary shift in a coordinate through interpolation from known shifts for a number of control points in the same area.",
+            "By performing a mathematical operation on the original coordinate to generate a new one."
+          ],
+          "correct_option": 2,
+          "selected_option": 3,
+          "explanation": "The correct answer is based on the idea that it is possible to find the necessary shift in a coordinate to transform it from its original TRF to a target TRF by interpolation from known shifts for a number of control points in the same area. This approach allows for more accurate transformation between different coordinate systems."
+        },
+        {
+          "subtopic": "Types of GIS coordinates",
+          "question": "What types of information do different GIS coordinates represent?",
+          "answer": "1",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-17T10:25:15.999Z",
+          "options": [
+            "Only distances",
+            "Neither distances nor angles",
+            "Distances, angles, or a combination of both",
+            "Only angles"
+          ],
+          "correct_option": 2,
+          "selected_option": 1,
+          "explanation": "According to the context, there are coordinates that represent all distances (like Cartesian coordinates), coordinates that represent all angles (like latitude and longitude), and coordinates that represent both an angle and a distance (like polar coordinates)."
+        },
+        {
+          "subtopic": "Reading and interpreting GIS coordinates",
+          "question": "What are the key elements necessary for interpreting GIS coordinates?",
+          "answer": "1",
+          "correct": true,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-17T10:25:45.205Z",
+          "options": [
+            "Datum, coordinate system, and understanding of polar coordinates.",
+            "Datum, coordinate system, and understanding of geometry.",
+            "Datum, coordinate system, and understanding of the Public Land Surveying System.",
+            "Datum, coordinate system, and knowledge of cartography. "
+          ],
+          "correct_option": 1,
+          "selected_option": 1,
+          "explanation": "The context mentions that understanding GIS coordinates requires knowledge of the datum (which provides a framework for the coordinates), the coordinate system (which could be Cartesian, polar, etc.), and an understanding of geometry (as points, lines, and polygons form the geometry of these systems). While knowledge of cartography, polar coordinates, or the Public Land Surveying System may be beneficial, they are not highlighted as key elements for interpreting GIS coordinates in the provided context."
+        },
+        {
+          "subtopic": "Practical application of GIS coordinates",
+          "question": "How does a bilinear interpolation algorithm assist in the practical application of GIS coordinates?",
+          "answer": "2",
+          "correct": false,
+          "question_type": "objective",
+          "difficulty": "medium",
+          "timestamp": "2025-07-17T10:26:19.196Z",
+          "options": [
+            "It identifies the best possible mapping solution for any given problem.",
+            "It eliminates all distortions in the coordinate system.",
+            "It simplifies the transformation from Cartesian to geographic coordinates.",
+            "It helps to derive the necessary shift for a geographic coordinate from its original TRF to a target TRF using control points in the same area."
+          ],
+          "correct_option": 3,
+          "selected_option": 2,
+          "explanation": "The bilinear interpolation algorithm is used in the transformation of a coordinate from its original Terrestrial Reference Frame (TRF) to a target TRF. This is done by interpolating from known shifts for a number of control points in the same area, which allows the necessary shift for the given point to be derived."
+        }
+      ],
+      "final_score": 0.25,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 4,
+        "objective_correct": 1,
+        "subjective_questions": 0,
+        "subjective_correct": 0,
+        "average_objective_score": 0.25,
+        "average_subjective_score": 0,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 4,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    },
+    {
+      "date": "2025-07-17T06:26:20.865936",
+      "topic": "GIS coordinates",
+      "subtopics_performance": [
+        {
+          "subtopic": "Introduction to GIS coordinates",
+          "question": "In the context of Geographic Information System (GIS), what is the method of transforming a geographic coordinate from its original Terrestrial Reference Frame (TRF) to a target TRF?",
+          "user_answer": "3",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Types of GIS coordinates",
+          "question": "What types of information do different GIS coordinates represent?",
+          "user_answer": "1",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Reading and interpreting GIS coordinates",
+          "question": "What are the key elements necessary for interpreting GIS coordinates?",
+          "user_answer": "1",
+          "correct": true,
+          "score": 1,
+          "feedback": ""
+        },
+        {
+          "subtopic": "Practical application of GIS coordinates",
+          "question": "How does a bilinear interpolation algorithm assist in the practical application of GIS coordinates?",
+          "user_answer": "2",
+          "correct": false,
+          "score": 0,
+          "feedback": ""
+        }
+      ],
+      "final_score": 0.25,
+      "mastery_level": "beginner",
+      "session_stats": {
+        "objective_questions": 0,
+        "objective_correct": 0,
+        "subjective_questions": 4,
+        "subjective_correct": 1,
+        "average_objective_score": 0,
+        "average_subjective_score": 0.25,
+        "questions_by_difficulty": {
+          "easy": {
+            "total": 0,
+            "correct": 0
+          },
+          "medium": {
+            "total": 4,
+            "correct": 1
+          },
+          "hard": {
+            "total": 0,
+            "correct": 0
+          }
+        }
+      }
+    }
+  ],
   "learning_plan": {},
-  "performance_data": {},
-  "last_active": "2025-07-10T18:21:41.652037"
+  "performance_data": {
+    "GIS coordinates": {
+      "attempts": 2,
+      "average_score": 0.25,
+      "subtopic_scores": {
+        "Introduction to GIS coordinates": [
+          0,
+          0
+        ],
+        "Types of GIS coordinates": [
+          0,
+          0
+        ],
+        "Reading and interpreting GIS coordinates": [
+          1,
+          1
+        ],
+        "Practical application of GIS coordinates": [
+          0,
+          0
+        ]
+      },
+      "question_type_performance": {
+        "objective": {
+          "total": 4,
+          "correct": 1,
+          "trend": [
+            0.25
+          ]
+        },
+        "subjective": {
+          "total": 4,
+          "correct": 1,
+          "trend": [
+            0.25
+          ]
+        }
+      },
+      "difficulty_performance": {
+        "easy": {
+          "total": 0,
+          "correct": 0
+        },
+        "medium": {
+          "total": 8,
+          "correct": 2
+        },
+        "hard": {
+          "total": 0,
+          "correct": 0
+        }
+      },
+      "common_mistakes": [],
+      "last_attempt": "2025-07-17T06:26:20.865936",
+      "improvement_rate": 0.0
+    }
+  },
+  "last_active": "2025-07-17T06:26:20.865936"
 }

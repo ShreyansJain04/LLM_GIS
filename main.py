@@ -260,10 +260,11 @@ def _adaptive_review_session(agent: PlannerAgent, focus_areas: List[Dict]):
         # Auto-create flashcard for correct answers at medium+ difficulty
         if correct and difficulty_level in ["medium", "hard"]:
             from flashcards import auto_create_flashcard_from_review
+            # print("DEBUG: Auto-creating flashcard", agent.username, type(agent.username), "\n", topic, type(topic), "\n", str(question), type(str(question)), "\n", feedback.split('\n')[0] if '\n' in feedback else feedback, type(feedback.split('\n')[0] if '\n' in feedback else feedback), "\n", difficulty_level, type(difficulty_level))
             auto_create_flashcard_from_review(
                 agent.username, 
                 topic, 
-                str(question),
+                str(question['text'] if isinstance(question, dict) and 'text' in question else question),
                 feedback.split('\n')[0] if '\n' in feedback else feedback,
                 difficulty_level
             )

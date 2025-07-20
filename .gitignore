@@ -47,3 +47,9 @@ env/
 # OS
 .DS_Store
 Thumbs.db 
+
+memory.py
+llm_providers.py
+requirements.txt
+user_data/
+flashcards_Ha.json
